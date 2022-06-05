@@ -1,0 +1,8 @@
+network: auto
+log-destination: console
+metrics-enabled: true
+metrics-host-allowlist: "*"
+metrics-interface: "0.0.0.0"
+metrics-port: "8008"
+validator-keys: "/opt/charon/keys:/opt/charon/keys"
+validators-graffiti: "Obol Distributed Validator"
