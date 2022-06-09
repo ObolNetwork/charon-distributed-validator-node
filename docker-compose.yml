@@ -8,18 +8,16 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
   charon:
     # Pegged charon version (update this for each release).
-    image: ghcr.io/obolnetwork/charon:v0.5.0
+    image: ghcr.io/obolnetwork/charon:latest
     entrypoint: "${COMPOSE_ENTRYPOINT:-/usr/local/bin/charon}"
     command: "${COMPOSE_COMMAND:-run}"
     env_file: .env
     networks: [dvnode]
-    environment:
-      - CHARON_P2P_BOOTNODES: "${BOOTNODE}"
-      - CHARON_BEACON_NODE_ENDPOINT: "${BEACON_NODE}"
     ports:
       - "16002:16002"
     volumes:
-      - ./charon:/opt/charon/.charon/
+      - ./charon/cluster-lock.json:/opt/charon/.charon/cluster-lock.json
+      - ./charon:/opt/charon/.charon/data
 
   #             _ _     _       _                 
   # __   ____ _| (_) __| | __ _| |_ ___  _ __ 
@@ -73,9 +71,3 @@ services:
 
 networks:
   dvnode:
-
-# mv charon-docker-compose/ /tmp/
-# cd /tmp
-# chmod -R a+rwX charon-docker-compose/
-# cd charon-docker-compose
-# make split-existing-keys

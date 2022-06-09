@@ -1,0 +1,11 @@
+global:
+  scrape_interval:     12s # Set the scrape interval to every 12 seconds. Default is every 1 minute.
+  evaluation_interval: 12s # Evaluate rules every 12 seconds. The default is every 1 minute.
+  
+scrape_configs:
+  - job_name: 'charon'
+    static_configs:
+      - targets: ['charon:16001']
+  - job_name: 'teku'
+    static_configs:
+      - targets: ['teku:8008']   
