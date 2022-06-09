@@ -13,11 +13,10 @@ services:
     command: "${COMPOSE_COMMAND:-run}"
     env_file: .env
     networks: [dvnode]
-    ports:
-      - "16002:16002"
+    ports: ["16002:16002"]
     volumes:
-      - ./charon/cluster-lock.json:/opt/charon/.charon/cluster-lock.json
-      - ./charon:/opt/charon/.charon/data
+      - "./charon/cluster-lock.json:/opt/charon/.charon/cluster-lock.json"
+      - "./charon:/opt/charon/.charon/data"
 
   #             _ _     _       _                 
   # __   ____ _| (_) __| | __ _| |_ ___  _ __ 
