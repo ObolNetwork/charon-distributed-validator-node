@@ -20,7 +20,16 @@ cd charon-distributed-validator-node
 # Prepare an environment variable file (requires at minimum an Infura API endpoint for your chosen chain)
 cp .env.sample .env
 
-# Replace DATA_DIR environment variable in .env with the location of your cluster-lock.json, charon-enr-private-key and validator_keys
+# Create your charon ENR private key, this will create charon-enr-private-key in .charon directory
+docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:latest create enr
+
+# Set ENRs of all the operators participating in DKG ceremony in .env file corresponding to CHARON_OPERATOR_ENRS
+
+# Create .charon/cluster-definition.json to participate in DKG ceremony
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env ghcr.io/obolnetwork/charon:latest create dkg
+
+# Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
+docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:latest dkg
 
 # Spin up a Distributed Validator Node with a Validator Client
 docker-compose up
