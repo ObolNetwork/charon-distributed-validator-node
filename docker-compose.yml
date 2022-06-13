@@ -14,9 +14,7 @@ services:
     env_file: .env
     networks: [dvnode]
     ports: ["16002:16002"]
-    volumes:
-      - "./charon/cluster-lock.json:/opt/charon/.charon/cluster-lock.json"
-      - "./charon:/opt/charon/.charon/data"
+    volumes: ["${DATA_DIR}:/opt/charon/.charon"]
 
   #             _ _     _       _                 
   # __   ____ _| (_) __| | __ _| |_ ___  _ __ 
@@ -33,8 +31,8 @@ services:
       --beacon-node-api-endpoint="http://charon:16002"
       --config-file "/opt/charon/teku/teku-config.yaml"
     volumes:
-      - ./keys:/opt/charon/keys
-      - ./teku:/opt/charon/teku
+      - "${DATA_DIR}/validator_keys:/opt/charon/validator_keys"
+      - "./teku:/opt/charon/teku"
 
   #                        _ _             _             
   #  _ __ ___   ___  _ __ (_) |_ ___  _ __(_)_ __   __ _ 
