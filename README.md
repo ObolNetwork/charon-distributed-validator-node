@@ -41,7 +41,7 @@ docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:latest dkg
 docker-compose up
 
 # Open Grafana dashboard
-open http://localhost:3000/d/laEp8vupp
+open http://localhost:3000/d/singlenode/
 
 # Open Jaeger dashboard
 open http://localhost:16686
@@ -56,3 +56,11 @@ docker-compose down
 It is still early days for the Obol Network and everything is under active development. 
 It is NOT ready for mainnet. 
 Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supported-consensus-layer-clients) is the latest on charon's supported clients and duties.
+
+## Bugs, Logs and Gotchas
+
+The following are some common issues that arise using this repo and how to fix them.
+
+    Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.
+
+ - Delete the file(s) ending with `.lock` in the folder `.charon/validator_keys`. Caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
