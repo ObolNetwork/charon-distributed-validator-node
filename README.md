@@ -1,10 +1,16 @@
 ![Obol Logo](https://obol.tech/obolnetwork.png)
 
-<h1 align="center">Distributed Validator Charon Node with Docker Compose</h1>
+<h1 align="center">Charon Distributed Validator Node</h1>
 
-This repo contains a [charon](https://github.com/ObolNetwork/charon) distributed validator node running using [docker-compose](https://docs.docker.com/compose/).
+This repo contains the [docker-compose](https://docs.docker.com/compose/) files needed to run one node in a [charon](https://github.com/ObolNetwork/charon) [Distributed Validator Cluster](https://docs.obol.tech/docs/int/key-concepts#distributed-validator-cluster). 
 
-This repo aims to give users ability to participate in a [Distributed Validator Cluster](https://docs.obol.tech/docs/int/key-concepts#distributed-validator-cluster) by spinning up a charon node with a Validator Client.
+A distributed validator node is a machine running:
+- An Ethereum Execution client
+- An Ethereum Consensus client
+- An Ethereum Distributed Validator client
+- An Ethereum Validator client
+
+![Distributed Validator Node](DVNode.png)
 
 ## Quickstart
 
