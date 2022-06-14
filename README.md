@@ -64,3 +64,11 @@ The following are some common issues that arise using this repo and how to fix t
     Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.
 
  - Delete the file(s) ending with `.lock` in the folder `.charon/validator_keys`. Caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
+
+Grafana Dashboard isn't loading any data
+
+- Sometimes the grafana dashboard doesn't load any data first time around. 
+- Click the Wheel Icon > Datasources
+- Click prometheus
+- Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
+- Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page. 
