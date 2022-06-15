@@ -41,7 +41,7 @@ docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:latest dkg
 docker-compose up
 
 # Open Grafana dashboard
-open http://localhost:3000/d/laEp8vupp
+open http://localhost:3000/d/singlenode/
 
 # Open Jaeger dashboard
 open http://localhost:16686
@@ -56,3 +56,21 @@ docker-compose down
 It is still early days for the Obol Network and everything is under active development. 
 It is NOT ready for mainnet. 
 Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supported-consensus-layer-clients) is the latest on charon's supported clients and duties.
+
+## Bugs, Logs and Gotchas
+
+The following are some common issues that arise using this repo and how to fix them.
+
+### Teku doesn't start due to a locked private key
+
+    Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.
+
+- Delete the file(s) ending with `.lock` in the folder `.charon/validator_keys`. Caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
+
+### Grafana doesn't load any data
+
+- Sometimes the grafana dashboard doesn't load any data first time around. 
+- Click the Wheel Icon > Datasources
+- Click prometheus
+- Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
+- Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page. 

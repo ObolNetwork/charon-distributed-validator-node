@@ -8,12 +8,12 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
   charon:
     # Pegged charon version (update this for each release).
-    image: ghcr.io/obolnetwork/charon:latest
+    image: ghcr.io/obolnetwork/charon:d06625f
     entrypoint: "${COMPOSE_ENTRYPOINT:-/usr/local/bin/charon}"
     command: "${COMPOSE_COMMAND:-run}"
     env_file: .env
     networks: [dvnode]
-    ports: ["16002:16002"]
+    ports: ["16001:16001"]
     volumes: ["${DATA_DIR}:/opt/charon/.charon"]
 
   #             _ _     _       _                 
@@ -26,6 +26,7 @@ services:
     networks: [dvnode]
     depends_on: [charon]
     restart: on-failure
+    ports: ["8008:8008"]
     command: |
       validator-client
       --beacon-node-api-endpoint="http://charon:16002"

@@ -1,1 +1,4 @@
 .env
+.charon
+charon-enr-private-key
+.DS_Store
