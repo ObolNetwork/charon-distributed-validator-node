@@ -5,7 +5,7 @@ global:
 scrape_configs:
   - job_name: 'charon'
     static_configs:
-      - targets: ['charon:16001']
+      - targets: ['charon:3620']
   - job_name: 'teku'
     static_configs:
       - targets: ['teku:8008']   

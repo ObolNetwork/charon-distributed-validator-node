@@ -8,7 +8,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
   charon:
     # Pegged charon version (update this for each release).
-    image: ghcr.io/obolnetwork/charon:d06625f
+    image: ghcr.io/obolnetwork/charon:v0.7.0
     entrypoint: "${COMPOSE_ENTRYPOINT:-/usr/local/bin/charon}"
     command: "${COMPOSE_COMMAND:-run}"
     env_file: .env
