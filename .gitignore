@@ -1,4 +1,8 @@
 .env
-.charon
 charon-enr-private-key
+validator_keys/
+keystore-*
+deposit-data.json
+cluster-definition.json
+cluster-lock.json
 .DS_Store
