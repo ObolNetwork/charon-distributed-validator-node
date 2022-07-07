@@ -33,7 +33,7 @@ git clone git@github.com:ObolNetwork/charon-distributed-validator-node.git
 cd charon-distributed-validator-node
 
 # Create your charon ENR private key, this will create a charon-enr-private-key file in the .charon directory
-docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.7.0 create enr
+docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.0 create enr
 ```
 
 You should expect to see a console output like
@@ -58,7 +58,7 @@ cp .env.sample .env
 # Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
 
 # Prepare a DKG configuration file by running the following
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env ghcr.io/obolnetwork/charon:v0.7.0 create dkg
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env ghcr.io/obolnetwork/charon:v0.8.0 create dkg
 
 ```
 
@@ -70,7 +70,7 @@ After receiving the `cluster-definition.json` file created by the leader, it sho
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
-docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.7.0 dkg
+docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.0 dkg
 
 ```
 
