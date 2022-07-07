@@ -8,13 +8,10 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
   charon:
     # Pegged charon version (update this for each release).
-    image: ghcr.io/obolnetwork/charon:v0.7.0
-    entrypoint: "${COMPOSE_ENTRYPOINT:-/usr/local/bin/charon}"
-    command: "${COMPOSE_COMMAND:-run}"
+    image: ghcr.io/obolnetwork/charon:v0.8.0
     env_file: .env
     networks: [dvnode]
-    ports: ["16001:16001"]
-    volumes: ["${DATA_DIR}:/opt/charon/.charon"]
+    volumes: [".charon:/opt/charon/.charon"]
 
   #             _ _     _       _                 
   # __   ____ _| (_) __| | __ _| |_ ___  _ __ 
@@ -29,10 +26,10 @@ services:
     ports: ["8008:8008"]
     command: |
       validator-client
-      --beacon-node-api-endpoint="http://charon:16002"
+      --beacon-node-api-endpoint="http://charon:3600"
       --config-file "/opt/charon/teku/teku-config.yaml"
     volumes:
-      - "${DATA_DIR}/validator_keys:/opt/charon/validator_keys"
+      - ".charon/validator_keys:/opt/charon/validator_keys"
       - "./teku:/opt/charon/teku"
 
   #                        _ _             _             
