@@ -19,7 +19,7 @@ services:
   #  \ V / (_| | | | (_| | (_| | || (_) | |  
   #   \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|
   teku:
-    image: consensys/teku:22.5.0
+    image: consensys/teku:${TEKU_VERSION}
     networks: [dvnode]
     depends_on: [charon]
     restart: on-failure
