@@ -27,7 +27,7 @@ The first step of running a cluster is preparing for a distributed key generatio
 
 ```sh
 # Clone this repo
-git clone git@github.com:ObolNetwork/charon-distributed-validator-node.git
+git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 # Change directory
 cd charon-distributed-validator-node
