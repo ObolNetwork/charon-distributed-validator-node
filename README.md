@@ -41,7 +41,8 @@ You should expect to see a console output like
     Created ENR private key: .charon/charon-enr-private-key
     enr:-JG4QGQpV4qYe32QFUAbY1UyGNtNcrVMip83cvJRhw1brMslPeyELIz3q6dsZ7GblVaCjL_8FKQhF6Syg-O_kIWztimGAYHY5EvPgmlkgnY0gmlwhH8AAAGJc2VjcDI1NmsxoQKzMe_GFPpSqtnYl-mJr8uZAUtmkqccsAx7ojGmFy-FY4N0Y3CCDhqDdWRwgg4u
 
-Please make sure to make a backup of the private key at `.charon/charon-enr-private-key`. Be careful not to commit it to git! If you lose this file you won't be able to take part in the DKG ceremony.
+## ⚠️ Attention
+Please make sure to create a backup of the private key at `.charon/charon-enr-private-key`. Be careful not to commit it to git! **If you lose this file you won't be able to take part in the DKG ceremony.**
 
 If you are taking part in an organised Obol testnet, submit the created ENR public address (the console output starting with `enr:-...` not the contents of the private key file) to the appropriate typeform.
 
@@ -157,3 +158,19 @@ This can be generally be fixed with some of the following:
 - Changing the permissions of the `.charon` folder with the commands:
   - `mkdir .charon` (if it doesn't already exist)
   - `sudo chmod -R 666 .charon`
+
+### FAQs:
+1. How do I get my ENR if I want to generate it again? 
+   1. `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
+   2. Run  `docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 enr`. This prints the ENR on your screen.
+   3. **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
+
+2. What do I do if lose my `charon-enr-private-key`?
+    1. Honestly, nothing much can be done.
+    2. Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
+
+3. I have run the command in `Step 1` but I can't find the keys anywhere.
+    1. The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
+    2. To view it, run `ls -al` in your terminal.
+    3. You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
+    4. Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
