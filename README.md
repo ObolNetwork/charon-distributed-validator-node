@@ -130,47 +130,41 @@ It is still early days for the Obol Network and everything is under active devel
 It is NOT ready for mainnet.
 Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supported-consensus-layer-clients) is the latest on charon's supported clients and duties.
 
-## Bugs, Logs and Gotchas
-
-The following are some common issues that arise using this repo and how to fix them.
-
-### Teku doesn't start due to a locked private key
-
-    Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.
-
-- Delete the file(s) ending with `.lock` in the folder `.charon/validator_keys`. Caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
-
-### Grafana doesn't load any data
-
-- Sometimes the grafana dashboard doesn't load any data first time around.
-- Click the Wheel Icon > Datasources
-- Click prometheus
-- Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
-- Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
-
-### Permission denied errors
-
-Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems. In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
-
-This can be generally be fixed with some of the following:
-
-- Running docker commands with `sudo`, if you haven't [setup docker to be run as a non-root](https://docs.docker.com/engine/install/linux-postinstall/) user.
-- Changing the permissions of the `.charon` folder with the commands:
-  - `mkdir .charon` (if it doesn't already exist)
-  - `sudo chmod -R 666 .charon`
-
-### FAQs:
+# FAQs:
 1. How do I get my ENR if I want to generate it again? 
-   1. `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   2. Run  `docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 enr`. This prints the ENR on your screen.
-   3. **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
+   - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
+   - Run  `docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 enr`. This prints the ENR on your screen.
+   - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 2. What do I do if lose my `charon-enr-private-key`?
-    1. Honestly, nothing much can be done.
-    2. Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
+    - For now, ENR rotation/replacement is not supported, it will be supported in a future release.
+    - Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
 
 3. I have run the command in `Step 1` but I can't find the keys anywhere.
-    1. The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
-    2. To view it, run `ls -al` in your terminal.
-    3. You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
-    4. Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
+    - The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
+    - To view it, run `ls -al` in your terminal.
+    - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
+    - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
+
+4. Why does Teku throw a keystore file error?
+    - Teku sometimes logs an error which looks like:
+     `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
+    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`. 
+    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
+
+5. How to fix the grafana dashboard?
+    - Sometimes, grafana dashboard doesn't load any data first time around
+    - You can solve this by following the steps below:
+        - Click the Wheel Icon > Datasources
+        - Click prometheus
+        - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
+        - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
+
+6. How to fix `permission denied` errors?
+    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems. 
+    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
+    - This can be generally be fixed with some of the following:
+        - Running docker commands with `sudo`, if you haven't [setup docker to be run as a non-root](https://docs.docker.com/engine/install/linux-postinstall/) user.
+        - Changing the permissions of the `.charon` folder with the commands:
+            - `mkdir .charon` (if it doesn't already exist)
+            - `sudo chmod -R 666 .charon`
