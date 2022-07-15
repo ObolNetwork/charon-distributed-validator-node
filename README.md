@@ -48,7 +48,7 @@ If you are taking part in an organised Obol testnet, submit the created ENR publ
 
 ## Step 2. Leader creates the DKG configuration file and distributes it to everyone else
 
-One person, in the cluster or otherwise, will prepare the configuration file for the distributed key generation ceremony using the `charon create dkg` command. For the official Obol testnets, this step will be completed by an Obol core team member and the definition file will be distributed to the testnet team for DKG completion. 
+One person, in the cluster or otherwise, will prepare the configuration file for the distributed key generation ceremony using the `charon create dkg` command. For the official Obol testnets, this step will be completed by an Obol core team member and the definition file will be distributed to the testnet team for DKG completion.
 
 In future, step 1 and step 2 of this guide will use the [Obol Distributed Validator Launchpad](https://docs.obol.tech/docs/dvk/distributed_validator_launchpad) to facilitate and verify these files are created in an authenticated manner.
 
@@ -67,7 +67,7 @@ This command should output a file at `.charon/cluster-definition.json`. This fil
 
 ## Step 3. Run the DKG
 
-After receiving the `cluster-definition.json` file created by the leader, it should ideally be saved in the `.charon/` folder that was created during step 1, alternatively, the `--definition-file` flag can override the default expected location for this file. 
+After receiving the `cluster-definition.json` file created by the leader, cluster members should ideally save it in the `.charon/` folder that was created during step 1, alternatively the `--definition-file` flag can override the default expected location for this file. Every cluster member then participates in the DKG ceremony:
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
@@ -81,7 +81,9 @@ Assuming the DKG is successful, a number of artefacts will be created in the `.c
 - A `cluster-lock.json` file. This contains the information needed by charon to operate the distributed validator cluster with its peers. 
 - A `validator_keys/` folder. This folder contains the private key shares and passwords for the created distributed validators.
 
-At this point you should make a backup of the `.charon/validator_keys` folder.  Replacing lost private keys is not straightforward at this point in charon's development. The `cluster-lock` and `deposit-data` files are identical for each operator and can be copied if lost. 
+At this point you should make a backup of the `.charon/validator_keys` folder as replacing lost private keys is not straightforward at this point in charon's development. The `cluster-lock` and `deposit-data` files are identical for each operator and can be copied if lost.
+
+If taking part in the official Athena testnet, one cluster member will have to submit the `cluster-lock` and `deposit-data` files to the Obol Team, setting the stage for activation.
 
 ## Step 4. Start the Distributed Validator Cluster
 
