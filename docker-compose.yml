@@ -59,11 +59,17 @@ services:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
 
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    networks: [dvnode]
+
   jaeger:
     image: jaegertracing/all-in-one:latest
-    networks: [dvnode]
     ports:
       - "16686:16686"
+    networks: [dvnode]
 
 networks:
   dvnode:
