@@ -67,12 +67,13 @@ This command should output a file at `.charon/cluster-definition.json`. This fil
 
 ## Step 3. Run the DKG
 
-After receiving the `cluster-definition.json` file created by the leader, cluster members should ideally save it in the `.charon/` folder that was created during step 1, alternatively the `--definition-file` flag can override the default expected location for this file. Every cluster member then participates in the DKG ceremony:
+After receiving the `cluster-definition.json` file created by the leader, cluster members should ideally save it in the `.charon/` folder that was created during step 1, alternatively the `--definition-file` flag can override the default expected location for this file. 
+
+Every cluster member then participates in the DKG ceremony. For Charon v1, this needs to happen synchronously between participants at an agreed time.
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
 docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 dkg
-
 ```
 
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
