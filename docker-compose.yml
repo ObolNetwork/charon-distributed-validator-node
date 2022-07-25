@@ -14,10 +14,23 @@ services:
       - 30303:30303/tcp
       - 30303:30303/udp
       - 8545:8545
-    command: --goerli --http --http.port=8545 --http.addr=0.0.0.0 --http.vhosts="*" --allow-insecure-unlock --http.api="db,eth,net,engine,rpc,web3,personal"
+      - 8551:8551/tcp
+      - 8551:8551/udp
+    command: |  
+      --goerli
+      --http
+      --http.addr=0.0.0.0
+      --http.port=8545
+      --http.vhosts="*"
+      --http.api="db,eth,net,engine,rpc,web3"
+      --authrpc.jwtsecret="/root/jwt/jwt.hex"
+      --authrpc.addr=0.0.0.0
+      --authrpc.port=8551
+      --authrpc.vhosts="*"
     networks: [dvnode]
     volumes:
       - ./data/geth:/root/.ethereum
+      - ./jwt:/root/jwt
     restart: on-failure
 
   #  _ _       _     _   _
@@ -38,13 +51,15 @@ services:
     command: |
       lighthouse bn
       --network=goerli
-      --eth1=http://geth:8545
+      --execution-endpoint=http://geth:8551
+      --execution-jwt=/opt/jwt/jwt.hex
       --http
       --http-address=0.0.0.0
       --http-port=5052
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
+      - ./jwt:/opt/jwt
     restart: on-failure
 
   #       _
