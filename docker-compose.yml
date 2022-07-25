@@ -14,7 +14,7 @@ services:
       - 30303:30303/tcp
       - 30303:30303/udp
       - 8545:8545
-    command: --goerli --http --http.port=${GETH_PORT} --http.addr=0.0.0.0 --http.vhosts="*" --allow-insecure-unlock --http.api="db,eth,net,engine,rpc,web3,personal"
+    command: --goerli --http --http.port=8545 --http.addr=0.0.0.0 --http.vhosts="*" --allow-insecure-unlock --http.api="db,eth,net,engine,rpc,web3,personal"
     networks: [dvnode]
     volumes:
       - ./data/geth:/root/.ethereum
@@ -37,7 +37,7 @@ services:
       - 5052:5052
     command: |
       lighthouse bn
-      --network=${ETH2_NETWORK}
+      --network=goerli
       --eth1=http://geth:8545
       --http
       --http-address=0.0.0.0
