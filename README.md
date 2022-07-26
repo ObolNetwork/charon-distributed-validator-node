@@ -127,7 +127,7 @@ If you have gotten this far through the process, and whether you succeed or fail
 
 ## Step 6. Add Central Monitoring Token
 
-You will be provided a Central Monitoring Token which will be used to push distributed validator metrics to central prometheus service so that we would be able to analyse and improve upon. The token needs to be added in prometheus/prometheus.yml replacing `$PROM_REMOTE_WRITE_TOKEN`. The token will look like:
+You will be provided with a Central Monitoring Token used to push distributed validator metrics to our central prometheus service to monitor, analyze and improve your cluster's performance. The token needs to be added in prometheus/prometheus.yml replacing `$PROM_REMOTE_WRITE_TOKEN`. The token will look like:
 `eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ`. Final prometheus/prometheus.yml would look something like:
 ```
 global:
