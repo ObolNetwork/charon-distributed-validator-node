@@ -33,7 +33,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 cd charon-distributed-validator-node
 
 # Create your charon ENR private key, this will create a charon-enr-private-key file in the .charon directory
-docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 create enr
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 create enr
 ```
 
 You should expect to see a console output like
@@ -59,7 +59,7 @@ cp .env.sample .env
 # Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
 
 # Prepare a DKG configuration file by running the following
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env ghcr.io/obolnetwork/charon:v0.8.1 create dkg
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg
 
 ```
 
@@ -73,7 +73,7 @@ Every cluster member then participates in the DKG ceremony. For Charon v1, this 
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
-docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 dkg
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 dkg --p2p-bootnode-relay
 ```
 
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
@@ -163,7 +163,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 # FAQs:
 1. How do I get my ENR if I want to generate it again? 
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   - Run  `docker run --rm -v "$(pwd):/opt/charon" ghcr.io/obolnetwork/charon:v0.8.1 enr`. This prints the ENR on your screen.
+   - Run  `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 2. What do I do if lose my `charon-enr-private-key`?
