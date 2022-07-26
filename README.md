@@ -125,6 +125,33 @@ This process can take a minimum of 16 hours, with the maximum time to activation
 
 If you have gotten this far through the process, and whether you succeed or fail at running the distributed validator successfully on the testnet, we would like to hear your feedback on the process and where you encountered difficulties. Please open issues in either this repo if the problem is deployment related, or the [charon](https://github.com/ObolNetwork/charon) repo if the issue is directly related to the client. 
 
+## Step 6. Add Central Monitoring Token
+
+You will be provided with a Central Monitoring Token used to push distributed validator metrics to our central prometheus service to monitor, analyze and improve your cluster's performance. The token needs to be added in prometheus/prometheus.yml replacing `$PROM_REMOTE_WRITE_TOKEN`. The token will look like:
+`eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ`. Final prometheus/prometheus.yml would look something like:
+```
+global:
+  scrape_interval:     12s # Set the scrape interval to every 12 seconds. Default is every 1 minute.
+  evaluation_interval: 12s # Evaluate rules every 12 seconds. The default is every 1 minute.
+
+remote_write:
+  - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
+    authorization:
+      credentials: 436764:eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ
+    name: obol-prom
+  
+scrape_configs:
+  - job_name: 'charon'
+    static_configs:
+      - targets: ['charon:3620']
+  - job_name: 'teku'
+    static_configs:
+      - targets: ['teku:8008']   
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']   
+```
+
 Thanks for trying our quickstart guide!
 
 # Project Status
