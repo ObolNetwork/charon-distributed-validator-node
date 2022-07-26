@@ -1,6 +1,12 @@
 global:
   scrape_interval:     12s # Set the scrape interval to every 12 seconds. Default is every 1 minute.
   evaluation_interval: 12s # Evaluate rules every 12 seconds. The default is every 1 minute.
+
+remote_write:
+  - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
+    authorization:
+      credentials: 436764:$PROM_REMOTE_WRITE_TOKEN
+    name: obol-prom
   
 scrape_configs:
   - job_name: 'charon'
