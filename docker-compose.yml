@@ -9,14 +9,14 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:v1.10.20
+    image: ethereum/client-go:v1.10.21
     ports:
       - 30303:30303/tcp
       - 30303:30303/udp
       - 8545:8545
       - 8551:8551/tcp
       - 8551:8551/udp
-    command: |  
+    command: |
       --goerli
       --http
       --http.addr=0.0.0.0
@@ -51,6 +51,7 @@ services:
     command: |
       lighthouse bn
       --network=goerli
+      --purge-db
       --checkpoint-sync-url=https://goerli.checkpoint-sync.ethdevops.io
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
@@ -72,7 +73,7 @@ services:
   charon:
     # Pegged charon version (update this for each release).
     # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:v0.8.1
+    image: ghcr.io/obolnetwork/charon:a6685ec
     depends_on:
       - lighthouse
     env_file: .env
