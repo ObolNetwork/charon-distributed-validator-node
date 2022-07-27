@@ -93,11 +93,8 @@ With the DKG ceremony over, the last phase before activation is to prepare your 
 Before completing these instructions, you should assign a static local IP address to your device (extending the DHCP reservation indefinitely or removing the device from the DCHP pool entirely if you prefer), and port forward the TCP protocol on the public port `:3610` on your router to your device's local IP address on the same port. This step is different for every person's home internet, and can be complicated by the presence of dynamic public IP addresses. We are currently working on making this as easy as possible, but for the time being, a distributed validator cluster isn't going to work very resiliently if all charon nodes cannot talk directly to one another and instead need to have an intermediary node forwarding traffic to them. 
 
 ```
-# Prepare an environment variable file
-cp .env.sample .env
-
 # Delete lighthouse data if it exists
-rm -r data/lighthouse
+rm -r ./data/lighthouse
 
 # Spin up a Distributed Validator Node with a Validator Client
 docker-compose up
