@@ -96,6 +96,9 @@ Before completing these instructions, you should assign a static local IP addres
 # Prepare an environment variable file
 cp .env.sample .env
 
+# Delete lighthouse data if it exists
+rm -r data/lighthouse
+
 # Spin up a Distributed Validator Node with a Validator Client
 docker-compose up
 
@@ -198,3 +201,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
         - Changing the permissions of the `.charon` folder with the commands:
             - `mkdir .charon` (if it doesn't already exist)
             - `sudo chmod -R 666 .charon`
+
+7. I see a lot of errors after running `docker-compose up`.
+    - It's because both `geth` and `lighthouse` starts syncing and so there's connectivity issues among the containers.
+    - Let the containers for a while until geth finishes syncing. You won't have that many errors thereafter.
