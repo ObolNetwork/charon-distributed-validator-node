@@ -6,3 +6,4 @@ deposit-data.json
 cluster-definition.json
 cluster-lock.json
 .DS_Store
+data/
