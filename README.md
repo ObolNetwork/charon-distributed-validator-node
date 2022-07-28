@@ -58,11 +58,11 @@ cp .env.sample .env
 
 # Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
 
-# Set fee recipient address and withdrawal address when running create dkg
-# Prepare a DKG configuration file by running the following
-obolnetwork/charon:v0.9.0 create dkg --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
+# Set FEE_RECIPIENT_ADDRESS and WITHDRAWAL_ADDRESS to ETH1 addresses of your choice.
+# NAME can be any random string like "Obol Team"
+obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
 
-```
+# The above command prepares a DKG configuration file.
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster. 
 
@@ -201,5 +201,5 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
             - `sudo chmod -R 666 .charon`
 
 7. I see a lot of errors after running `docker-compose up`.
-    - It's because both `geth` and `lighthouse` starts syncing and so there's connectivity issues among the containers.
-    - Let the containers for a while until geth finishes syncing. You won't have that many errors thereafter.
+    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
