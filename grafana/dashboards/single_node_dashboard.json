@@ -387,20 +387,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "semi-dark-red",
+                "color": "green",
                 "value": null
               },
               {
-                "color": "semi-dark-orange",
-                "value": 1
-              },
-              {
-                "color": "semi-dark-yellow",
-                "value": 2
-              },
-              {
-                "color": "semi-dark-green",
-                "value": 3
+                "color": "red",
+                "value": 80
               }
             ]
           }
