@@ -58,8 +58,9 @@ cp .env.sample .env
 
 # Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
 
+# Set fee recipient address and withdrawal address when running create dkg
 # Prepare a DKG configuration file by running the following
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg
+obolnetwork/charon:v0.9.0 create dkg --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
 
 ```
 
