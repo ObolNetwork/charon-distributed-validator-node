@@ -63,6 +63,7 @@ cp .env.sample .env
 obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
 
 # The above command prepares a DKG configuration file.
+```
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster. 
 
