@@ -60,7 +60,7 @@ cp .env.sample .env
 
 # Set FEE_RECIPIENT_ADDRESS and WITHDRAWAL_ADDRESS to ETH1 addresses of your choice.
 # NAME can be any random string like "Obol Team"
-obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
 
 # The above command prepares a DKG configuration file.
 ```
