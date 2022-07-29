@@ -58,6 +58,10 @@ services:
       --http
       --http-address=0.0.0.0
       --http-port=5052
+      --metrics
+      --metrics-address=0.0.0.0
+      --metrics-port=5054
+      --metrics-allow-origin="*"
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
