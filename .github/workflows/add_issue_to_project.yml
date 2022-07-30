@@ -19,4 +19,4 @@ jobs:
           # URL of the project to add issues to
           project-url: https://github.com/orgs/ObolNetwork/projects/7
           # A GitHub personal access token with write access to the project, need org admin's token with repo and project permissions, need to store the token outside the script if public
-          github-token: <TOKEN>
+          github-token: ${{ secrets.GH_ORG_ADMIN_SECRET }}
