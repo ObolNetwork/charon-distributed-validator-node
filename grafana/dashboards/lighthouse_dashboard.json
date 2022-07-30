@@ -1,84 +1,37 @@
 {
-    "__inputs": [
-      {
-        "name": "DS_PROMETHEUS",
-        "label": "Prometheus",
-        "description": "",
-        "type": "datasource",
-        "pluginId": "prometheus",
-        "pluginName": "Prometheus"
-      }
-    ],
-    "__requires": [
-      {
-        "type": "panel",
-        "id": "bargauge",
-        "name": "Bar Gauge",
-        "version": ""
-      },
-      {
-        "type": "panel",
-        "id": "gauge",
-        "name": "Gauge",
-        "version": ""
-      },
-      {
-        "type": "grafana",
-        "id": "grafana",
-        "name": "Grafana",
-        "version": "6.4.3"
-      },
-      {
-        "type": "panel",
-        "id": "graph",
-        "name": "Graph",
-        "version": ""
-      },
-      {
-        "type": "datasource",
-        "id": "prometheus",
-        "name": "Prometheus",
-        "version": "1.0.0"
-      },
-      {
-        "type": "panel",
-        "id": "singlestat",
-        "name": "Singlestat",
-        "version": ""
-      },
-      {
-        "type": "panel",
-        "id": "text",
-        "name": "Text",
-        "version": ""
-      }
-    ],
     "annotations": {
       "list": [
         {
           "builtIn": 1,
-          "datasource": "-- Grafana --",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
           "enable": true,
           "hide": true,
           "iconColor": "rgba(0, 211, 255, 1)",
           "name": "Annotations & Alerts",
+          "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+          },
           "type": "dashboard"
         }
       ]
     },
     "editable": true,
-    "gnetId": null,
+    "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 10,
+    "id": 2,
     "links": [],
+    "liveNow": false,
     "panels": [
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 6,
@@ -92,36 +45,47 @@
           "content": "\n# Lighthouse Metrics\n\nMetrics collected from a Lighthouse Beacon Node.\n\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
           },
           "overrides": []
-        },
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -130,40 +94,23 @@
           "y": 0
         },
         "id": 2,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "avg(beacon_head_state_total_validators_total)",
@@ -172,45 +119,47 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Validator Count",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
           },
           "overrides": []
-        },
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -219,40 +168,23 @@
           "y": 0
         },
         "id": 48,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "avg(beacon_head_state_withdrawn_validators_total)",
@@ -261,45 +193,47 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Withdrawable Validators",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "#1F60C4",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "locale"
           },
           "overrides": []
-        },
-        "format": "locale",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -308,41 +242,23 @@
           "y": 0
         },
         "id": 13,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "pluginVersion": "6.2.1",
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "max(slotclock_present_slot)",
@@ -351,30 +267,20 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Current Slot",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "thresholds": {
               "mode": "absolute",
@@ -410,7 +316,7 @@
           "text": {},
           "textMode": "name"
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "lighthouse_info",
@@ -427,34 +333,52 @@
             "options": {
               "valueLabel": "version"
             }
+          },
+          {
+            "id": "merge",
+            "options": {}
           }
         ],
         "transparent": true,
         "type": "stat"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
           },
           "overrides": []
-        },
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -463,40 +387,23 @@
           "y": 3
         },
         "id": 47,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "avg(beacon_head_state_slashed_validators_total)",
@@ -505,45 +412,47 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Slashed Validators",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
           },
           "overrides": []
-        },
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -552,40 +461,23 @@
           "y": 3
         },
         "id": 3,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "avg(beacon_head_state_active_validators_total)",
@@ -594,45 +486,47 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Active Validators",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "#1F60C4",
-          "#d44a3a"
-        ],
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "locale"
           },
           "overrides": []
-        },
-        "format": "locale",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
         },
         "gridPos": {
           "h": 3,
@@ -641,41 +535,23 @@
           "y": 3
         },
         "id": 25,
-        "interval": null,
         "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
         "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "pluginVersion": "6.2.1",
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": false
+        "options": {
+          "colorMode": "none",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "tableColumn": "",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "max(slotclock_present_epoch)",
@@ -684,31 +560,21 @@
             "refId": "A"
           }
         ],
-        "thresholds": "",
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Avg. Current Epoch",
         "transparent": true,
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "avg"
+        "type": "stat"
       },
       {
         "aliasColors": {},
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -739,7 +605,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -756,9 +622,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Average Load (loadavg 1m)",
         "tooltip": {
           "shared": true,
@@ -767,33 +631,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "percentunit",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -801,10 +656,12 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -835,7 +692,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -852,9 +709,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Available Memory",
         "tooltip": {
           "shared": true,
@@ -863,33 +718,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "decbytes",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -897,10 +743,12 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -931,7 +779,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -948,9 +796,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Lighthouse Resident Memory Usage",
         "tooltip": {
           "shared": true,
@@ -959,42 +805,30 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "decbytes",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -1008,23 +842,21 @@
           "content": "\n### Consensus\n\nOverview of consensus between nodes.\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1056,7 +888,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1073,9 +905,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Slots since Best Block",
         "tooltip": {
           "shared": true,
@@ -1084,9 +914,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1096,34 +924,29 @@
             "format": "short",
             "label": "Slots",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1155,7 +978,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1174,9 +997,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Epoch Boundaries since Justification (Min)",
         "tooltip": {
           "shared": true,
@@ -1185,9 +1006,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1197,34 +1016,29 @@
             "format": "short",
             "label": "Epochs",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1256,7 +1070,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1273,9 +1087,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Epoch Boundaries since Finalization (Min)",
         "tooltip": {
           "shared": true,
@@ -1284,9 +1096,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1296,34 +1106,29 @@
             "format": "short",
             "label": "Epochs",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1355,7 +1160,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1374,9 +1179,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Previous Epoch Attesting Balance",
         "tooltip": {
           "shared": true,
@@ -1385,9 +1188,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1397,34 +1198,29 @@
             "format": "percentunit",
             "label": "Percentage of Balance",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1456,7 +1252,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1475,9 +1271,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Previous Epoch Target Attesting Balance",
         "tooltip": {
           "shared": true,
@@ -1486,9 +1280,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1498,34 +1290,29 @@
             "format": "percentunit",
             "label": "Percentage of Balance",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1557,7 +1344,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1576,9 +1363,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Previous Epoch Head Attesting Balance",
         "tooltip": {
           "shared": true,
@@ -1587,9 +1372,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1599,35 +1382,30 @@
             "format": "percentunit",
             "label": "Percentage of Balance",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "The number of attesters for which we have seen an attestation. That attestation is not necessarily included in the chain.",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1659,7 +1437,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1678,9 +1456,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Previous Epoch Observed Attesters",
         "tooltip": {
           "shared": true,
@@ -1689,9 +1465,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1701,35 +1475,30 @@
             "format": "none",
             "label": "# of Validators",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "The number of aggregators for which we have seen an attestation. That attestation is not necessarily included in the chain.",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1761,7 +1530,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1780,9 +1549,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Previous Epoch Observed Aggregators",
         "tooltip": {
           "shared": true,
@@ -1791,9 +1558,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -1803,34 +1568,29 @@
             "format": "none",
             "label": "# of Validators",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1862,7 +1622,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1879,9 +1639,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Validator Balances",
         "tooltip": {
           "shared": true,
@@ -1890,46 +1648,38 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
-            "decimals": null,
             "format": "none",
             "label": "Total Validator ETH",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -1961,7 +1711,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1978,9 +1728,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Active Validators",
         "tooltip": {
           "shared": true,
@@ -1989,46 +1737,38 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
-            "decimals": null,
             "format": "none",
             "label": "Total Validator ETH",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2060,7 +1800,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2077,9 +1817,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Total Validators",
         "tooltip": {
           "shared": true,
@@ -2088,46 +1826,38 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
-            "decimals": null,
             "format": "none",
             "label": "Total Validator ETH",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2159,7 +1889,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": true,
         "renderer": "flot",
@@ -2176,9 +1906,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Finalized Root (hash shown as int)",
         "tooltip": {
           "shared": true,
@@ -2187,9 +1915,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -2198,34 +1924,29 @@
             "format": "sci",
             "label": "int(hash)",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2257,7 +1978,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2276,9 +1997,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Total Fork Choice Re-Orgs",
         "tooltip": {
           "shared": true,
@@ -2287,9 +2006,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -2299,31 +2016,22 @@
             "format": "none",
             "label": "Re-Orgs",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -2337,23 +2045,21 @@
           "content": "\n### Networking\n\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2385,7 +2091,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2402,9 +2108,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "libp2p Connected Peers",
         "tooltip": {
           "shared": true,
@@ -2413,9 +2117,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -2425,33 +2127,29 @@
             "format": "short",
             "label": "Peers",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "Peers via client implementations",
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "max": 100,
             "min": 0,
@@ -2480,6 +2178,8 @@
         "id": 104,
         "options": {
           "displayMode": "gradient",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
           "orientation": "auto",
           "reduceOptions": {
             "calcs": [
@@ -2491,7 +2191,7 @@
           "showUnfilled": true,
           "text": {}
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "libp2p_peers_per_client",
@@ -2501,8 +2201,6 @@
             "refId": "A"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Connected Clients",
         "type": "bargauge"
       },
@@ -2511,11 +2209,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2542,8 +2242,11 @@
         "lines": true,
         "linewidth": 1,
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2560,9 +2263,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Unsolicited Discovery Requests/s",
         "tooltip": {
           "shared": true,
@@ -2571,33 +2272,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -2605,11 +2297,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2622,6 +2316,7 @@
           "x": 10,
           "y": 43
         },
+        "hiddenSeries": false,
         "id": 91,
         "legend": {
           "avg": false,
@@ -2635,8 +2330,11 @@
         "lines": true,
         "linewidth": 1,
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2653,9 +2351,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Active Discv5 Sessions",
         "tooltip": {
           "shared": true,
@@ -2664,43 +2360,36 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "max": 100,
             "min": 0,
@@ -2740,7 +2429,7 @@
           "showThresholdMarkers": true,
           "text": {}
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "discovery_queue_size",
@@ -2749,8 +2438,6 @@
             "refId": "A"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Queued Discovery Queries",
         "type": "gauge"
       },
@@ -2759,10 +2446,12 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2775,6 +2464,7 @@
           "x": 0,
           "y": 50
         },
+        "hiddenSeries": false,
         "id": 116,
         "interval": "",
         "legend": {
@@ -2789,8 +2479,11 @@
         "lines": true,
         "linewidth": 1,
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2806,9 +2499,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Total Libp2p Bandwidth",
         "tooltip": {
           "shared": true,
@@ -2817,33 +2508,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -2851,10 +2533,12 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2867,6 +2551,7 @@
           "x": 8,
           "y": 50
         },
+        "hiddenSeries": false,
         "id": 118,
         "interval": "",
         "legend": {
@@ -2881,8 +2566,11 @@
         "lines": true,
         "linewidth": 1,
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2898,9 +2586,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Libp2p Inbound Bandwidth",
         "tooltip": {
           "shared": true,
@@ -2909,33 +2595,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -2943,10 +2620,12 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -2959,6 +2638,7 @@
           "x": 16,
           "y": 50
         },
+        "hiddenSeries": false,
         "id": 120,
         "interval": "",
         "legend": {
@@ -2973,8 +2653,11 @@
         "lines": true,
         "linewidth": 1,
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2990,9 +2673,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Libp2p Outbound Bandwidth",
         "tooltip": {
           "shared": true,
@@ -3001,42 +2682,30 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -3049,21 +2718,20 @@
           "content": "### Gossipsub Metrics",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "max": 100,
             "min": 0,
@@ -3092,6 +2760,8 @@
         "id": 111,
         "options": {
           "displayMode": "gradient",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
           "orientation": "auto",
           "reduceOptions": {
             "calcs": [
@@ -3103,7 +2773,7 @@
           "showUnfilled": true,
           "text": {}
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "gossipsub_mesh_peers_per_main_topic",
@@ -3113,19 +2783,19 @@
             "refId": "A"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Mesh peers per topic",
         "type": "bargauge"
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "max": 100,
             "min": 0,
@@ -3154,6 +2824,8 @@
         "id": 114,
         "options": {
           "displayMode": "gradient",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
           "orientation": "auto",
           "reduceOptions": {
             "calcs": [
@@ -3165,7 +2837,7 @@
           "showUnfilled": true,
           "text": {}
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "gossipsub_avg_peer_score_per_topic",
@@ -3174,20 +2846,20 @@
             "refId": "A"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Average Peer Score per Topic",
         "type": "bargauge"
       },
       {
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
             "color": {
               "mode": "thresholds"
             },
-            "custom": {},
             "mappings": [],
             "max": 100,
             "min": 0,
@@ -3216,6 +2888,8 @@
         "id": 110,
         "options": {
           "displayMode": "gradient",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
           "orientation": "vertical",
           "reduceOptions": {
             "calcs": [
@@ -3227,7 +2901,7 @@
           "showUnfilled": true,
           "text": {}
         },
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "targets": [
           {
             "expr": "gossipsub_mesh_peers_per_subnet_topic",
@@ -3237,18 +2911,13 @@
             "refId": "A"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Mesh peers per subnet",
         "type": "bargauge"
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -3262,10 +2931,7 @@
           "content": "\n### Logging\n\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
@@ -3274,11 +2940,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3306,8 +2974,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3326,9 +2997,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Crit Logs Total",
         "tooltip": {
           "shared": true,
@@ -3337,33 +3006,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "none",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -3371,11 +3031,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3405,8 +3067,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3423,9 +3088,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Error Logs per Minute",
         "tooltip": {
           "shared": true,
@@ -3434,33 +3097,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "none",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -3468,11 +3122,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3500,8 +3156,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3518,9 +3177,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Warn Logs per Minute",
         "tooltip": {
           "shared": true,
@@ -3529,33 +3186,24 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "none",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
@@ -3563,11 +3211,13 @@
         "bars": false,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3595,8 +3245,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3613,9 +3266,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Info Logs per Minute",
         "tooltip": {
           "shared": true,
@@ -3624,42 +3275,30 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "none",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -3673,23 +3312,21 @@
           "content": "\n### Core BeaconChain Functions\n\nTiming of core `BeaconChain` functions and syncing.\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3717,8 +3354,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3738,9 +3378,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Block Processing Times (24s moving avg)",
         "tooltip": {
           "shared": true,
@@ -3749,45 +3387,37 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "s",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3815,8 +3445,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3833,9 +3466,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Find & Update Head Routine (1m avg)",
         "tooltip": {
           "shared": true,
@@ -3844,45 +3475,37 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "s",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -3910,8 +3533,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3928,9 +3554,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Syncing Slots per Second",
         "tooltip": {
           "shared": true,
@@ -3939,9 +3563,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -3950,35 +3572,30 @@
             "format": "none",
             "label": "Slots",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "Time taken to calculate the tree hash root of a BeaconState during block processing.",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4006,8 +3623,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4024,9 +3644,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Block Tree Hash Times (5m avg)",
         "tooltip": {
           "shared": true,
@@ -4035,46 +3653,38 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "s",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "Time taken to calculate the tree hash root of a BeaconState during block processing.",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4102,8 +3712,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4120,9 +3733,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "State Tree Hash Times (5m avg)",
         "tooltip": {
           "shared": true,
@@ -4131,42 +3742,30 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "s",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "gridPos": {
           "h": 2,
@@ -4180,23 +3779,21 @@
           "content": "\n### Database\n\nStats about the on-disk database (LevelDB)\n\n\n\n",
           "mode": "markdown"
         },
-        "pluginVersion": "7.4.3",
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "",
+        "pluginVersion": "8.5.3",
         "transparent": true,
         "type": "text"
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4224,8 +3821,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4242,9 +3842,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "On-Disk Database Size (Hot DB Only)",
         "tooltip": {
           "shared": true,
@@ -4253,9 +3851,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -4264,34 +3860,29 @@
             "format": "decbytes",
             "label": "",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4319,8 +3910,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4337,9 +3931,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "DB Throughput (Read) per Minute",
         "tooltip": {
           "shared": true,
@@ -4348,9 +3940,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -4359,34 +3949,29 @@
             "format": "decbytes",
             "label": "Bytes per Minute",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4414,8 +3999,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4432,9 +4020,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "DB Throughput (Write) (1m avg)",
         "tooltip": {
           "shared": true,
@@ -4443,9 +4029,7 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
@@ -4454,35 +4038,30 @@
             "format": "decbytes",
             "label": "Bytes per Minute",
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       },
       {
         "aliasColors": {},
         "bars": false,
-        "cacheTimeout": null,
         "dashLength": 10,
         "dashes": false,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "description": "Time taken to calculate the tree hash root of a BeaconState during block processing.",
         "fieldConfig": {
           "defaults": {
-            "custom": {},
             "links": []
           },
           "overrides": []
@@ -4510,8 +4089,11 @@
         "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
         "percentage": false,
-        "pluginVersion": "7.4.3",
+        "pluginVersion": "8.5.3",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -4528,9 +4110,7 @@
           }
         ],
         "thresholds": [],
-        "timeFrom": null,
         "timeRegions": [],
-        "timeShift": null,
         "title": "Persist Beacon Chain Times (1m avg)",
         "tooltip": {
           "shared": true,
@@ -4539,38 +4119,29 @@
         },
         "type": "graph",
         "xaxis": {
-          "buckets": null,
           "mode": "time",
-          "name": null,
           "show": true,
           "values": []
         },
         "yaxes": [
           {
             "format": "s",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           },
           {
             "format": "short",
-            "label": null,
             "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
           }
         ],
         "yaxis": {
-          "align": false,
-          "alignLevel": null
+          "align": false
         }
       }
     ],
     "refresh": "10s",
-    "schemaVersion": 27,
+    "schemaVersion": 36,
     "style": "dark",
     "tags": [],
     "templating": {
@@ -4605,8 +4176,8 @@
       ]
     },
     "timezone": "",
-    "title": "Summary",
-    "uid": "yY7PIGdZd",
-    "version": 3
+    "title": "Lighthouse Beacon Client  Overview",
+    "uid": "lighthouse",
+    "version": 2,
+    "weekStart": ""
   }
-  
