@@ -60,10 +60,15 @@ cp .env.sample .env
 
 # Set FEE_RECIPIENT_ADDRESS and WITHDRAWAL_ADDRESS to ETH1 addresses of your choice.
 # NAME can be any random string like "Obol Team"
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS --threshold=<val>
 
-# The above command prepares a DKG configuration file.
+threshold can be calcuated using: val = n-(ceil(n/3)-1). (default 3)
+where n is number of nodes in your team.
+
 ```
+There is a google sheet template available which makes it quite easier: [DKG Workshop Template](https://docs.google.com/spreadsheets/d/1A-ncCgasaRZwRPlvrUqRFovNaUTOksNuQLFOqGCaxf8/edit#gid=0)
+
+The above command prepares a DKG configuration file.
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster. 
 
@@ -203,7 +208,8 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
         - Running docker commands with `sudo`, if you haven't [setup docker to be run as a non-root](https://docs.docker.com/engine/install/linux-postinstall/) user.
         - Changing the permissions of the `.charon` folder with the commands:
             - `mkdir .charon` (if it doesn't already exist)
-            - `sudo chmod -R 666 .charon`
+            - `sudo chmod -R 666 .charon` or alternatively 
+            - `sudo chmod a+rwx .charon`
 
 7. I see a lot of errors after running `docker-compose up`.
     - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
