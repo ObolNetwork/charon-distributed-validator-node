@@ -65,8 +65,10 @@ docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.
 threshold can be calcuated using: val = n-(ceil(n/3)-1). (default 3)
 where n is number of nodes in your team.
 
-# The above command prepares a DKG configuration file.
 ```
+There is a google sheet template available which makes it quite easier: [DKG Workshop Template](https://docs.google.com/spreadsheets/d/1A-ncCgasaRZwRPlvrUqRFovNaUTOksNuQLFOqGCaxf8/edit#gid=0)
+
+The above command prepares a DKG configuration file.
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster. 
 
