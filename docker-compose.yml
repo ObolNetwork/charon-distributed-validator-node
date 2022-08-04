@@ -41,7 +41,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:v2.4.0
+    image: sigp/lighthouse:v2.5.1
     depends_on:
       - geth
     ports:
@@ -73,7 +73,7 @@ services:
   charon:
     # Pegged charon version (update this for each release).
     # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:827d675
+    image: ghcr.io/obolnetwork/charon:4453fee
     depends_on:
       - lighthouse
     environment:
@@ -99,7 +99,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:22.7.0
+    image: consensys/teku:22.8.0
     depends_on:
       - charon
       - lighthouse
