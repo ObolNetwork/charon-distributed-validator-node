@@ -76,6 +76,8 @@ services:
     image: ghcr.io/obolnetwork/charon:d8eca51
     depends_on:
       - lighthouse
+    ports:
+      - 3610:3610
     environment:
       CHARON_BEACON_NODE_ENDPOINTS: http://lighthouse:5052
       CHARON_JAEGER_ADDRESS: jaeger:6831
