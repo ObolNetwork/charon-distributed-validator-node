@@ -73,7 +73,7 @@ services:
   charon:
     # Pegged charon version (update this for each release).
     # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:4453fee
+    image: ghcr.io/obolnetwork/charon:d8eca51
     depends_on:
       - lighthouse
     environment:
