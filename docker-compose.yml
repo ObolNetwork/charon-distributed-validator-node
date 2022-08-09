@@ -87,6 +87,11 @@ services:
       CHARON_LOG_LEVEL: info
       CHARON_JAEGER_SERVICE: charon
       CHARON_P2P_EXTERNAL_HOSTNAME: charon
+    ports:
+      - 3600:3600/tcp
+      - 3610:3610/tcp
+      - 3620:3620/tcp
+      - 3630:3630/udp
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
