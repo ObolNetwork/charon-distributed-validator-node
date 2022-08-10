@@ -29,16 +29,14 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 48,
-      "panels": [],
-      "title": "Charon",
+      "id": 55,
+      "title": "Beacon Client",
       "type": "row"
     },
     {
@@ -89,7 +87,82 @@
         },
         "textMode": "none"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "1",
+          "refId": "A"
+        }
+      ],
+      "title": "LIGHTHOUSE",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 48,
+      "panels": [],
+      "title": "Charon",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 56,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "none"
+      },
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -139,7 +212,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 2
+        "y": 4
       },
       "id": 32,
       "options": {
@@ -152,7 +225,7 @@
         },
         "showHeader": false
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -221,7 +294,7 @@
         "h": 4,
         "w": 4,
         "x": 6,
-        "y": 2
+        "y": 4
       },
       "id": 42,
       "options": {
@@ -238,7 +311,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -281,7 +354,7 @@
         "h": 4,
         "w": 3,
         "x": 10,
-        "y": 2
+        "y": 4
       },
       "id": 6,
       "options": {
@@ -298,7 +371,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -355,7 +428,7 @@
         "h": 4,
         "w": 4,
         "x": 13,
-        "y": 2
+        "y": 4
       },
       "id": 4,
       "links": [],
@@ -373,7 +446,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "expr": "core_scheduler_current_slot",
@@ -439,7 +512,7 @@
         "h": 4,
         "w": 3,
         "x": 17,
-        "y": 2
+        "y": 4
       },
       "id": 46,
       "options": {
@@ -456,7 +529,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -513,7 +586,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 2
+        "y": 4
       },
       "id": 34,
       "options": {
@@ -530,7 +603,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -606,7 +679,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 6
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -700,7 +773,7 @@
         "h": 9,
         "w": 9,
         "x": 8,
-        "y": 6
+        "y": 8
       },
       "id": 40,
       "options": {
@@ -839,7 +912,7 @@
         "h": 9,
         "w": 7,
         "x": 17,
-        "y": 6
+        "y": 8
       },
       "id": 13,
       "maxDataPoints": 1296,
@@ -879,7 +952,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 17
       },
       "id": 50,
       "panels": [],
@@ -917,7 +990,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 18
       },
       "id": 36,
       "options": {
@@ -934,7 +1007,7 @@
         },
         "textMode": "none"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -997,7 +1070,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 17
+        "y": 19
       },
       "id": 25,
       "links": [],
@@ -1016,7 +1089,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -1074,7 +1147,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 17
+        "y": 19
       },
       "id": 23,
       "links": [],
@@ -1093,7 +1166,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "expr": "validator_current_epoch",
@@ -1137,7 +1210,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 17
+        "y": 19
       },
       "id": 29,
       "options": {
@@ -1154,7 +1227,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "expr": "validator_beacon_node_published_attestation_total",
@@ -1202,7 +1275,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 17
+        "y": 19
       },
       "id": 30,
       "options": {
@@ -1219,7 +1292,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "expr": "validator_beacon_node_published_block_total",
@@ -1270,7 +1343,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 17
+        "y": 19
       },
       "id": 21,
       "options": {
@@ -1284,7 +1357,7 @@
         "showHeader": false,
         "sortBy": []
       },
-      "pluginVersion": "9.0.2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -1372,7 +1445,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 21
+        "y": 23
       },
       "id": 27,
       "options": {
@@ -1417,7 +1490,7 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
@@ -1437,6 +1510,6 @@
   "timezone": "",
   "title": "Single Charon Node Dashboard",
   "uid": "singlenode",
-  "version": 7,
+  "version": 1,
   "weekStart": ""
 }
