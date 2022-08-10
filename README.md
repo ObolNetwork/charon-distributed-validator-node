@@ -160,6 +160,21 @@ scrape_configs:
 
 Thanks for trying our quickstart guide!
 
+## Steps to host your own bootnode
+
+```
+# Clone the repo and cd into it.
+git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
+
+cd charon-distributed-validator-node/bootnode
+
+# Replace "1.2.3.4" with the public IPv4 address of your hosted bootnode by editing docker-compose.yml file. (Line 32-33)
+nano docker-compose.yml
+
+# Save and file and you are good to go!
+docker-compose up
+```
+
 # Project Status
 
 It is still early days for the Obol Network and everything is under active development.
