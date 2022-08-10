@@ -169,7 +169,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 cd charon-distributed-validator-node/bootnode
 
-# Replace "1.2.3.4" with the public IPv4 address of your hosted bootnode by editing docker-compose.yml file. (Line 32 and 33)
+# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname
 nano docker-compose.yml
 
 docker-compose up
@@ -223,3 +223,6 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 7. I see a lot of errors after running `docker-compose up`.
     - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
     - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+
+8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+   - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
