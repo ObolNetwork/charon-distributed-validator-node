@@ -162,16 +162,16 @@ Thanks for trying our quickstart guide!
 
 ## Steps to host your own bootnode
 
+You can also host your own bootnode on a separate server.
 ```
 # Clone the repo and cd into it.
 git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 cd charon-distributed-validator-node/bootnode
 
-# Replace "1.2.3.4" with the public IPv4 address of your hosted bootnode by editing docker-compose.yml file. (Line 32-33)
+# Replace "1.2.3.4" with the public IPv4 address of your hosted bootnode by editing docker-compose.yml file. (Line 32 and 33)
 nano docker-compose.yml
 
-# Save and file and you are good to go!
 docker-compose up
 ```
 

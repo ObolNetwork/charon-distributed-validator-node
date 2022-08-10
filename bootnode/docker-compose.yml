@@ -9,7 +9,7 @@ services:
   bootnode:
     # Pegged charon version (update this for each release).
     # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:d8eca51
+    image: ghcr.io/obolnetwork/charon:b40678b
     environment:
       CHARON_JAEGER_ADDRESS: jaeger:6831
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:3610
