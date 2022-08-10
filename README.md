@@ -169,8 +169,10 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 cd charon-distributed-validator-node/bootnode
 
-# Replace "1.2.3.4" with the public IPv4 address of your hosted bootnode by editing docker-compose.yml file. (Line 32 and 33)
-nano docker-compose.yml
+# Get public IPv4 address of your cloud instance.
+export ip=${NEW_IPv4_ADDR}
+
+sed "s/1.2.3.4/${ip}/g" docker-compose.yml
 
 docker-compose up
 ```
