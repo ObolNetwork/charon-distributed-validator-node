@@ -8,32 +8,16 @@ services:
   # |_.__/ \___/ \___/ \__|_| |_|\___/ \__,_|\___|
   bootnode:
     # Pegged charon version (update this for each release).
-    # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:14ce3bf
+    image: obolnetwork/charon:14ce3bf
     environment:
-      CHARON_JAEGER_ADDRESS: jaeger:6831
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:3610
       CHARON_P2P_UDP_ADDRESS: 0.0.0.0:3630
+      CHARON_BOOTNODE_HTTP_ADDRESS: 0.0.0.0:3640
       CHARON_LOG_LEVEL: debug
-      CHARON_P2P_RELAY_LOGLEVEL: info
-      CHARON_BOOTNODE_HTTP_ADDRESS: "0.0.0.0:3640"
-      CHARON_P2P_BOOTNODES: ""
-      CHARON_P2P_EXTERNAL_HOSTNAME: bootnode
-      CHARON_JAEGER_SERVICE: charon
+      CHARON_P2P_EXTERNAL_HOST: replace.with.public.ip.or.hostname
     ports:
-      - 3600:3600/tcp
       - 3610:3610/tcp
-      - 3620:3620/tcp
       - 3630:3630/udp
       - 3640:3640/tcp
-    # Replace "1.2.3.4" with your own Public IPv4 for both p2p-external-ip and p2p-external-hostname.
-    command: |
-      bootnode
-      --p2p-external-ip="1.2.3.4"
-      --p2p-external-hostname="1.2.3.4"
-    networks: [bootnode]
-    volumes:
-      - .charon:/opt/charon/.charon
+    command: bootnode
     restart: on-failure
-networks:
-  bootnode:
