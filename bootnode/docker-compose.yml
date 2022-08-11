@@ -20,4 +20,6 @@ services:
       - 3630:3630/udp
       - 3640:3640/tcp
     command: bootnode
+    volumes:
+      - .charon:/opt/charon/.charon # Bootnode charon-enr-private-key generated and persisted across restarts in this folder
     restart: on-failure
