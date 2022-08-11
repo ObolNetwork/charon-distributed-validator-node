@@ -174,7 +174,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 cd charon-distributed-validator-node/bootnode
 
-# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname
+# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname (exclude prefix 'http(s)://')
 nano docker-compose.yml
 
 docker-compose up
@@ -189,6 +189,8 @@ Configure **ALL** charon nodes in your cluster to use this bootnode:
 
 - Either by adding a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
 - Or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
+
+Note that a local `.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts. 
 
 # Project Status
 
