@@ -180,15 +180,15 @@ nano docker-compose.yml
 docker-compose up
 ```
 
-Test whether the bootnode is publicly accessible. This should return a ENR:
+Test whether the bootnode is publicly accessible. This should return an ENR:
 `curl http://replace.with.public.ip.or.hostname:3640/enr`
 
 Ensure the ENR returned by the bootnode contains the correct public IP and port by decoding it with https://enr-viewer.com/.
 
-Configure ALL charon nodes in your cluster to use this bootnode:
+Configure **ALL** charon nodes in your cluster to use this bootnode:
 
-- either via a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
-- or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
+- Either by adding a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
+- Or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
 
 # Project Status
 
