@@ -174,7 +174,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
 cd charon-distributed-validator-node/bootnode
 
-# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname
+# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname (exclude prefix 'http(s)://')
 nano docker-compose.yml
 
 docker-compose up

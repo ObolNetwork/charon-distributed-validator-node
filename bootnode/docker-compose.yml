@@ -14,7 +14,7 @@ services:
       CHARON_P2P_UDP_ADDRESS: 0.0.0.0:3630
       CHARON_BOOTNODE_HTTP_ADDRESS: 0.0.0.0:3640
       CHARON_LOG_LEVEL: debug
-      CHARON_P2P_EXTERNAL_HOST: replace.with.public.ip.or.hostname
+      CHARON_P2P_EXTERNAL_HOSTNAME: replace.with.public.ip.or.hostname
     ports:
       - 3610:3610/tcp
       - 3630:3630/udp
