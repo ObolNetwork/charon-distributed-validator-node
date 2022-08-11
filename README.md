@@ -164,8 +164,6 @@ scrape_configs:
       - targets: ['node-exporter:9100']
 ```
 
-Thanks for trying our quickstart guide!
-
 ## Steps to host your own bootnode
 
 If you are experiencing connectivity issues with the Obol hosted bootnode, or you want to improve your clusters latency and decentralisation, you can opt to host your own bootnode on a separate open and static internet port.
