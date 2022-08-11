@@ -41,8 +41,9 @@ You should expect to see a console output like
     Created ENR private key: .charon/charon-enr-private-key
     enr:-JG4QGQpV4qYe32QFUAbY1UyGNtNcrVMip83cvJRhw1brMslPeyELIz3q6dsZ7GblVaCjL_8FKQhF6Syg-O_kIWztimGAYHY5EvPgmlkgnY0gmlwhH8AAAGJc2VjcDI1NmsxoQKzMe_GFPpSqtnYl-mJr8uZAUtmkqccsAx7ojGmFy-FY4N0Y3CCDhqDdWRwgg4u
 
-## ⚠️ Attention
-Please make sure to create a backup of the private key at `.charon/charon-enr-private-key`. Be careful not to commit it to git! **If you lose this file you won't be able to take part in the DKG ceremony.**
+> ⚠️ Attention
+>
+> Please make sure to create a backup of the private key at `.charon/charon-enr-private-key`. Be careful not to commit it to git! **If you lose this file you won't be able to take part in the DKG ceremony.**
 
 If you are taking part in an organised Obol testnet, submit the created ENR public address (the console output starting with `enr:-...` not the contents of the private key file) to the appropriate typeform.
 
@@ -53,7 +54,7 @@ One person, in the cluster or otherwise, will prepare the configuration file for
 In future, step 1 and step 2 of this guide will use the [Obol Distributed Validator Launchpad](https://docs.obol.tech/docs/dvk/distributed_validator_launchpad) to facilitate and verify these files are created in an authenticated manner.
 
 ```
-# Prepare an environment variable file 
+# Prepare an environment variable file
 cp .env.sample .env
 
 # Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
@@ -65,11 +66,11 @@ docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.
 # The above command prepares a DKG configuration file.
 ```
 
-This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster. 
+This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster.
 
 ## Step 3. Run the DKG
 
-After receiving the `cluster-definition.json` file created by the leader, cluster members should ideally save it in the `.charon/` folder that was created during step 1, alternatively the `--definition-file` flag can override the default expected location for this file. 
+After receiving the `cluster-definition.json` file created by the leader, cluster members should ideally save it in the `.charon/` folder that was created during step 1, alternatively the `--definition-file` flag can override the default expected location for this file.
 
 Every cluster member then participates in the DKG ceremony. For Charon v1, this needs to happen synchronously between participants at an agreed time.
 
@@ -81,7 +82,7 @@ docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 dkg --p2p-boot
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
 
 - A `deposit-data.json` file. This contains the information needed to activate the validator on the Ethereum network.
-- A `cluster-lock.json` file. This contains the information needed by charon to operate the distributed validator cluster with its peers. 
+- A `cluster-lock.json` file. This contains the information needed by charon to operate the distributed validator cluster with its peers.
 - A `validator_keys/` folder. This folder contains the private key shares and passwords for the created distributed validators.
 
 At this point you should make a backup of the `.charon/validator_keys` folder as replacing lost private keys is not straightforward at this point in charon's development. The `cluster-lock` and `deposit-data` files are identical for each operator and can be copied if lost.
@@ -92,7 +93,7 @@ If taking part in the official Athena testnet, one cluster member will have to s
 
 With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term. This repo is configured to sync an execution layer client (`geth`) and a consensus layer client (`lighthouse`).
 
-Before completing these instructions, you should assign a static local IP address to your device (extending the DHCP reservation indefinitely or removing the device from the DCHP pool entirely if you prefer), and port forward the TCP protocol on the public port `:3610` on your router to your device's local IP address on the same port. This step is different for every person's home internet, and can be complicated by the presence of dynamic public IP addresses. We are currently working on making this as easy as possible, but for the time being, a distributed validator cluster isn't going to work very resiliently if all charon nodes cannot talk directly to one another and instead need to have an intermediary node forwarding traffic to them. 
+Before completing these instructions, you should assign a static local IP address to your device (extending the DHCP reservation indefinitely or removing the device from the DCHP pool entirely if you prefer), and port forward the TCP protocol on the public port `:3610` on your router to your device's local IP address on the same port. This step is different for every person's home internet, and can be complicated by the presence of dynamic public IP addresses. We are currently working on making this as easy as possible, but for the time being, a distributed validator cluster isn't going to work very resiliently if all charon nodes cannot talk directly to one another and instead need to have an intermediary node forwarding traffic to them.
 
 **Caution**: If you manually update `docker-compose` to mount `lighthouse` from your locally synced `~/.lighthouse`, the whole chain database may get deleted. It'd be best not to manually update as `lighthouse` checkpoint-syncs so the syncing doesn't take much time.
 
@@ -127,14 +128,19 @@ docker-compose down
 
 If you and your team have gotten to this phase of the quickstart, and you have successfully created a distributed validator together, and you have connected all of your charon clients together such that the monitoring indicates that they are all healthy and ready to operate, one person may process to activate this deposit data with the existing [staking launchpad](https://prater.launchpad.ethereum.org/).
 
-This process can take a minimum of 16 hours, with the maximum time to activation being dictated by the length of the activation queue, which can be weeks. You can leave your distributed validator cluster offline until closer to the activation period if you would prefer. You can also use this time to improve and harden your monitoring and alerting for the cluster. 
+This process can take a minimum of 16 hours, with the maximum time to activation being dictated by the length of the activation queue, which can be weeks. You can leave your distributed validator cluster offline until closer to the activation period if you would prefer. You can also use this time to improve and harden your monitoring and alerting for the cluster.
 
-If you have gotten this far through the process, and whether you succeed or fail at running the distributed validator successfully on the testnet, we would like to hear your feedback on the process and where you encountered difficulties. Please open issues in either this repo if the problem is deployment related, or the [charon](https://github.com/ObolNetwork/charon) repo if the issue is directly related to the client. 
+If you have gotten this far through the process, and whether you succeed or fail at running the distributed validator successfully on the testnet, we would like to hear your feedback on the process and where you encountered difficulties. Please open issues in either this repo if the problem is deployment related, or the [charon](https://github.com/ObolNetwork/charon) repo if the issue is directly related to the client.
+
+# Other Actions
+
+The above steps should get you running a distributed validator cluster. The following are some extra steps you may want to take either to help Obol with their testing program, or to improve the resilience and performance of your distributed validator cluster.
 
 ## Step 6. Leader Adds Central Monitoring Token
 
 The cluster leader will be provided with a Central Monitoring Token used to push distributed validator metrics to our central prometheus service to monitor, analyze and improve your cluster's performance. The token needs to be added in prometheus/prometheus.yml replacing `$PROM_REMOTE_WRITE_TOKEN`. The token will look like:
 `eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ`. Final prometheus/prometheus.yml would look something like:
+
 ```
 global:
   scrape_interval:     12s # Set the scrape interval to every 12 seconds. Default is every 1 minute.
@@ -145,17 +151,17 @@ remote_write:
     authorization:
       credentials: 436764:eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ
     name: obol-prom
-  
+
 scrape_configs:
   - job_name: 'charon'
     static_configs:
       - targets: ['charon:3620']
   - job_name: 'teku'
     static_configs:
-      - targets: ['teku:8008']   
+      - targets: ['teku:8008']
   - job_name: 'node-exporter'
     static_configs:
-      - targets: ['node-exporter:9100']   
+      - targets: ['node-exporter:9100']
 ```
 
 Thanks for trying our quickstart guide!
@@ -163,6 +169,7 @@ Thanks for trying our quickstart guide!
 ## Steps to host your own bootnode
 
 If you are experiencing connectivity issues with the Obol hosted bootnode, or you want to improve your clusters latency and decentralisation, you can opt to host your own bootnode on a separate open and static internet port.
+
 ```
 # Clone the repo and cd into it.
 git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
@@ -174,14 +181,16 @@ nano docker-compose.yml
 
 docker-compose up
 ```
+
 Test whether the bootnode is publicly accessible. This should return a ENR:
 `curl http://replace.with.public.ip.or.hostname:3640/enr`
 
 Ensure the ENR returned by the bootnode contains the correct public IP and port by decoding it with https://enr-viewer.com/.
 
 Configure ALL charon nodes in your cluster to use this bootnode:
+
 - either via a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
-- or via an env var: `P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
+- or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
 
 # Project Status
 
@@ -190,48 +199,56 @@ It is NOT ready for mainnet.
 Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supported-consensus-layer-clients) is the latest on charon's supported clients and duties.
 
 # FAQs:
-1. How do I get my ENR if I want to generate it again? 
+
+1. How do I get my ENR if I want to generate it again?
+
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   - Run  `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 enr`. This prints the ENR on your screen.
+   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 2. What do I do if lose my `charon-enr-private-key`?
-    - For now, ENR rotation/replacement is not supported, it will be supported in a future release.
-    - Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
+
+   - For now, ENR rotation/replacement is not supported, it will be supported in a future release.
+   - Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
 
 3. I have run the command in `Step 1` but I can't find the keys anywhere.
-    - The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
-    - To view it, run `ls -al` in your terminal.
-    - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
-    - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
+
+   - The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
+   - To view it, run `ls -al` in your terminal.
+   - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
+   - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
 
 4. Why does Teku throw a keystore file error?
-    - Teku sometimes logs an error which looks like:
+
+   - Teku sometimes logs an error which looks like:
      `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
-    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`. 
-    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
+   - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`.
+   - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
 
 5. How to fix the grafana dashboard?
-    - Sometimes, grafana dashboard doesn't load any data first time around
-    - You can solve this by following the steps below:
-        - Click the Wheel Icon > Datasources
-        - Click prometheus
-        - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
-        - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
+
+   - Sometimes, grafana dashboard doesn't load any data first time around
+   - You can solve this by following the steps below:
+     - Click the Wheel Icon > Datasources
+     - Click prometheus
+     - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
+     - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
 
 6. How to fix `permission denied` errors?
-    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems. 
-    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
-    - This can be generally be fixed with some of the following:
-        - Running docker commands with `sudo`, if you haven't [setup docker to be run as a non-root](https://docs.docker.com/engine/install/linux-postinstall/) user.
-        - Changing the permissions of the `.charon` folder with the commands:
-            - `mkdir .charon` (if it doesn't already exist)
-            - `sudo chmod -R 666 .charon`
+
+   - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems.
+   - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
+   - This can be generally be fixed with some of the following:
+     - Running docker commands with `sudo`, if you haven't [setup docker to be run as a non-root](https://docs.docker.com/engine/install/linux-postinstall/) user.
+     - Changing the permissions of the `.charon` folder with the commands:
+       - `mkdir .charon` (if it doesn't already exist)
+       - `sudo chmod -R 666 .charon`
 
 7. I see a lot of errors after running `docker-compose up`.
-    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
-    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
+
+   - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+   - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+   - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
 8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
