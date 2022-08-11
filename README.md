@@ -162,7 +162,7 @@ Thanks for trying our quickstart guide!
 
 ## Steps to host your own bootnode
 
-You can also host your own bootnode on a separate server.
+If you are experiencing connectivity issues with the Obol hosted bootnode, or you want to improve your clusters latency and decentralisation, you can opt to host your own bootnode on a separate open and static internet port.
 ```
 # Clone the repo and cd into it.
 git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
@@ -231,6 +231,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 7. I see a lot of errors after running `docker-compose up`.
     - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
     - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
 8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
