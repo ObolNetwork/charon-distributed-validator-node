@@ -51,7 +51,6 @@ services:
     command: |
       lighthouse bn
       --network=goerli
-      --purge-db
       --checkpoint-sync-url=https://goerli.checkpoint-sync.ethdevops.io
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex

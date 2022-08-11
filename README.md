@@ -169,15 +169,19 @@ scrape_configs:
 If you are experiencing connectivity issues with the Obol hosted bootnode, or you want to improve your clusters latency and decentralisation, you can opt to host your own bootnode on a separate open and static internet port.
 
 ```
+# Figure out your public IP
+curl v4.ident.me
+
 # Clone the repo and cd into it.
 git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 
-cd charon-distributed-validator-node/bootnode
+cd charon-distributed-validator-node
 
-# Replace 'replace.with.public.ip.or.hostname' in docker-compose.yml with your public IPv4 or DNS hostname (exclude prefix 'http(s)://')
-nano docker-compose.yml
+# Replace 'replace.with.public.ip.or.hostname' in bootnode/docker-compose.yml with your public IPv4 or DNS hostname # Replace 'replace.with.public.ip.or.hostname' in bootnode/docker-compose.yml with your public IPv4 or DNS hostname
 
-docker-compose up
+nano bootnode/docker-compose.yml
+
+docker-compose -f bootnode/docker-compose.yml up
 ```
 
 Test whether the bootnode is publicly accessible. This should return an ENR:
@@ -190,7 +194,7 @@ Configure **ALL** charon nodes in your cluster to use this bootnode:
 - Either by adding a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
 - Or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
 
-Note that a local `.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts. 
+Note that a local `boonode/.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts. 
 
 # Project Status
 
