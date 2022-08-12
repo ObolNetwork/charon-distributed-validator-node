@@ -254,18 +254,20 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
 9. How do I voluntary exit a validator?
-    - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
-    - Note: Quorum peers in the cluster need to perform this task to exit a validator.
-    - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
-    - Copy the validator keys and passwords that you want to exit from the `validator_keys` folder to the `exit_keys` folder.
-      - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/`
-      - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
-    - Ensure the external network in `compose-volutary-exit.yml` is correct.
-      - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
-      - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
-    - Run the command to submit this node's partially signed voluntary exit:
-      - `docker-compose -f compose-voluntary-exit.yml up`
-      - Confirm the logs: `Exit for validator XXXXX submitted`.
-    - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
-    - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
-    - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+   - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
+   - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
+   - Note: Quorum peers in the cluster need to perform this task to exit a validator.
+   - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
+   - Copy the validator keys and passwords that you want to exit from the `validator_keys` folder to the `exit_keys` folder.
+     - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/`
+     - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
+   - Ensure the external network in `compose-volutary-exit.yml` is correct.
+     - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
+     - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
+   - Run the command to submit this node's partially signed voluntary exit:
+     - `docker-compose -f compose-voluntary-exit.yml up`
+     - Confirm the logs: `Exit for validator XXXXX submitted`
+     - Exit the container: `Ctrl-C`
+   - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
+   - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
+   - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.

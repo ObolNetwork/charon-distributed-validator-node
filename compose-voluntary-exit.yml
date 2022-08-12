@@ -7,9 +7,9 @@ services:
     image: consensys/teku:22.8.0
     command: |
       voluntary-exit
-      --beacon-node-api-endpoint "http://charon:3600"
+      --beacon-node-api-endpoint="http://charon:3600"
       --confirmation-enabled=false
-      --validator-keys "/opt/charon/exit_keys:/opt/charon/exit_keys"
+      --validator-keys="/opt/charon/exit_keys:/opt/charon/exit_keys"
       --epoch=1
     volumes:
       - ".charon/exit_keys:/opt/charon/exit_keys"
@@ -17,5 +17,5 @@ services:
 networks:
   default:
     # Ensure this network exists: docker network ls
-    name: charon-distributed-validator-node-dvnode
+    name: charon-distributed-validator-node_dvnode
     external: true
