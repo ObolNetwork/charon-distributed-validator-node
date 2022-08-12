@@ -252,3 +252,19 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 
 8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
+
+9. How do I voluntary exit a validator?
+    - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
+    - Note: Quorum peers in the cluster need to perform this task to exit a validator.
+    - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
+    - Copy the validator keys and passwords that you want to exit from the validator_keys folder to the exit_keys folder.
+      - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/` 
+    - Ensure the external network in `compose-volutary-exit.yml` is correct.
+      - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
+      - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
+    - Run the command to submit this nodes partially signed voluntary exit:
+      - `docker-compose -f compose-voluntary-exit.yml up`
+      - Confirm the logs: `Exit for validator 8a54f5c submitted`.
+    - The charon metric `core_parsigdb_exit_total` will be incremented each time an voluntary exit partial signature is received, either from this node or from peers.
+    - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
+    - The validator keys can be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
