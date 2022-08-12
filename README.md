@@ -259,13 +259,13 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
     - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
     - Copy the validator keys and passwords that you want to exit from the `validator_keys` folder to the `exit_keys` folder.
       - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/`
-      - Warning: all keys copied to the `exit_keys` folder will be exitted, so be careful!
+      - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
     - Ensure the external network in `compose-volutary-exit.yml` is correct.
       - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
       - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
-    - Run the command to submit this nodes partially signed voluntary exit:
+    - Run the command to submit this node's partially signed voluntary exit:
       - `docker-compose -f compose-voluntary-exit.yml up`
-      - Confirm the logs: `Exit for validator 8a54f5c submitted`.
-    - The charon metric `core_parsigdb_exit_total` will be incremented each time an voluntary exit partial signature is received, either from this node or from peers.
+      - Confirm the logs: `Exit for validator XXXXX submitted`.
+    - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
     - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
-    - The validator keys can be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+    - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
