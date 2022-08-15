@@ -89,7 +89,7 @@
         },
         "textMode": "none"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -257,7 +257,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "expr": "max(slotclock_present_slot)",
@@ -537,7 +537,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -621,7 +621,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -698,7 +698,7 @@
         },
         "textMode": "none"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -761,7 +761,7 @@
         },
         "showHeader": false
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -848,7 +848,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -908,7 +908,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -983,7 +983,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "expr": "core_scheduler_current_slot",
@@ -1066,7 +1066,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -1140,7 +1140,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -1152,6 +1152,293 @@
         }
       ],
       "title": "Number of connected peers",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 0,
+        "y": 13
+      },
+      "id": 68,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(core_tracker_participation{job=\"charon\"}) by (duty)",
+          "legendFormat": "{{type}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Number of participating peers",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 10,
+        "y": 13
+      },
+      "id": 13,
+      "maxDataPoints": 1296,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "histogram_quantile(0.90, sum(rate(p2p_ping_latency_secs_bucket[30s])) by (le,peer))  ",
+          "interval": "",
+          "legendFormat": "{{peer}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Peer ping latency (90%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-YlBl"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 19,
+        "y": 13
+      },
+      "id": 70,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "core_bcast_broadcast_total{duty=\"attester\"}",
+          "legendFormat": "{{duty}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Attestations Submitted",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-green",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 19,
+        "y": 18
+      },
+      "id": 72,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "core_bcast_broadcast_total{duty=\"proposer\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Blocks Proposed",
       "type": "stat"
     },
     {
@@ -1216,7 +1503,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 13
+        "y": 23
       },
       "id": 2,
       "options": {
@@ -1310,7 +1597,7 @@
         "h": 9,
         "w": 9,
         "x": 8,
-        "y": 13
+        "y": 23
       },
       "id": 40,
       "options": {
@@ -1389,107 +1676,12 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "links": [],
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 7,
-        "x": 17,
-        "y": 13
-      },
-      "id": 13,
-      "maxDataPoints": 1296,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.0.4",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "histogram_quantile(0.90, sum(rate(p2p_ping_latency_secs_bucket[30s])) by (le,peer))  ",
-          "interval": "",
-          "legendFormat": "{{peer}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Peer ping latency (90%)",
-      "type": "timeseries"
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 32
       },
       "id": 50,
       "panels": [],
@@ -1528,7 +1720,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 33
       },
       "id": 36,
       "options": {
@@ -1545,7 +1737,7 @@
         },
         "textMode": "none"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -1608,7 +1800,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 24
+        "y": 34
       },
       "id": 25,
       "links": [],
@@ -1627,7 +1819,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -1685,7 +1877,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 24
+        "y": 34
       },
       "id": 23,
       "links": [],
@@ -1704,7 +1896,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "expr": "validator_current_epoch",
@@ -1748,7 +1940,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 24
+        "y": 34
       },
       "id": 29,
       "options": {
@@ -1765,7 +1957,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "expr": "validator_beacon_node_published_attestation_total",
@@ -1813,7 +2005,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 24
+        "y": 34
       },
       "id": 30,
       "options": {
@@ -1830,7 +2022,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "expr": "validator_beacon_node_published_block_total",
@@ -1881,7 +2073,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 24
+        "y": 34
       },
       "id": 21,
       "options": {
@@ -1895,7 +2087,7 @@
         "showHeader": false,
         "sortBy": []
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.7",
       "targets": [
         {
           "datasource": {
@@ -1983,7 +2175,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 28
+        "y": 38
       },
       "id": 27,
       "options": {
