@@ -137,6 +137,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
 
   grafana:
     image: grafana/grafana:9.0.7
@@ -149,6 +150,7 @@ services:
       - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
+      - ./data/grafana:/var/lib/grafana
 
   node-exporter:
     image: prom/node-exporter:latest
