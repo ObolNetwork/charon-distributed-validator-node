@@ -2,6 +2,7 @@ version: "3.8"
 
 # Docker-compose file to trigger voluntary exits. See README.md for info.
 
+# TODO(corver): epoch=112260 used to use latest fork to mitigate bug in lighthouse. This only works for prater!
 services:
   teku-exit:
     image: consensys/teku:22.8.0
