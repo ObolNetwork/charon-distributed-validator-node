@@ -132,6 +132,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.37.0
+    user: ":"
     ports:
       - "9090:9090"
     networks: [dvnode]
@@ -141,6 +142,7 @@ services:
 
   grafana:
     image: grafana/grafana:9.0.7
+    user: ":"
     depends_on: [prometheus]
     ports:
       - "3000:3000"
