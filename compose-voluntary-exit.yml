@@ -2,7 +2,8 @@ version: "3.8"
 
 # Docker-compose file to trigger voluntary exits. See README.md for info.
 
-# TODO(corver): epoch=112260 used to map to the latest fork to mitigate against bug in lighthouse. This only works for prater!
+# TODO(corver): epoch=112260 used to map to the latest fork to mitigate against bug in lighthouse,
+#  see https://github.com/sigp/lighthouse/issues/3471. This only works for prater!
 
 services:
   teku-exit:
