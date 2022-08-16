@@ -264,6 +264,13 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - Ensure the external network in `compose-volutary-exit.yml` is correct.
      - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
      - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
+   - Ensure the latest fork version epoch is used:
+     - Voluntary exists require an epoch after which they take effect.
+     - All VCs need to sign and submit the exact same messages (epoch) in DVT.
+     - `--epoch=1` would be ideal, since all chains have that epoch in the past, so the validator should exit immediately.
+     - There is however a [bug](https://github.com/sigp/lighthouse/issues/3471) in lighthouse requiring an epoch that maps to the latest fork version to be used.
+     - `compose-volutary-exit.yml` is configured with `--epoch=112260` which is the latest Bellatrix fork on Prater.
+     - If the Charon cluster is running on a different chain, **ALL** operators must update `--epoch` to the same latest fork version returned by `curl $BEACON_NODE/eth/v1/config/fork_schedule`.
    - Run the command to submit this node's partially signed voluntary exit:
      - `docker-compose -f compose-voluntary-exit.yml up`
      - Confirm the logs: `Exit for validator XXXXX submitted`
