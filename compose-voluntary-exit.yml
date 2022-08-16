@@ -1,0 +1,24 @@
+version: "3.8"
+
+# Docker-compose file to trigger voluntary exits. See README.md for info.
+
+# TODO(corver): epoch=112260 used to map to the latest fork to mitigate against bug in lighthouse,
+#  see https://github.com/sigp/lighthouse/issues/3471. This only works for prater!
+
+services:
+  teku-exit:
+    image: consensys/teku:22.8.0
+    command: |
+      voluntary-exit
+      --beacon-node-api-endpoint="http://charon:3600"
+      --confirmation-enabled=false
+      --validator-keys="/opt/charon/exit_keys:/opt/charon/exit_keys"
+      --epoch=112260
+    volumes:
+      - ".charon/exit_keys:/opt/charon/exit_keys"
+
+networks:
+  default:
+    # Ensure this network exists: docker network ls
+    name: charon-distributed-validator-node_dvnode
+    external: true

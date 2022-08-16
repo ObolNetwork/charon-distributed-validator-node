@@ -76,8 +76,7 @@ services:
 
   charon:
     # Pegged charon version (update this for each release).
-    # image: obolnetwork/charon:${CHARON_VERSION}
-    image: ghcr.io/obolnetwork/charon:152ba99
+    image: obolnetwork/charon:152ba99
     depends_on:
       - lighthouse
     environment:
@@ -92,14 +91,16 @@ services:
       CHARON_JAEGER_SERVICE: charon
       CHARON_P2P_EXTERNAL_HOSTNAME: charon
     ports:
-      - 3600:3600/tcp
-      - 3610:3610/tcp
-      - 3620:3620/tcp
-      - 3630:3630/udp
+      - 3600:3600/tcp # Validator API
+      - 3610:3610/tcp # Libp2p
+      - 3620:3620/tcp # Monitoring
+      - 3630:3630/udp # Discv5
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
     restart: on-failure
+    healthcheck:
+      test: wget -qO- http://localhost:3620/readyz
 
   #  _       _
   # | |_ ___| | ___   _
