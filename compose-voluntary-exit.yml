@@ -10,7 +10,7 @@ services:
       --beacon-node-api-endpoint="http://charon:3600"
       --confirmation-enabled=false
       --validator-keys="/opt/charon/exit_keys:/opt/charon/exit_keys"
-      --epoch=1
+      --epoch=112260
     volumes:
       - ".charon/exit_keys:/opt/charon/exit_keys"
 
