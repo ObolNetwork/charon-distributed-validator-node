@@ -16,6 +16,7 @@ services:
       - 8545:8545
       - 8551:8551/tcp
       - 8551:8551/udp
+      - 6060:6060
     command: |
       --goerli
       --http
@@ -27,6 +28,9 @@ services:
       --authrpc.addr=0.0.0.0
       --authrpc.port=8551
       --authrpc.vhosts="*"
+      --metrics
+      --metrics.addr=0.0.0.0
+      --metrics.port=6060
     networks: [dvnode]
     volumes:
       - ./data/geth:/root/.ethereum
