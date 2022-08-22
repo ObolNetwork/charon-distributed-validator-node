@@ -282,3 +282,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
    - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
    - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
