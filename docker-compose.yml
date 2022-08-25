@@ -9,7 +9,7 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:v1.10.21
+    image: ethereum/client-go:v1.10.23
     ports:
       - 30303:30303/tcp
       - 30303:30303/udp
@@ -45,7 +45,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:v2.5.1
+    image: sigp/lighthouse:v3.0.0
     depends_on:
       - geth
     ports:
@@ -113,7 +113,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:22.8.0
+    image: consensys/teku:22.8.1
     depends_on:
       - charon
       - lighthouse
