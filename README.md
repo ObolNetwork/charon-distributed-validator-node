@@ -207,7 +207,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 1. How do I get my ENR if I want to generate it again?
 
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v10.0 enr`. This prints the ENR on your screen.
+   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.10.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 2. What do I do if lose my `charon-enr-private-key`?
