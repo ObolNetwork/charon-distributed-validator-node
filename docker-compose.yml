@@ -9,7 +9,7 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:v1.10.22
+    image: ethereum/client-go:v1.10.23
     ports:
       - 30303:30303/tcp
       - 30303:30303/udp

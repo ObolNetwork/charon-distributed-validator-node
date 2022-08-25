@@ -33,7 +33,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 cd charon-distributed-validator-node
 
 # Create your charon ENR private key, this will create a charon-enr-private-key file in the .charon directory
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 create enr
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.10.0 create enr
 ```
 
 You should expect to see a console output like
@@ -61,7 +61,7 @@ cp .env.sample .env
 
 # Set FEE_RECIPIENT_ADDRESS and WITHDRAWAL_ADDRESS to ETH1 addresses of your choice.
 # NAME can be any random string like "Obol Team"
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.9.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.10.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
 
 # The above command prepares a DKG configuration file.
 ```
@@ -76,7 +76,7 @@ Every cluster member then participates in the DKG ceremony. For Charon v1, this 
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 dkg --p2p-bootnode-relay
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.10.0 dkg --p2p-bootnode-relay
 ```
 
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
@@ -194,7 +194,7 @@ Configure **ALL** charon nodes in your cluster to use this bootnode:
 - Either by adding a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
 - Or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
 
-Note that a local `boonode/.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts. 
+Note that a local `boonode/.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts.
 
 # Project Status
 
@@ -207,7 +207,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 1. How do I get my ENR if I want to generate it again?
 
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.9.0 enr`. This prints the ENR on your screen.
+   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v10.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 2. What do I do if lose my `charon-enr-private-key`?
@@ -255,6 +255,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
 8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+
    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
 9. How do I voluntary exit a validator?
