@@ -237,7 +237,7 @@ docker-compose up
 You can check your logs using
 `docker-compose logs --tail 100 -f`
 
-<details>
+<details open>
 <summary><h2>ENR & Keys</h2></summary>
 <details>
 <summary><h4>How do I get my ENR if I want to generate it again?</h4></summary>
@@ -248,7 +248,7 @@ You can check your logs using
 </details>
 
 <details>
-<summary><h4>What do I do if lose my <code>charon-enr-private-key</code>?</h4></summary>
+    <summary><h4>What do I do if lose my <code>charon-enr-private-key</code>?</h4></summary>
 <ul>
 <li>For now, ENR rotation/replacement is not supported, it will be supported in a future release.</li>
 <li>Therefore, it's advised to always keep a backup of your <code>private-key</code> in a secure location (ex: cloud storage, USB Flash drive etc.)</li>
@@ -264,7 +264,7 @@ You can check your logs using
 </details>
 </details>
 
-<details>
+<details open>
 <summary><h2>Lighthouse</h2></summary>
 <details>
 <summary><h4>Downloading historical blocks</h4></summary>
@@ -284,7 +284,7 @@ This could be linked to a internet connection being to slow or relying on a slow
 </details>
 </details>
 
-<details>
+<details open>
 <summary><h2>Beacon Node</h2></summary>
 <details>
 <summary><h4><code>Error communicating with Beacon Node API</code> & <code>Error while connecting to beacon node event stream</code></h4></summary>
@@ -309,7 +309,7 @@ We are working on https://github.com/ObolNetwork/charon/issues/960 to mitigate a
 
 </details>
 
-<details>
+<details open>
 <summary><h2>Charon</h2></summary>
 <details>
 <summary><h4><code>Attester failed in consensus component</code> error</h4></summary>
@@ -352,7 +352,7 @@ This could also be due to the bootnode being overloaded in general, so reaching 
 </details>
 </details>
 
-<details>
+<details open>
 <summary><h2>Teku</h2></summary>
 <details>
 <summary><h4>Teku <code>keystore file</code> error</h4></summary>
@@ -362,7 +362,7 @@ Teku sometimes logs an error which looks like <code>Keystore file /opt/charon/va
 </details>
 </details>
 
-<details>
+<details open>
 <summary><h2>Grafana</h2></summary>
 <details>
 <summary><h4>How to fix the grafana dashboard?</h4></summary>
@@ -381,7 +381,7 @@ Can be linked to the <a href="https://github.com/ObolNetwork/charon-distributed-
 </details>
 </details>
 
-<details>
+<details open>
 <summary><h2>Prometheus</h2></summary>
 <details>
 <summary><h4><code>Unauthorized: authentication error: invalid token</code></h4></summary>
@@ -392,7 +392,7 @@ Check <a href="https://discord.com/channels/849256203614945310/10039215829656741
 
 </details>
 
-<details>
+<details open>
 <summary><h2>Docker</h2></summary>
 <details>
 <summary><h4>How to fix <code>permission denied</code> errors?</h4></summary>
@@ -415,7 +415,7 @@ You can also add a second beacon node endpoint for something like infura by addi
 
 </details>
 
-<details>
+<details open>
 <summary><h2>Standalone Bootnode</h2></summary>
 <details>
 <summary><h4><code>Resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host</code> error</h4></summary>
