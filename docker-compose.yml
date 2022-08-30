@@ -80,7 +80,7 @@ services:
 
   charon:
     # Pegged charon version (update this for each release).
-    image: obolnetwork/charon:v0.10.0
+    image: obolnetwork/charon:2f03b05
     depends_on:
       - lighthouse
     environment:

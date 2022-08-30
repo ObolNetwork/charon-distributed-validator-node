@@ -2517,7 +2517,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Total Balance of Validators",
+      "description": "Total Balance of Validators and beaconcha.in links for each public key.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2534,7 +2534,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-blue",
                 "value": null
               },
               {
@@ -2598,6 +2598,28 @@
                 "value": "ETH"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pubkey_full"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "beaconcha.in",
+                    "url": "https://goerli.beaconcha.in/validator/${__data.fields[\"Public Key\"]}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              }
+            ]
           }
         ]
       },
@@ -2635,7 +2657,7 @@
           "refId": "A"
         }
       ],
-      "title": "Validator Balance",
+      "title": "Validators",
       "transformations": [
         {
           "id": "organize",
@@ -2643,12 +2665,14 @@
             "excludeByName": {
               "Time": true,
               "instance": true,
-              "job": true
+              "job": true,
+              "pubkey": true
             },
             "indexByName": {},
             "renameByName": {
               "Value": "Balance",
-              "pubkey": "Public Key"
+              "pubkey": "",
+              "pubkey_full": "Public Key"
             }
           }
         }
@@ -3220,6 +3244,6 @@
   "timezone": "",
   "title": "Single Charon Node Dashboard",
   "uid": "singlenode",
-  "version": 6,
+  "version": 3,
   "weekStart": ""
 }
