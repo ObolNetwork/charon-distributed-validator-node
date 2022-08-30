@@ -2513,12 +2513,155 @@
       "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "Total Balance of Validators",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "decimals": 5,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 32,
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 30,
+                      "result": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "to": 32
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "red",
+                        "index": 2
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  }
+                ]
+              },
+              {
+                "id": "unit",
+                "value": "ETH"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 38
+      },
+      "id": 88,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.7",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "core_scheduler_validator_balance_gwei / 1000000000",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{pubkey}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Validator Balance",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "instance": true,
+              "job": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value": "Balance",
+              "pubkey": "Public Key"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 44
       },
       "id": 50,
       "panels": [],
@@ -2557,7 +2700,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 45
       },
       "id": 36,
       "options": {
@@ -2637,7 +2780,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 40
+        "y": 46
       },
       "id": 25,
       "links": [],
@@ -2714,7 +2857,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 40
+        "y": 46
       },
       "id": 23,
       "links": [],
@@ -2777,7 +2920,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 40
+        "y": 46
       },
       "id": 29,
       "options": {
@@ -2842,7 +2985,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 40
+        "y": 46
       },
       "id": 30,
       "options": {
@@ -2910,7 +3053,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 40
+        "y": 46
       },
       "id": 21,
       "options": {
@@ -3012,7 +3155,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 44
+        "y": 50
       },
       "id": 27,
       "options": {
