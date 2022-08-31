@@ -1290,7 +1290,7 @@
           "refId": "A"
         }
       ],
-      "title": "Version Info",
+      "title": "Cluster Info",
       "transformations": [
         {
           "id": "labelsToFields",
