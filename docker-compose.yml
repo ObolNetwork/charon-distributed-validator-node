@@ -83,8 +83,7 @@ services:
     image: obolnetwork/charon:${CHARON_VERSION}
     depends_on:
       - lighthouse
-    env_file:
-      - .env
+    env_file: .env
     ports:
       - 3600:3600/tcp # Validator API
       - 3610:3610/tcp # Libp2p
