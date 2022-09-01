@@ -80,20 +80,10 @@ services:
 
   charon:
     # Pegged charon version (update this for each release).
-    image: obolnetwork/charon:d3ae2c2
+    image: obolnetwork/charon:${CHARON_VERSION}
     depends_on:
       - lighthouse
-    environment:
-      CHARON_BEACON_NODE_ENDPOINTS: http://lighthouse:5052
-      CHARON_JAEGER_ADDRESS: jaeger:6831
-      CHARON_VALIDATOR_API_ADDRESS: 0.0.0.0:3600
-      CHARON_P2P_TCP_ADDRESS: 0.0.0.0:3610
-      CHARON_MONITORING_ADDRESS: 0.0.0.0:3620
-      CHARON_P2P_UDP_ADDRESS: 0.0.0.0:3630
-      CHARON_P2P_BOOTNODE_RELAY: "true"
-      CHARON_LOG_LEVEL: info
-      CHARON_JAEGER_SERVICE: charon
-      CHARON_P2P_EXTERNAL_HOSTNAME: charon
+    env_file: .env
     ports:
       - 3600:3600/tcp # Validator API
       - 3610:3610/tcp # Libp2p
