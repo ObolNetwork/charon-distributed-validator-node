@@ -95,7 +95,6 @@ services:
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
       - CHARON_JAEGER_ADDRESS=${CHARON_JAEGER_ADDRESS-jaeger:6831} # Overriding to empty address allowed
       - CHARON_JAEGER_SERVICE=charon
-    entrypoint: [printenv]
     ports:
       - ${CHARON_PORT_VALIDATOR_API:-3600}:3600/tcp # Validator API
       - ${CHARON_PORT_P2P_TCP:-3610}:3610/tcp       # P2P TCP libp2p
