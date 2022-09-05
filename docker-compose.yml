@@ -1,5 +1,7 @@
 version: "3.8"
 
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+
 services:
   #             _   _
   #   __ _  ___| |_| |__
@@ -9,14 +11,13 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:v1.10.23
+    image: ethereum/client-go:${GETH_VERSION:-v1.10.23}
     ports:
-      - 30303:30303/tcp
-      - 30303:30303/udp
-      - 8545:8545
-      - 8551:8551/tcp
-      - 8551:8551/udp
-      - 6060:6060
+      - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
+      - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
+      - ${GETH_PORT_HTTP:-8545}:8545      # JSON-RPC
+      - ${GETH_PORT_AUTH:-8551}:8551      # AUTH-RPC
+      - ${GETH_PORT_METRICS:-6060}:6060   # Metrics
     command: |
       --goerli
       --http
@@ -45,13 +46,13 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:v3.0.0
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.0.0}
     depends_on:
       - geth
     ports:
-      - 9000:9000/tcp
-      - 9000:9000/udp
-      - 5052:5052
+      - ${LIGHTHOUSE_PORT_P2P:-9000}:30303/tcp    # P2P TCP
+      - ${LIGHTHOUSE_PORT_P2P:-9000}:30303/udp    # P2P UDP
+      - ${LIGHTHOUSE_PORT_METRICS:-5052}:5052     # Metrics
     command: |
       lighthouse bn
       --network=goerli
@@ -79,16 +80,27 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    # Pegged charon version (update this for each release).
-    image: obolnetwork/charon:${CHARON_VERSION}
+    image: obolnetwork/charon:${CHARON_VERSION:-v0.10.0}
     depends_on:
       - lighthouse
-    env_file: .env
+    environment:
+      - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
+      - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
+      - CHARON_P2P_BOOTNODES=${CHARON_P2P_BOOTNODES:-http://bootnode.lb.gcp.obol.tech:3640/enr}
+      - CHARON_P2P_BOOTNODE_RELAY=${CHARON_P2P_BOOTNODE_RELAY:-true}
+      - CHARON_P2P_EXTERNAL_HOSTNAME=${CHARON_P2P_EXTERNAL_HOSTNAME:-} # Empty default required to avoid warnings.
+      - CHARON_P2P_TCP_ADDRESS=0.0.0.0:3610
+      - CHARON_P2P_UDP_ADDRESS=0.0.0.0:3630
+      - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
+      - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
+      - CHARON_JAEGER_ADDRESS=${CHARON_JAEGER_ADDRESS-jaeger:6831} # Overriding to empty address allowed
+      - CHARON_JAEGER_SERVICE=charon
+    entrypoint: [printenv]
     ports:
-      - 3600:3600/tcp # Validator API
-      - 3610:3610/tcp # Libp2p
-      - 3620:3620/tcp # Monitoring
-      - 3630:3630/udp # Discv5
+      - ${CHARON_PORT_VALIDATOR_API:-3600}:3600/tcp # Validator API
+      - ${CHARON_PORT_P2P_TCP:-3610}:3610/tcp       # P2P TCP libp2p
+      - ${CHARON_PORT_MONITORING:-3620}:3620/tcp    # Monitoring
+      - ${CHARON_PORT_P2P_UDP:-3630}:3630/udp       # P2P UDP discv5
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
@@ -103,12 +115,12 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:22.8.1
+    image: consensys/teku:${TEKU_VERSION:-22.9}
     depends_on:
       - charon
       - lighthouse
     ports:
-      - 8008:8008
+      - ${TEKU_PORT_METRICS:-8008}:8008 # Metrics
     command: |
       validator-client
       --config-file "/opt/charon/teku/teku_config.yaml"
@@ -129,7 +141,7 @@ services:
     image: prom/prometheus:v2.38.0
     user: ":"
     ports:
-      - "9090:9090"
+      - ${MONITORING_PORT_PROMETHEUS:-9090}:9090
     networks: [dvnode]
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -140,7 +152,7 @@ services:
     user: ":"
     depends_on: [prometheus]
     ports:
-      - "3000:3000"
+      - ${MONITORING_PORT_GRAFANA:-3000}:3000
     networks: [dvnode]
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
@@ -151,14 +163,12 @@ services:
 
   node-exporter:
     image: prom/node-exporter:latest
-    ports:
-      - "9100:9100"
     networks: [dvnode]
 
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686"
+      - ${MONITORING_PORT_JAEGER:-16686}:16686
     networks: [dvnode]
 
 networks:

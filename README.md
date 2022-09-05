@@ -49,21 +49,19 @@ If you are taking part in an organised Obol testnet, submit the created ENR publ
 
 ## Step 2. Leader creates the DKG configuration file and distributes it to everyone else
 
-One person, in the cluster or otherwise, will prepare the configuration file for the distributed key generation ceremony using the `charon create dkg` command. For the official Obol testnets, this step will be completed by an Obol core team member or the cluster captain and the definition file will be distributed to the cluster members for DKG completion.
+One person, in the cluster or otherwise, will prepare the `cluster-definition.json` file for the distributed key generation ceremony using the `charon create dkg` command. For the official Obol testnets, this step will be completed by an Obol core team member or the cluster captain and the definition file will be distributed to the cluster members for DKG completion.
 
 In future, step 1 and step 2 of this guide will use the [Obol Distributed Validator Launchpad](https://docs.obol.tech/docs/dvk/distributed_validator_launchpad) to facilitate and verify these files are created in an authenticated manner.
 
 ```
 # Prepare an environment variable file
-cp .env.sample .env
+cp .env.create_dkg.sample .env.create_dkg
 
-# Set the ENRs of all the operators participating in the DKG ceremony in the .env file variable CHARON_OPERATOR_ENRS
+# Populate the .env.create_dkg file with the cluster name, the fee recipient and withdrawal Ethereum addresses and the 
+# operator ENRs of all the operators participating in the DKG ceremony.
 
-# Set FEE_RECIPIENT_ADDRESS and WITHDRAWAL_ADDRESS to ETH1 addresses of your choice.
-# NAME can be any random string like "Obol Team"
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env obolnetwork/charon:v0.10.0 create dkg --name=$NAME --fee-recipient-address=$FEE_RECIPIENT_ADDRESS --withdrawal-address=$WITHDRAWAL_ADDRESS
-
-# The above command prepares a DKG configuration file.
+# Run the `charon create dkg` command that generates DKG cluster-definition.json file.
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env.create_dkg obolnetwork/charon:v0.10.0 create dkg
 ```
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster.
@@ -192,7 +190,7 @@ Ensure the ENR returned by the bootnode contains the correct public IP and port 
 Configure **ALL** charon nodes in your cluster to use this bootnode:
 
 - Either by adding a flag: `--p2p-bootnodes=http://replace.with.public.ip.or.hostname:3640/enr`
-- Or by setting the environment variable: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
+- Or by setting the environment variable in the `.env` file: `CHARON_P2P_BOOTNODES=http://replace.with.public.ip.or.hostname:3640/enr`
 
 Note that a local `boonode/.charon/charon-enr-private-key` file will be created next to `bootnode/docker-compose.yml` to ensure a persisted bootnode ENR across restarts.
 
@@ -271,9 +269,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
      - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
    - Ensure the latest fork version epoch is used:
      - Voluntary exists require an epoch after which they take effect.
-     - All VCs need to sign and submit the exact same messages (epoch) in DVT.
-     - `--epoch=1` would be ideal, since all chains have that epoch in the past, so the validator should exit immediately.
-     - There is however a [bug](https://github.com/sigp/lighthouse/issues/3471) in lighthouse requiring an epoch that maps to the latest fork version to be used.
+     - All VCs need to sign and submit the exact same messages (epoch) in DVT. Using the epoch of the latest fork version is well known option.
      - `compose-volutary-exit.yml` is configured with `--epoch=112260` which is the latest Bellatrix fork on Prater.
      - If the Charon cluster is running on a different chain, **ALL** operators must update `--epoch` to the same latest fork version returned by `curl $BEACON_NODE/eth/v1/config/fork_schedule`.
    - Run the command to submit this node's partially signed voluntary exit:
