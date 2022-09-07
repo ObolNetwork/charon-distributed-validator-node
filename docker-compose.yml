@@ -2,6 +2,13 @@ version: "3.8"
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "10"
+
 services:
   #             _   _
   #   __ _  ___| |_| |__
@@ -37,6 +44,7 @@ services:
       - ./data/geth:/root/.ethereum
       - ./jwt:/root/jwt
     restart: on-failure
+    <<: *logging
 
   #  _ _       _     _   _
   # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
@@ -72,6 +80,7 @@ services:
       - ./data/lighthouse:/opt/app/beacon
       - ./jwt:/opt/jwt
     restart: on-failure
+    <<: *logging
 
   #       _
   #   ___| |__   __ _ _ __ ___  _ __
@@ -106,6 +115,7 @@ services:
     restart: on-failure
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
+    <<: *logging
 
   #  _       _
   # | |_ ___| | ___   _
@@ -128,6 +138,7 @@ services:
       - ".charon/validator_keys:/opt/charon/validator_keys"
       - "./config:/opt/charon/teku"
     restart: on-failure
+    <<: *logging
 
   #                        _ _             _
   #  _ __ ___   ___  _ __ (_) |_ ___  _ __(_)_ __   __ _
@@ -145,6 +156,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    <<: *logging
 
   grafana:
     image: grafana/grafana:9.0.7
@@ -159,16 +171,21 @@ services:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
       - ./data/grafana:/var/lib/grafana
+    <<: *logging
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.3.1
+    ports:
+      - "9100:9100"
     networks: [dvnode]
+    <<: *logging
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.37
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
     networks: [dvnode]
+    <<: *logging
 
 networks:
   dvnode:
