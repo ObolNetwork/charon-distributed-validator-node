@@ -175,8 +175,6 @@ services:
 
   node-exporter:
     image: prom/node-exporter:v1.3.1
-    ports:
-      - "9100:9100"
     networks: [dvnode]
     <<: *logging
 
