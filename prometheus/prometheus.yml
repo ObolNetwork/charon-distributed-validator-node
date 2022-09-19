@@ -1,12 +1,13 @@
 global:
-  scrape_interval:     30s # Set the scrape interval to every 30 seconds. Default is every 1 minute.
-  evaluation_interval: 30s # Evaluate rules every 30 seconds. The default is every 1 minute.
+  scrape_interval:     30s # Set the scrape interval to every 30 seconds.
+  evaluation_interval: 30s # Evaluate rules every 30 seconds.
+  external_labels:
+    cluster_name: $CLUSTER_NAME
 
 remote_write:
-  - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
+  - url: https://vm.monitoring.gcp.obol.tech/write
     authorization:
-      credentials: 436764:$PROM_REMOTE_WRITE_TOKEN
-    name: obol-prom
+      credentials: $PROM_REMOTE_WRITE_TOKEN
   
 scrape_configs:
   - job_name: 'geth'
