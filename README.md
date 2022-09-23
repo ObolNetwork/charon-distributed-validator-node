@@ -204,32 +204,43 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 
 # FAQs:
 
-1. How do I get my ENR if I want to generate it again?
+2. How do I get my ENR if I want to generate it again?
 
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
    - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.10.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
-2. What do I do if lose my `charon-enr-private-key`?
+3. What do I do if lose my `charon-enr-private-key`?
 
    - For now, ENR rotation/replacement is not supported, it will be supported in a future release.
    - Therefore, it's advised to always keep a backup of your `private-key` in a secure location (ex: cloud storage, USB Flash drive etc.)
 
-3. I have run the command in `Step 1` but I can't find the keys anywhere.
+4. I have run the command in `Step 1` but I can't find the keys anywhere.
 
    - The `charon-enr-private-key` is generated inside a hidden folder `.charon`.
    - To view it, run `ls -al` in your terminal.
    - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
    - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
 
-4. Why does Teku throw a keystore file error?
+5. How do I override the default config provided in this repo with my own custom values?
+
+   - This repo uses docker compose to run and configure all the different components of the DVT stack.
+   - The `docker-compose.yml` file contains the default configuration such that no custom configuration is required. As long as the canonical folder structure is maintained.
+   - Some users might however want to override the default config. E.g., changing image versions, using external beacon API, using custom bootnodes, etc.
+   - Instead of modifying `docker-compose.yml` directly, which causes git conflicts when pulling new versions of this repo, users can provide custom config in a `.env` file.
+   - This functionality is made possible by the [special env var syntax](https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files) in `docker-compose.yml` which defines a default if the env var isn't present. E.g., `${CHARON_VERSION:-v0.10.0}` defaults to `v0.10.0` or to the value of `CHARON_VERSION` env var if present.
+   - Docker compose also automatically loads environment variables from a local `.env` file.
+   - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
+   - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
+
+7. Why does Teku throw a keystore file error?
 
    - Teku sometimes logs an error which looks like:
      `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`.
    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
 
-5. How to fix the grafana dashboard?
+8. How to fix the grafana dashboard?
 
    - Sometimes, grafana dashboard doesn't load any data first time around
    - You can solve this by following the steps below:
@@ -238,7 +249,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
      - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
      - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
 
-6. How to fix `permission denied` errors?
+9. How to fix `permission denied` errors?
 
    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems.
    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
@@ -248,36 +259,37 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
        - `mkdir .charon` (if it doesn't already exist)
        - `sudo chmod -R 666 .charon`
 
-7. I see a lot of errors after running `docker-compose up`.
+10. I see a lot of errors after running `docker-compose up`.
 
-   - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
-   - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-   - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
+    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
-8. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+11. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
 
-   - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
+    - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
-9. How do I voluntary exit a validator?
-   - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
-   - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
-   - Note: Quorum peers in the cluster need to perform this task to exit a validator.
-   - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
-   - Copy the validator keys and passwords that you want to exit from the `validator_keys` folder to the `exit_keys` folder.
-     - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/`
-     - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
-   - Ensure the external network in `compose-volutary-exit.yml` is correct.
-     - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
-     - If it isn't `charon-distributed-validator-node-dvnode`, then update `compose-volutary-exit.yml` accordingly.
-   - Ensure the latest fork version epoch is used:
-     - Voluntary exists require an epoch after which they take effect.
-     - All VCs need to sign and submit the exact same messages (epoch) in DVT. Using the epoch of the latest fork version is well known option.
-     - `compose-volutary-exit.yml` is configured with `--epoch=112260` which is the latest Bellatrix fork on Prater.
-     - If the Charon cluster is running on a different chain, **ALL** operators must update `--epoch` to the same latest fork version returned by `curl $BEACON_NODE/eth/v1/config/fork_schedule`.
-   - Run the command to submit this node's partially signed voluntary exit:
-     - `docker-compose -f compose-voluntary-exit.yml up`
-     - Confirm the logs: `Exit for validator XXXXX submitted`
-     - Exit the container: `Ctrl-C`
-   - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
-   - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
-   - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+12. How do I voluntary exit a validator?
+    - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
+    - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
+    - To override any default config defined in `compose-volutary-exit.yml`, copy `.env.sample` to `.env` and update any of the "Voluntary Exit Config" env vars.
+    - Note: Quorum peers in the cluster need to perform this task to exit a validator.
+    - Create a new `exit_keys` folder next to `.charon/validator_keys`: `mkdir .charon/exit_keys`
+    - Copy the validator keys and passwords that you want to exit from the `validator_keys` folder to the `exit_keys` folder.
+      - E.g. to exit validator #4: `cp .charon/validator_keys/keystore/keystore-4* .charon/exit_keys/`
+      - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
+    - Ensure the external network in `compose-volutary-exit.yml` is correct.
+      - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
+      - If it isn't `charon-distributed-validator-node-dvnode`, then update the `EXIT_DOCKER_NETWORK` env var in `.env` accordingly.
+    - Ensure the latest fork version epoch is used:
+      - Voluntary exists require an epoch after which they take effect.
+      - All VCs need to sign and submit the exact same messages (epoch) in DVT. Using the epoch of the latest fork version is well known option.
+      - `compose-volutary-exit.yml` is configured with `--epoch=112260` which is the latest Bellatrix fork on Prater.
+      - If the Charon cluster is running on a different chain, **ALL** operators must update the `EXIT_EPOCH` env var in `.env` to the same latest fork version returned by `curl $BEACON_NODE/eth/v1/config/fork_schedule`.
+    - Run the command to submit this node's partially signed voluntary exit:
+      - `docker-compose -f compose-voluntary-exit.yml up`
+      - Confirm the logs: `Exit for validator XXXXX submitted`
+      - Exit the container: `Ctrl-C`
+    - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
+    - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
+    - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
