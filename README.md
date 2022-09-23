@@ -150,7 +150,7 @@ global:
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
     authorization:
-      credentials: 436764:eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ
+      credentials: eyJtZXNzYWdlIjoiSldUIFJ1bGVzISIsImlhdCI6MTQ1OTQ0ODExOSwiZXhwIjoxNDU5NDU0NTE5fQ
 
 scrape_configs:
   - job_name: 'charon'
