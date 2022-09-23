@@ -46,7 +46,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.0.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.1.0}
     depends_on:
       - geth
     ports:
