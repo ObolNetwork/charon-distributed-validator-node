@@ -233,6 +233,13 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
 
+6. How do configure `charon` with additional flags not provided in `docker-compose.yml`?
+
+   - As mentioned above, users can override config in `docker-compose.yml` via env vars in `.env`. But charon has a lot more config flags available than those few specified in `docker-compose.yml`.
+   - To customise and configure any additional config flags in charon, create a new `.env.charon.custom` file.
+   - Populate any [config flags supported by charon](https://github.com/ObolNetwork/charon/blob/main/docs/configuration.md#configuration-options) as env var using upper case prefixed with `CHARON`, ie. `CHARON_LOG_FORMAT=logfmt`
+   - Enable additional custom config by uncommenting `#CHARON_CUSTOM_ENV_FILE=.env.charon.custom` in `.env`.
+
 7. Why does Teku throw a keystore file error?
 
    - Teku sometimes logs an error which looks like:
