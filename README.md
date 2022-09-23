@@ -228,7 +228,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - The `docker-compose.yml` file contains the default configuration such that no custom configuration is required. As long as the canonical folder structure is maintained.
    - Some users might however want to override the default config. E.g., changing image versions, using external beacon API, using custom bootnodes, etc.
    - Instead of modifying `docker-compose.yml` directly, which causes git conflicts when pulling new versions of this repo, users can provide custom config in a `.env` file.
-   - This functionality is made possible by the [special env var syntax](https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files) in `docker-compose.yml` which defines a default if the env var isn't present. E.g., `${CHARON_VERSION:-v0.10.0}` defaults to v0.10.0 or to the value of `CHARON_VERSION` env var if present.
+   - This functionality is made possible by the [special env var syntax](https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files) in `docker-compose.yml` which defines a default if the env var isn't present. E.g., `${CHARON_VERSION:-v0.10.0}` defaults to `v0.10.0` or to the value of `CHARON_VERSION` env var if present.
    - Docker compose also automatically loads environment variables from a local `.env` file.
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
