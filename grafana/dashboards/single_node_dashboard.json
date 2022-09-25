@@ -2684,7 +2684,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "core_scheduler_validator_balance_gwei / 1000000000",
+          "expr": "sum by (pubkey_full) (core_scheduler_validator_balance_gwei) / 1000000000",
           "format": "table",
           "instant": true,
           "legendFormat": "{{pubkey}}",
@@ -2706,7 +2706,7 @@
             "indexByName": {},
             "renameByName": {
               "Value": "Balance",
-              "pubkey": "",
+              "pubkey": "Public Key",
               "pubkey_full": "Public Key"
             }
           }
