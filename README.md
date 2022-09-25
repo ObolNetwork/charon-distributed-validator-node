@@ -57,8 +57,7 @@ In future, step 1 and step 2 of this guide will use the [Obol Distributed Valida
 # Prepare an environment variable file
 cp .env.create_dkg.sample .env.create_dkg
 
-# Populate the .env.create_dkg file with the cluster name, the fee recipient and withdrawal Ethereum addresses and the
-# operator ENRs of all the operators participating in the DKG ceremony.
+# Populate the .env.create_dkg file with the cluster name, the fee recipient and withdrawal Ethereum addresses and the operator ENRs of all the operators participating in the DKG ceremony.
 
 # Run the `charon create dkg` command that generates DKG cluster-definition.json file.
 docker run --rm -v "$(pwd):/opt/charon" --env-file .env.create_dkg obolnetwork/charon:v0.10.0 create dkg
