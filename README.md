@@ -233,21 +233,14 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
 
-6. How do configure `charon` with additional flags not provided in `docker-compose.yml`?
-
-   - As mentioned above, users can override config in `docker-compose.yml` via env vars in `.env`. But charon has a lot more config flags available than those few specified in `docker-compose.yml`.
-   - To customise and configure any additional config flags in charon, create a new `.env.charon.custom` file.
-   - Populate any [config flags supported by charon](https://github.com/ObolNetwork/charon/blob/main/docs/configuration.md#configuration-options) as env var using upper case prefixed with `CHARON`, ie. `CHARON_LOG_FORMAT=logfmt`
-   - Enable additional custom config by uncommenting `#CHARON_CUSTOM_ENV_FILE=.env.charon.custom` in `.env`.
-
-7. Why does Teku throw a keystore file error?
+6. Why does Teku throw a keystore file error?
 
    - Teku sometimes logs an error which looks like:
      `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`.
    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
 
-8. How to fix the grafana dashboard?
+7. How to fix the grafana dashboard?
 
    - Sometimes, grafana dashboard doesn't load any data first time around
    - You can solve this by following the steps below:
@@ -256,7 +249,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
      - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
      - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
 
-9. How to fix `permission denied` errors?
+8. How to fix `permission denied` errors?
 
    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems.
    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
@@ -266,17 +259,17 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
        - `mkdir .charon` (if it doesn't already exist)
        - `sudo chmod -R 666 .charon`
 
-10. I see a lot of errors after running `docker-compose up`.
+9. I see a lot of errors after running `docker-compose up`.
 
-    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
-    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
+   - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+   - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+   - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
-11. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+10. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
 
     - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
-12. How do I voluntary exit a validator?
+11. How do I voluntary exit a validator?
     - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
     - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
     - To override any default config defined in `compose-volutary-exit.yml`, copy `.env.sample` to `.env` and update any of the "Voluntary Exit Config" env vars.
