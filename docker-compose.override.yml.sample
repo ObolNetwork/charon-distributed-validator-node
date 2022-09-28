@@ -6,9 +6,10 @@
 # Just copy this file to `docker-compose.override.yml` and customise it to your liking.
 # `cp docker-compose.override.yml.sample docker-compose.override.yml`
 
-# Some example overrides are commented out below, any uncommented section
+# Some example overrides are commented out below. Any uncommented section
 # below will automatically override the same section in
 # docker-compose.yml when ran with `docker-compose up`.
+# See https://docs.docker.com/compose/extends/#adding-and-overriding-configuration for details.
 
 # WARNING: This is for power users only and requires a deep understanding of Docker Compose
 # and how the local docker-compose.yml is configured.
@@ -19,19 +20,13 @@ services:
     #profiles: [disable]
 
   lighthouse:
-    # Remove dependency if geth disabled
-    #depends_on: []
-
     # Disable lighthouse
     #profiles: [disable]
 
   charon:
-    # Remove dependency if lighthouse disabled
-    #depends_on: []
-
     # Configure any addition env var flags in .env.charon.more
-    #env-file: [.env.charon.more]
+    #env_file: [.env.charon.more]
 
   teku:
     # Disable teku
-    #profiles: [teku]
+    #profiles: [disable]
