@@ -1,4 +1,6 @@
 .env
+.env.charon.more
+docker-compose.override.yml
 charon-enr-private-key
 validator_keys/
 keystore-*
