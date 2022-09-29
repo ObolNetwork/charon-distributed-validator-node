@@ -24,7 +24,7 @@ services:
     #profiles: [disable]
 
   charon:
-    # Configure any addition env var flags in .env.charon.more
+    # Configure any additional env var flags in .env.charon.more
     #env_file: [.env.charon.more]
 
   teku:
