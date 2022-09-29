@@ -1,28 +1,26 @@
 global:
-  scrape_interval:     30s # Set the scrape interval to every 30 seconds.
+  scrape_interval: 30s # Set the scrape interval to every 30 seconds.
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
-  external_labels:
-    cluster_name: $CLUSTER_NAME
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
     authorization:
       credentials: $PROM_REMOTE_WRITE_TOKEN
-  
+
 scrape_configs:
-  - job_name: 'geth'
+  - job_name: "geth"
     metrics_path: /debug/metrics/prometheus
     static_configs:
-      - targets: ['geth:6060']
-  - job_name: 'lighthouse'
+      - targets: ["geth:6060"]
+  - job_name: "lighthouse"
     static_configs:
-      - targets: ['lighthouse:5054']
-  - job_name: 'charon'
+      - targets: ["lighthouse:5054"]
+  - job_name: "charon"
     static_configs:
-      - targets: ['charon:3620']
-  - job_name: 'teku'
+      - targets: ["charon:3620"]
+  - job_name: "teku"
     static_configs:
-      - targets: ['teku:8008']   
-  - job_name: 'node-exporter'
+      - targets: ["teku:8008"]
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
