@@ -1,0 +1,32 @@
+# The "Multiple Compose File" feature provides a very powerful way to override
+# any configuration in docker-compose.yml without needing to modify
+# git-checked-in files since that results in conflicts when upgrading this repo.
+# See https://docs.docker.com/compose/extends/#multiple-compose-files for more.
+
+# Just copy this file to `docker-compose.override.yml` and customise it to your liking.
+# `cp docker-compose.override.yml.sample docker-compose.override.yml`
+
+# Some example overrides are commented out below. Any uncommented section
+# below will automatically override the same section in
+# docker-compose.yml when ran with `docker-compose up`.
+# See https://docs.docker.com/compose/extends/#adding-and-overriding-configuration for details.
+
+# WARNING: This is for power users only and requires a deep understanding of Docker Compose
+# and how the local docker-compose.yml is configured.
+
+services:
+  geth:
+    # Disable geth
+    #profiles: [disable]
+
+  lighthouse:
+    # Disable lighthouse
+    #profiles: [disable]
+
+  charon:
+    # Configure any additional env var flags in .env.charon.more
+    #env_file: [.env.charon.more]
+
+  teku:
+    # Disable teku
+    #profiles: [disable]
