@@ -2,6 +2,12 @@ version: "3.8"
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: http://localhost:${MONITORING_PORT_LOKI:-3100}/loki/api/v1/push
+
 services:
   #             _   _
   #   __ _  ___| |_| |__
@@ -78,10 +84,12 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
+    <<: *logging
     image: obolnetwork/charon:${CHARON_VERSION:-v0.10.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
+      - CHARON_LOG_FORMAT=${CHARON_LOG_FORMAT:-logfmt}
       - CHARON_P2P_BOOTNODES=${CHARON_P2P_BOOTNODES:-http://bootnode.lb.gcp.obol.tech:3640/enr}
       - CHARON_P2P_BOOTNODE_RELAY=${CHARON_P2P_BOOTNODE_RELAY:-true}
       - CHARON_P2P_EXTERNAL_HOSTNAME=${CHARON_P2P_EXTERNAL_HOSTNAME:-} # Empty default required to avoid warnings.
@@ -115,11 +123,11 @@ services:
       - ${TEKU_PORT_METRICS:-8008}:8008 # Metrics
     command: |
       validator-client
-      --config-file "/opt/charon/teku/teku_config.yaml"
+      --config-file "/opt/teku/teku_config.yaml"
     networks: [dvnode]
     volumes:
-      - ".charon/validator_keys:/opt/charon/validator_keys"
-      - "./config:/opt/charon/teku"
+      - .charon/validator_keys:/opt/charon/validator_keys
+      - ./teku:/opt/teku
     restart: on-failure
 
   #                        _ _             _
@@ -138,6 +146,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    restart: on-failure
 
   grafana:
     image: grafana/grafana:9.0.7
@@ -151,6 +160,18 @@ services:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
       - ./data/grafana:/var/lib/grafana
+    restart: on-failure
+
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - ${MONITORING_PORT_LOKI:-3100}:3100
+    networks: [dvnode]
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./data/loki:/opt/loki
+    restart: on-failure
 
   node-exporter:
     image: prom/node-exporter:latest
