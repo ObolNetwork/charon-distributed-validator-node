@@ -164,6 +164,7 @@ services:
 
   loki:
     image: grafana/loki:2.6.1
+    user: ":"
     ports:
       - ${MONITORING_PORT_LOKI:-3100}:3100
     networks: [dvnode]
