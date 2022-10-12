@@ -127,7 +127,7 @@ services:
     networks: [dvnode]
     volumes:
       - .charon/validator_keys:/opt/charon/validator_keys
-      - ./teku:/opt/teku
+      - ./teku/teku_config.yaml:/opt/teku/teku_config.yaml
     restart: on-failure
 
   #                        _ _             _
