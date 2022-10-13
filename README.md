@@ -19,7 +19,14 @@ The following instructions aim to assist a group of users coordinating together 
 
 ## Pre-requisites
 
-Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed. Also, make sure `docker` is running before executing the commands below.
+Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed. 
+
+Ensure you have the [loki docker driver](https://grafana.com/docs/loki/latest/clients/docker-driver/) installed.
+```shell
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+```
+
+Also, make sure `docker` is running before executing the commands below.
 
 ## Step 1. Creating and backing up a private key for charon
 
@@ -219,7 +226,16 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
    - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
 
-5. How do I override the default config provided in this repo with my own custom values?
+5. How do I fix the `plugin "loki" not found` error?
+
+   - If you get the following error when calling `docker-compose up`. 
+   - `Error response from daemon: error looking up logging plugin loki: plugin "loki" not found`
+   - Then install the Loki docker driver.
+```shell
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+```
+
+6. How do I override the default config provided in this repo with my own custom values?
 
    - This repo uses docker compose to run and configure all the different components of the DVT stack.
    - The `docker-compose.yml` file contains the default configuration such that no custom configuration is required. As long as the canonical folder structure is maintained.
@@ -230,14 +246,14 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
 
-6. Why does Teku throw a keystore file error?
+7. Why does Teku throw a keystore file error?
 
    - Teku sometimes logs an error which looks like:
      `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`.
    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
 
-7. How to fix the grafana dashboard?
+8. How to fix the grafana dashboard?
 
    - Sometimes, grafana dashboard doesn't load any data first time around
    - You can solve this by following the steps below:
@@ -246,7 +262,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
      - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
      - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
 
-8. How to fix `permission denied` errors?
+9. How to fix `permission denied` errors?
 
    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems.
    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
@@ -256,17 +272,17 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
        - `mkdir .charon` (if it doesn't already exist)
        - `sudo chmod -R 666 .charon`
 
-9. I see a lot of errors after running `docker-compose up`.
+10. I see a lot of errors after running `docker-compose up`.
 
-   - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
-   - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-   - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
+    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
 
-10. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+11. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
 
     - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
-11. How do I voluntary exit a validator?
+12. How do I voluntary exit a validator?
     - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
     - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
     - To override any default config defined in `compose-volutary-exit.yml`, copy `.env.sample` to `.env` and update any of the "Voluntary Exit Config" env vars.
