@@ -25,29 +25,22 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 3,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Explore Charon Logs",
+      "tooltip": "Explore Charon Logs",
+      "type": "link",
+      "url": "/explore?orgId=1&left=%7B%22datasource%22:%22Loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%7Bcompose_service%3D%5C%22charon%5C%22%7D%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.level%7D%7D%5Ct%7B%7B.msg%7D%7D%60%22,%22queryType%22:%22range%22,%22editorMode%22:%22builder%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
+    }
+  ],
   "liveNow": false,
   "panels": [
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "",
-      "gridPos": {
-        "h": 3,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 8,
-      "options": {
-        "content": "This dashboard contains metrics and panels extracted from Charon structured logs.\n\nSee also: Grafana > Explore",
-        "mode": "markdown"
-      },
-      "pluginVersion": "9.0.7",
-      "type": "text"
-    },
     {
       "datasource": {
         "type": "loki",
@@ -135,7 +128,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 3
+        "y": 0
       },
       "id": 2,
       "options": {
@@ -176,7 +169,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 3
+        "y": 0
       },
       "id": 4,
       "options": {
@@ -212,7 +205,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 6
       },
       "id": 6,
       "options": {
@@ -254,6 +247,6 @@
   "timezone": "",
   "title": "Charon Log Dashboard",
   "uid": "wYIonDS4z",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
