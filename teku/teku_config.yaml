@@ -5,5 +5,6 @@ metrics-interface: "0.0.0.0"
 metrics-port: "8008"
 network: "auto"
 validator-keys: "/opt/charon/validator_keys:/opt/charon/validator_keys"
+validators-keystore-locking-enabled: false
 validators-graffiti: "Obol Distributed Validator"
 validators-proposer-default-fee-recipient: "0x0000000000000000000000000000000000000000"
