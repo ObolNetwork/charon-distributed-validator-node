@@ -85,7 +85,7 @@ services:
 
   charon:
     <<: *logging
-    image: obolnetwork/charon:${CHARON_VERSION:-v0.11.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v0.10.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
