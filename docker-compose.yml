@@ -176,12 +176,20 @@ services:
 
   node-exporter:
     image: prom/node-exporter:latest
-    networks: [dvnode]
+    networks: [wdvnode]
 
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+      - BADGER_SPAN_STORE_TTL=72h
+    volumes:
+      - ./data/jaeger:/badger
     networks: [dvnode]
 
 networks:
