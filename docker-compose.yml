@@ -175,11 +175,11 @@ services:
     restart: on-failure
 
   node-exporter:
-    image: prom/node-exporter:latest
-    networks: [wdvnode]
+    image: bitnami/node-exporter:1.4.0
+    networks: [dvnode]
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.38.1
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
     environment:
