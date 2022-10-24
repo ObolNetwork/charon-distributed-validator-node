@@ -175,13 +175,21 @@ services:
     restart: on-failure
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: bitnami/node-exporter:1.4.0
     networks: [dvnode]
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.38.1
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+      - BADGER_SPAN_STORE_TTL=72h
+    volumes:
+      - ./data/jaeger:/badger
     networks: [dvnode]
 
 networks:
