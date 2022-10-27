@@ -11,7 +11,6 @@ services:
     command: |
       voluntary-exit
       --beacon-node-api-endpoint="http://charon:3600"
-      --validators-keystore-locking-enabled=false
       --confirmation-enabled=false
       --validator-keys="/opt/charon/exit_keys:/opt/charon/exit_keys"
       --epoch=${EXIT_EPOCH:-112260}
