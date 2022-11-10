@@ -276,7 +276,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
 
     - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
     - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-    - You can also add a second beacon node endpoint for something like infura by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84).
+    - You can also add a second beacon node endpoint by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84) file.
 
 11. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
 
