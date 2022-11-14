@@ -17,16 +17,32 @@
 services:
   geth:
     # Disable geth
-    #profiles: [disable]
+    # profiles: [disable]
+    ports:
+      # - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
+      # - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
+      # - ${GETH_PORT_HTTP:-8545}:8545 # JSON-RPC
+      # - ${GETH_PORT_AUTH:-8551}:8551 # AUTH-RPC
+      # - ${GETH_PORT_METRICS:-6060}:6060 # Metrics
 
   lighthouse:
     # Disable lighthouse
-    #profiles: [disable]
+    # profiles: [disable]
+    ports:
+      # - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
+      # - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
+      # - ${LIGHTHOUSE_PORT_METRICS:-5052}:5052   # Metrics
 
   charon:
     # Configure any additional env var flags in .env.charon.more
-    #env_file: [.env.charon.more]
-
+    # env_file: [.env.charon.more]
+    ports:
+      # - ${CHARON_PORT_VALIDATOR_API:-3600}:3600/tcp # Validator API
+      # - ${CHARON_PORT_P2P_TCP:-3610}:3610/tcp # P2P TCP libp2p
+      # - ${CHARON_PORT_MONITORING:-3620}:3620/tcp # Monitoring
+      # - ${CHARON_PORT_P2P_UDP:-3630}:3630/udp # P2P UDP discv5
   teku:
     # Disable teku
-    #profiles: [disable]
+    # profiles: [disable]
+    ports:
+      # - ${TEKU_PORT_METRICS:-8008}:8008 # Metrics

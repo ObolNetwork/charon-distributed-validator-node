@@ -19,9 +19,10 @@ The following instructions aim to assist a group of users coordinating together 
 
 ## Pre-requisites
 
-Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed. 
+Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed.
 
 Ensure you have the [loki docker driver](https://grafana.com/docs/loki/latest/clients/docker-driver/) installed.
+
 ```shell
 docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 ```
@@ -93,7 +94,7 @@ At this point you should make a backup of the `.charon/validator_keys` folder as
 
 If taking part in the official Athena testnet, one cluster member will have to submit the `cluster-lock` and `deposit-data` files to the Obol Team, setting the stage for activation.
 
-## Step 4. Start the Distributed Validator Cluster
+## Step 4. Start the Distributed Validator Node
 
 With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term. This repo is configured to sync an execution layer client (`geth`) and a consensus layer client (`lighthouse`).
 
@@ -103,12 +104,17 @@ Before completing these instructions, you should assign a static local IP addres
 
 **NOTE**: If you have a `geth` node already synced, you can simply copy over the directory. For ex: `cp -r ~/.ethereum/goerli data/geth`. This makes everything faster since you start from a synced geth node.
 
+**NOTE**: If you need to run a node for debugging purposes, checkout the [debug README](debug/README.md) instead.
+
 ```
 # Delete lighthouse data if it exists
 rm -r ./data/lighthouse
 
 # Spin up a Distributed Validator Node with a Validator Client
 docker-compose up
+
+# If you are a docker power user, run this instead:
+docker-compose -f docker-compose.yml -f compose-debug.yml up
 
 # Open Grafana dashboard
 open http://localhost:3000/d/singlenode/
@@ -228,9 +234,10 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 
 5. How do I fix the `plugin "loki" not found` error?
 
-   - If you get the following error when calling `docker-compose up`. 
+   - If you get the following error when calling `docker-compose up`.
    - `Error response from daemon: error looking up logging plugin loki: plugin "loki" not found`
    - Then install the Loki docker driver.
+
 ```shell
 docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 ```
@@ -293,7 +300,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
       - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
     - Ensure the external network in `compose-volutary-exit.yml` is correct.
       - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
-      - If it isn't `charon-distributed-validator-node-dvnode`, then update the `EXIT_DOCKER_NETWORK` env var in `.env` accordingly.
+      - If it isn't `charon-distributed-validator-node-dvnode`, then update the `CHARON_DOCKER_NETWORK` env var in `.env` accordingly.
     - Ensure the latest fork version epoch is used:
       - Voluntary exists require an epoch after which they take effect.
       - All VCs need to sign and submit the exact same messages (epoch) in DVT. Using the epoch of the latest fork version is well known option.

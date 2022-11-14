@@ -1,0 +1,30 @@
+version: "3.8"
+
+# Docker-compose file to aid developers in debugging. This is not required for "normal" users. See README.md for info.
+
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# See .env.sample "Debug Config" section
+
+# Execute "docker-compose -f docker-compose.yml -f compose-debug.yml up".
+
+services:
+  node-exporter:
+    image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.4.0}
+
+  jaeger:
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.39.0}
+    ports:
+      - ${MONITORING_PORT_JAEGER:-16686}:16686
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+      - BADGER_SPAN_STORE_TTL=72h
+    volumes:
+      - ./data/jaeger:/badger
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    external: true
