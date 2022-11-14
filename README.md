@@ -313,3 +313,10 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
     - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
     - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
     - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+
+13. I get an error `network charon-distributed-validator-node_dvnode declared as external, but could not be found` when I run `docker-compose -f docker-compose.yml -f compose-debug.yml up`.
+    - It occurs when docker can't find a network with the given name.
+    - Verify if the network is present by running:
+      - `docker network ls | grep charon-distributed-validator-node_dvnode`.
+    - If there are no results, simply create one:
+      - `docker network create charon-distributed-validator-node_dvnode`
