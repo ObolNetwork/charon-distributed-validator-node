@@ -19,9 +19,10 @@ The following instructions aim to assist a group of users coordinating together 
 
 ## Pre-requisites
 
-Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed. 
+Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed.
 
 Ensure you have the [loki docker driver](https://grafana.com/docs/loki/latest/clients/docker-driver/) installed.
+
 ```shell
 docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 ```
@@ -93,7 +94,7 @@ At this point you should make a backup of the `.charon/validator_keys` folder as
 
 If taking part in the official Athena testnet, one cluster member will have to submit the `cluster-lock` and `deposit-data` files to the Obol Team, setting the stage for activation.
 
-## Step 4. Start the Distributed Validator Cluster
+## Step 4. Start the Distributed Validator Node
 
 With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term. This repo is configured to sync an execution layer client (`geth`) and a consensus layer client (`lighthouse`).
 
@@ -102,6 +103,8 @@ Before completing these instructions, you should assign a static local IP addres
 **Caution**: If you manually update `docker-compose` to mount `lighthouse` from your locally synced `~/.lighthouse`, the whole chain database may get deleted. It'd be best not to manually update as `lighthouse` checkpoint-syncs so the syncing doesn't take much time.
 
 **NOTE**: If you have a `geth` node already synced, you can simply copy over the directory. For ex: `cp -r ~/.ethereum/goerli data/geth`. This makes everything faster since you start from a synced geth node.
+
+**NOTE**: If you are a "docker power user", click [here](#docker-power-users).
 
 ```
 # Delete lighthouse data if it exists
@@ -139,6 +142,36 @@ If you have gotten this far through the process, and whether you succeed or fail
 # Other Actions
 
 The above steps should get you running a distributed validator cluster. The following are some extra steps you may want to take either to help Obol with their testing program, or to improve the resilience and performance of your distributed validator cluster.
+
+## Docker power users
+
+This section of the readme is intended for the "docker power users", i.e., for the ones who are familiar with working with `docker-compose` and want to have more flexibility and power to change the default configuration.
+
+We use the "Multiple Compose File" feature which provides a very powerful way to override any configuration in `docker-compose.yml` without needing to modify git-checked-in files since that results in conflicts when upgrading this repo.
+See https://docs.docker.com/compose/extends/#multiple-compose-files for more details.
+
+There are two additional files in this repository, `compose-debug.yml` and `docker-compose.override.yml.sample`, alongwith the default `docker-compose.yml` file that you can use for this purpose.
+
+- `compose-debug.yml` contains some additional containers that developers can use for debugging, like `jaeger`. To achieve this, you can run:
+```
+docker-compose -f docker-compose.yml -f compose-debug.yml up
+```
+
+- `docker-compose.override.yml.sample` is intended to override the default configuration provided in `docker-compose.yml`. This is useful when, for example, you wish to add port mappings or want to disable a container.
+
+- To use it, just copy the sample file to `docker-compose.override.yml` and customise it to your liking. Please create this file ONLY when you want to tweak something. This is because the default override file is empty and docker errors if you provide an empty compose file.
+```
+cp docker-compose.override.yml.sample docker-compose.override.yml
+
+# Tweak docker-compose.override.yml and then run docker-compose up
+docker-compose up
+```
+
+- You can also run all these compose files together. This is desirable when you want to use both the features. For example, you may want to have some debugging containers AND also want to override some defaults. To achieve this, you can run:
+```
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f compose-debug.yml up
+```
+
 
 ## Step 6. Leader Adds Central Monitoring Token
 
@@ -226,16 +259,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - You can then copy the key to your `~/Downloads` folder for easy access by running `cp .charon/charon-enr-private-key ~/Downloads`. This step maybe a bit different for windows.
    - Else, if you are on `macOS`, press `Cmd + Shift + . ` to view the `.charon` folder in the `finder` application.
 
-5. How do I fix the `plugin "loki" not found` error?
-
-   - If you get the following error when calling `docker-compose up`. 
-   - `Error response from daemon: error looking up logging plugin loki: plugin "loki" not found`
-   - Then install the Loki docker driver.
-```shell
-docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-```
-
-6. How do I override the default config provided in this repo with my own custom values?
+5. How do I override the default config provided in this repo with my own custom values?
 
    - This repo uses docker compose to run and configure all the different components of the DVT stack.
    - The `docker-compose.yml` file contains the default configuration such that no custom configuration is required. As long as the canonical folder structure is maintained.
@@ -246,14 +270,14 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
 
-7. Why does Teku throw a keystore file error?
+6. Why does Teku throw a keystore file error?
 
    - Teku sometimes logs an error which looks like:
      `Keystore file /opt/charon/validator_keys/keystore-0.json.lock already in use.`
    - This can be solved by deleting the file(s) ending with `.lock` in the folder `.charon/validator_keys`.
    - It is caused by an unsafe shut down of Teku (usually by double pressing Ctrl+C to shutdown containers faster).
 
-8. How to fix the grafana dashboard?
+7. How to fix the grafana dashboard?
 
    - Sometimes, grafana dashboard doesn't load any data first time around
    - You can solve this by following the steps below:
@@ -262,7 +286,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
      - Change the "Access" field from `Server (default)` to `Browser`. Press "Save & Test". It should fail.
      - Change the "Access" field back to `Server (default)` and press "Save & Test". You should be presented with a green success icon saying "Data source is working" and you can return to the dashboard page.
 
-9. How to fix `permission denied` errors?
+8. How to fix `permission denied` errors?
 
    - Permission denied errors can come up in a variety of manners, particularly on Linux and WSL for Windows systems.
    - In the interest of security, the charon docker image runs as a non-root user, and this user often does not have the permissions to write in the directory you have checked out the code to.
@@ -272,17 +296,18 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
        - `mkdir .charon` (if it doesn't already exist)
        - `sudo chmod -R 666 .charon`
 
-10. I see a lot of errors after running `docker-compose up`.
+9. I see a lot of errors after running `docker-compose up`.
 
-    - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
-    - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
-    - You can also add a second beacon node endpoint by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84) file.
+   - It's because both `geth` and `lighthouse` start syncing and so there's connectivity issues among the containers.
+   - Simply let the containers run for a while. You won't observe frequent errors when geth finishes syncing.
+   - You can also add a second beacon node endpoint by adding a comma separated API URL to the end of `CHARON_BEACON_NODE_ENDPOINTS` in the [docker-compose](./docker-compose.yml#84) file.
 
-11. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
+10. When starting the standalone bootnode, I get a `resolve IP of p2p external host flag: lookup replace.with.public.ip.or.hostname: no such host` error
 
     - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
-12. How do I voluntary exit a validator?
+11. How do I voluntary exit a validator?
+
     - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
     - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
     - To override any default config defined in `compose-volutary-exit.yml`, copy `.env.sample` to `.env` and update any of the "Voluntary Exit Config" env vars.
@@ -293,7 +318,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
       - Warning: all keys copied to the `exit_keys` folder will be exited, so be careful!
     - Ensure the external network in `compose-volutary-exit.yml` is correct.
       - Confirm the name of the exiting `charon-distributed-validator-node` docker network: `docker network ls`.
-      - If it isn't `charon-distributed-validator-node-dvnode`, then update the `EXIT_DOCKER_NETWORK` env var in `.env` accordingly.
+      - If it isn't `charon-distributed-validator-node-dvnode`, then update the `CHARON_DOCKER_NETWORK` env var in `.env` accordingly.
     - Ensure the latest fork version epoch is used:
       - Voluntary exists require an epoch after which they take effect.
       - All VCs need to sign and submit the exact same messages (epoch) in DVT. Using the epoch of the latest fork version is well known option.
@@ -306,3 +331,10 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
     - The charon metric `core_parsigdb_exit_total` will be incremented each time a voluntary exit partial signature is received, either from this node or from peers.
     - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
     - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
+
+12. I get an error `network charon-distributed-validator-node_dvnode declared as external, but could not be found`.
+    - It occurs when docker can't find a network with the given name.
+    - Verify if the docker network is present by running:
+      - `docker network ls | grep charon-distributed-validator-node`.
+    - If there are no results, update the `CHARON_DOCKER_NETWORK` env var in `.env` accordingly:
+      - `CHARON_DOCKER_NETWORK=<network obtained from 'docker network ls'>`

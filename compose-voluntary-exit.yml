@@ -7,7 +7,7 @@ version: "3.8"
 
 services:
   teku-exit:
-    image: consensys/teku:${TEKU_VERSION:-22.9.1}
+    image: consensys/teku:${TEKU_VERSION:-22.10.2}
     command: |
       voluntary-exit
       --beacon-node-api-endpoint="http://charon:3600"
@@ -19,5 +19,5 @@ services:
 
 networks:
   default:
-    name: ${EXIT_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
     external: true
