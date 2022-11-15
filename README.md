@@ -104,6 +104,8 @@ Before completing these instructions, you should assign a static local IP addres
 
 **NOTE**: If you have a `geth` node already synced, you can simply copy over the directory. For ex: `cp -r ~/.ethereum/goerli data/geth`. This makes everything faster since you start from a synced geth node.
 
+**NOTE**: If you are a "docker power user", click [here](#docker-power-users).
+
 ```
 # Delete lighthouse data if it exists
 rm -r ./data/lighthouse
@@ -143,6 +145,34 @@ If you have gotten this far through the process, and whether you succeed or fail
 # Other Actions
 
 The above steps should get you running a distributed validator cluster. The following are some extra steps you may want to take either to help Obol with their testing program, or to improve the resilience and performance of your distributed validator cluster.
+
+## Docker power users
+
+This section of the readme is intended for the "docker power users", i.e., for the ones who are familiar with working with `docker-compose` and want to have more flexibility and power to change the default configuration.
+
+There are two additional files in this repository, `compose-debug.yml` and `docker-compose.override.yml.sample`, alongwith the default `docker-compose.yml` file for this purpose.
+
+- `compose-debug.yml` contains some additional containers that would developers can use for debugging, like `jaeger`. To achieve this, you can run:
+```
+docker-compose -f docker-compose.yml -f compose-debug.yml up
+```
+
+- `docker-compose.override.yml.sample` is intended to override the default configuration provided in `docker-compose.yml`. This is useful when, for example, you wish to add port mappings or want to disable a container.
+
+- We use the "Multiple Compose File" feature which provides a very powerful way to override any configuration in `docker-compose.yml` without needing to modify git-checked-in files since that results in conflicts when upgrading this repo.
+See https://docs.docker.com/compose/extends/#multiple-compose-files for more details.
+- To use it, just copy this file to `docker-compose.override.yml` and customise it to your liking. Please create this file ONLY when you want to tweak something. This is because the default override file is empty and docker errors if you provide an empty compose file.
+```
+cp docker-compose.override.yml.sample docker-compose.override.yml
+
+docker-compose up
+```
+
+- You can also run all these compose files together. This is desirable when you want to use both the features. For example, you may want to have some debugging containers AND also want to override some defaults. To achieve this, you can run:
+```
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f compose-debug.yml
+```
+
 
 ## Step 6. Leader Adds Central Monitoring Token
 
