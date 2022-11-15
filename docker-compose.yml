@@ -1,6 +1,8 @@
 version: "3.8"
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
   #             _   _
@@ -45,7 +47,7 @@ services:
       lighthouse bn
       --network=goerli
       --checkpoint-sync-url=https://goerli.checkpoint-sync.ethdevops.io
-      --execution-endpoint=http://192.168.1.10:8551
+      --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
       --http
@@ -80,7 +82,7 @@ services:
       - CHARON_P2P_UDP_ADDRESS=0.0.0.0:3630
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
-      - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-}
+      - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES-http://loki:3100/loki/api/v1/push} # Overriding to empty address allowed
       - CHARON_LOKI_SERVICE=charon
     networks: [dvnode]
     volumes:
@@ -134,6 +136,16 @@ services:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
       - ./data/grafana:/var/lib/grafana
+    restart: on-failure
+
+  loki:
+    image: grafana/loki:${LOKI_VERSION:-2.7.0}
+    user: ":"
+    networks: [dvnode]
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./data/loki:/opt/loki
     restart: on-failure
 
 networks:

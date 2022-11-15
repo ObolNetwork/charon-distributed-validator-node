@@ -290,6 +290,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
     - Replace `replace.with.public.ip.or.hostname` in the bootnode/docker-compose.yml with your real public IP or DNS hostname.
 
 12. How do I voluntary exit a validator?
+
     - A voluntary exit is when a validator chooses to stop performing its duties, and exits the beacon chain permanently. To voluntarily exit, the validator must continue performing its validator duties until successfully exited to avoid penalties.
     - To trigger a voluntary exit, a sidecar docker-compose command is executed that signs and submits the voluntary exit to the active running charon node that shares it with other nodes in the cluster. The commands below should be executed on the same machine and same folder as the active running charon-distribute-validator-node docker compose.
     - To override any default config defined in `compose-volutary-exit.yml`, copy `.env.sample` to `.env` and update any of the "Voluntary Exit Config" env vars.
@@ -316,7 +317,7 @@ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all
 
 13. I get an error `network charon-distributed-validator-node_dvnode declared as external, but could not be found` when I run `docker-compose -f docker-compose.yml -f compose-debug.yml up`.
     - It occurs when docker can't find a network with the given name.
-    - Verify if the network is present by running:
-      - `docker network ls | grep charon-distributed-validator-node_dvnode`.
-    - If there are no results, simply create one:
-      - `docker network create charon-distributed-validator-node_dvnode`
+    - Verify if the docker network is present by running:
+      - `docker network ls | grep charon-distributed-validator-node`.
+    - If there are no results, update the `CHARON_DOCKER_NETWORK` env var in `.env` accordingly:
+      - `CHARON_DOCKER_NETWORK=charon-distributed-validator-node_dvnode`

@@ -24,6 +24,11 @@ services:
     volumes:
       - ./data/jaeger:/badger
 
+  charon:
+    environment:
+      - CHARON_JAEGER_ADDRESS=jaeger:6831
+      - CHARON_JAEGER_SERVICE=charon
+
 networks:
   default:
     name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
