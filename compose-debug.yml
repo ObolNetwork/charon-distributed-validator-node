@@ -5,8 +5,6 @@ version: "3.8"
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 # See .env.sample "Debug Config" section
 
-# Execute "docker-compose -f docker-compose.yml -f compose-debug.yml -f docker-compose.override.yml up".
-
 services:
   node-exporter:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.4.0}
