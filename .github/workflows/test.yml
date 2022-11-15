@@ -1,0 +1,14 @@
+name: tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  create_containers:
+    # Ensures default fresh checkout can create containers.
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: docker-compose up --no-start
+    - run: docker-compose -f docker-compose.yml -f compose-debug.yml up --no-start
