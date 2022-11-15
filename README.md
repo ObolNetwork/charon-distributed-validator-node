@@ -113,9 +113,6 @@ rm -r ./data/lighthouse
 # Spin up a Distributed Validator Node with a Validator Client
 docker-compose up
 
-# If you are a docker power user, run this instead:
-docker-compose -f docker-compose.yml -f compose-debug.yml -f docker-compose.override.yml up
-
 # Open Grafana dashboard
 open http://localhost:3000/d/singlenode/
 ```
@@ -165,7 +162,7 @@ See https://docs.docker.com/compose/extends/#multiple-compose-files for more det
 ```
 cp docker-compose.override.yml.sample docker-compose.override.yml
 
-# Tweak docker-compose.override.yml and run docker-compose
+# Tweak docker-compose.override.yml and then run docker-compose up
 docker-compose up
 ```
 
