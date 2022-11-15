@@ -31,7 +31,8 @@
     # ports:
       # - 9000:9000/tcp # P2P TCP
       # - 9000:9000/udp # P2P UDP
-      # - 5052:5052 # Metrics
+      # - 5052:5052 # HTTP
+      # - 5054:5054 # Metrics
 
   # charon:
     # Configure any additional env var flags in .env.charon.more
