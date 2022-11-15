@@ -1,6 +1,6 @@
 version: "3.8"
 
-# Docker-compose file to aid developers in debugging. This is not required for "normal" users. See README.md for info.
+# Docker-compose file to aid developers in debugging. This is not required for "normal" users. See the "Docker power users" section of the README.md for more info.
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 # See .env.sample "Debug Config" section

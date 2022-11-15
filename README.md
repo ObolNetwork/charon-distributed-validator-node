@@ -147,6 +147,9 @@ The above steps should get you running a distributed validator cluster. The foll
 
 This section of the readme is intended for the "docker power users", i.e., for the ones who are familiar with working with `docker-compose` and want to have more flexibility and power to change the default configuration.
 
+We use the "Multiple Compose File" feature which provides a very powerful way to override any configuration in `docker-compose.yml` without needing to modify git-checked-in files since that results in conflicts when upgrading this repo.
+See https://docs.docker.com/compose/extends/#multiple-compose-files for more details.
+
 There are two additional files in this repository, `compose-debug.yml` and `docker-compose.override.yml.sample`, alongwith the default `docker-compose.yml` file that you can use for this purpose.
 
 - `compose-debug.yml` contains some additional containers that developers can use for debugging, like `jaeger`. To achieve this, you can run:
@@ -156,8 +159,6 @@ docker-compose -f docker-compose.yml -f compose-debug.yml up
 
 - `docker-compose.override.yml.sample` is intended to override the default configuration provided in `docker-compose.yml`. This is useful when, for example, you wish to add port mappings or want to disable a container.
 
-- We use the "Multiple Compose File" feature which provides a very powerful way to override any configuration in `docker-compose.yml` without needing to modify git-checked-in files since that results in conflicts when upgrading this repo.
-See https://docs.docker.com/compose/extends/#multiple-compose-files for more details.
 - To use it, just copy the sample file to `docker-compose.override.yml` and customise it to your liking. Please create this file ONLY when you want to tweak something. This is because the default override file is empty and docker errors if you provide an empty compose file.
 ```
 cp docker-compose.override.yml.sample docker-compose.override.yml
@@ -331,7 +332,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
     - Once quorum partially signed voluntary exists have been received, they will be aggregated and submitted to the beacon node. This will add the validator to the beacon chain exit queue.
     - The validator keys can only be deleted from both `exit_keys` and `validator_keys` folders once the validator has successfully exited.
 
-12. I get an error `network charon-distributed-validator-node_dvnode declared as external, but could not be found` when I run `docker-compose -f docker-compose.yml -f compose-debug.yml up`.
+12. I get an error `network charon-distributed-validator-node_dvnode declared as external, but could not be found`.
     - It occurs when docker can't find a network with the given name.
     - Verify if the docker network is present by running:
       - `docker network ls | grep charon-distributed-validator-node`.
