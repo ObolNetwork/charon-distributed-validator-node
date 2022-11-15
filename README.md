@@ -150,9 +150,9 @@ The above steps should get you running a distributed validator cluster. The foll
 
 This section of the readme is intended for the "docker power users", i.e., for the ones who are familiar with working with `docker-compose` and want to have more flexibility and power to change the default configuration.
 
-There are two additional files in this repository, `compose-debug.yml` and `docker-compose.override.yml.sample`, alongwith the default `docker-compose.yml` file for this purpose.
+There are two additional files in this repository, `compose-debug.yml` and `docker-compose.override.yml.sample`, alongwith the default `docker-compose.yml` file that you can use for this purpose.
 
-- `compose-debug.yml` contains some additional containers that would developers can use for debugging, like `jaeger`. To achieve this, you can run:
+- `compose-debug.yml` contains some additional containers that developers can use for debugging, like `jaeger`. To achieve this, you can run:
 ```
 docker-compose -f docker-compose.yml -f compose-debug.yml up
 ```
@@ -161,16 +161,17 @@ docker-compose -f docker-compose.yml -f compose-debug.yml up
 
 - We use the "Multiple Compose File" feature which provides a very powerful way to override any configuration in `docker-compose.yml` without needing to modify git-checked-in files since that results in conflicts when upgrading this repo.
 See https://docs.docker.com/compose/extends/#multiple-compose-files for more details.
-- To use it, just copy this file to `docker-compose.override.yml` and customise it to your liking. Please create this file ONLY when you want to tweak something. This is because the default override file is empty and docker errors if you provide an empty compose file.
+- To use it, just copy the sample file to `docker-compose.override.yml` and customise it to your liking. Please create this file ONLY when you want to tweak something. This is because the default override file is empty and docker errors if you provide an empty compose file.
 ```
 cp docker-compose.override.yml.sample docker-compose.override.yml
 
+# Tweak docker-compose.override.yml and run docker-compose
 docker-compose up
 ```
 
 - You can also run all these compose files together. This is desirable when you want to use both the features. For example, you may want to have some debugging containers AND also want to override some defaults. To achieve this, you can run:
 ```
-docker-compose -f docker-compose.yml -f docker-compose.override.yml -f compose-debug.yml
+docker-compose -f docker-compose.yml -f docker-compose.override.yml -f compose-debug.yml up
 ```
 
 
