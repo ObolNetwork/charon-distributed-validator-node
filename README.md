@@ -104,8 +104,6 @@ Before completing these instructions, you should assign a static local IP addres
 
 **NOTE**: If you have a `geth` node already synced, you can simply copy over the directory. For ex: `cp -r ~/.ethereum/goerli data/geth`. This makes everything faster since you start from a synced geth node.
 
-**NOTE**: If you need to run a node for debugging purposes, checkout the [debug README](debug/README.md) instead.
-
 ```
 # Delete lighthouse data if it exists
 rm -r ./data/lighthouse

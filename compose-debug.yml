@@ -26,7 +26,7 @@ services:
 
   charon:
     environment:
-      - CHARON_JAEGER_ADDRESS=jaeger:6831
+      - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
       - CHARON_JAEGER_SERVICE=charon
 
 networks:

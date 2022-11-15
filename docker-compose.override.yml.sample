@@ -48,6 +48,12 @@ services:
     ports:
       # - 8008:8008 # Metrics
 
+  prometheus:
+    # Disable prometheus
+    # profiles: [disable]
+    ports:
+      # - 9090:9090 # Metrics
+
   loki:
     # Disable loki
     # profiles: [disable]
