@@ -18,7 +18,7 @@
   #geth:
     # Disable geth
     #profiles: [disable]
-    #ports:
+    #ports: # Bind geth internal ports to host ports
       #- 30303:30303/tcp # P2P TCP
       #- 30303:30303/udp # P2P UDP
       #- 8545:8545 # JSON-RPC
