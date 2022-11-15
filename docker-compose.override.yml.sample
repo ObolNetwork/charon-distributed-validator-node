@@ -14,49 +14,49 @@
 # WARNING: This is for power users only and requires a deep understanding of Docker Compose
 # and how the local docker-compose.yml is configured.
 
-# services:
-  # geth:
+#services:
+  #geth:
     # Disable geth
-    # profiles: [disable]
-    # ports:
-      # - 30303:30303/tcp # P2P TCP
-      # - 30303:30303/udp # P2P UDP
-      # - 8545:8545 # JSON-RPC
-      # - 8551:8551 # AUTH-RPC
-      # - 6060:6060 # Metrics
+    #profiles: [disable]
+    #ports:
+      #- 30303:30303/tcp # P2P TCP
+      #- 30303:30303/udp # P2P UDP
+      #- 8545:8545 # JSON-RPC
+      #- 8551:8551 # AUTH-RPC
+      #- 6060:6060 # Metrics
 
-  # lighthouse:
+  #lighthouse:
     # Disable lighthouse
-    # profiles: [disable]
-    # ports:
-      # - 9000:9000/tcp # P2P TCP
-      # - 9000:9000/udp # P2P UDP
-      # - 5052:5052 # HTTP
-      # - 5054:5054 # Metrics
+    #profiles: [disable]
+    #ports:
+      #- 9000:9000/tcp # P2P TCP
+      #- 9000:9000/udp # P2P UDP
+      #- 5052:5052 # HTTP
+      #- 5054:5054 # Metrics
 
-  # charon:
+  #charon:
     # Configure any additional env var flags in .env.charon.more
-    # env_file: [.env.charon.more]
-    # ports:
-      # - 3600:3600/tcp # Validator API
-      # - 3610:3610/tcp # P2P TCP libp2p
-      # - 3620:3620/tcp # Monitoring
-      # - 3630:3630/udp # P2P UDP discv5
+    #env_file: [.env.charon.more]
+    #ports:
+      #- 3600:3600/tcp # Validator API
+      #- 3610:3610/tcp # P2P TCP libp2p
+      #- 3620:3620/tcp # Monitoring
+      #- 3630:3630/udp # P2P UDP discv5
 
-  # teku:
+  #teku:
     # Disable teku
-    # profiles: [disable]
-    # ports:
-      # - 8008:8008 # Metrics
+    #profiles: [disable]
+    #ports:
+      #- 8008:8008 # Metrics
 
-  # prometheus:
+  #prometheus:
     # Disable prometheus
-    # profiles: [disable]
-    # ports:
-      # - 9090:9090 # Metrics
+    #profiles: [disable]
+    #ports:
+      #- 9090:9090 # Metrics
 
-  # loki:
+  #loki:
     # Disable loki
-    # profiles: [disable]
-    # ports:
-      # - 3100:3100 # Metrics
+    #profiles: [disable]
+    #ports:
+      #- 3100:3100 # Metrics
