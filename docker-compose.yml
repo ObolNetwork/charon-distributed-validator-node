@@ -14,6 +14,9 @@ services:
 
   geth:
     image: ethereum/client-go:${GETH_VERSION:-v1.10.26}
+    ports:
+      - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
+      - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
     command: |
       --goerli
       --http
@@ -43,6 +46,9 @@ services:
 
   lighthouse:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.2.1}
+    ports:
+      - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
+      - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
       lighthouse bn
       --network=goerli
@@ -84,6 +90,9 @@ services:
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES-http://loki:3100/loki/api/v1/push} # Overriding to empty address allowed
       - CHARON_LOKI_SERVICE=charon
+    ports:
+      - ${CHARON_PORT_P2P_TCP:-3610}:3610/tcp       # P2P TCP libp2p
+      - ${CHARON_PORT_P2P_UDP:-3630}:3630/udp       # P2P UDP discv5
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
