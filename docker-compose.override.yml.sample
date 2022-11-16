@@ -18,9 +18,8 @@
   #geth:
     # Disable geth
     #profiles: [disable]
-    #ports: # Bind geth internal ports to host ports
-      #- 30303:30303/tcp # P2P TCP
-      #- 30303:30303/udp # P2P UDP
+    # Bind geth internal ports to host ports
+    #ports:
       #- 8545:8545 # JSON-RPC
       #- 8551:8551 # AUTH-RPC
       #- 6060:6060 # Metrics
@@ -28,35 +27,36 @@
   #lighthouse:
     # Disable lighthouse
     #profiles: [disable]
+    # Bind lighthouse internal ports to host ports
     #ports:
-      #- 9000:9000/tcp # P2P TCP
-      #- 9000:9000/udp # P2P UDP
       #- 5052:5052 # HTTP
       #- 5054:5054 # Metrics
 
   #charon:
     # Configure any additional env var flags in .env.charon.more
     #env_file: [.env.charon.more]
+    # Bind charon internal ports to host ports
     #ports:
       #- 3600:3600/tcp # Validator API
-      #- 3610:3610/tcp # P2P TCP libp2p
       #- 3620:3620/tcp # Monitoring
-      #- 3630:3630/udp # P2P UDP discv5
 
   #teku:
     # Disable teku
     #profiles: [disable]
+    # Bind teku internal ports to host ports
     #ports:
       #- 8008:8008 # Metrics
 
   #prometheus:
     # Disable prometheus
     #profiles: [disable]
+    # Bind prometheus internal ports to host ports
     #ports:
       #- 9090:9090 # Metrics
 
   #loki:
     # Disable loki
     #profiles: [disable]
+    # Bind loki internal ports to host ports
     #ports:
       #- 3100:3100 # Metrics
