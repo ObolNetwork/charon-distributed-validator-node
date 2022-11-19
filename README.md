@@ -21,12 +21,6 @@ The following instructions aim to assist a group of users coordinating together 
 
 Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed.
 
-Ensure you have the [loki docker driver](https://grafana.com/docs/loki/latest/clients/docker-driver/) installed.
-
-```shell
-docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-```
-
 Also, make sure `docker` is running before executing the commands below.
 
 ## Step 1. Creating and backing up a private key for charon
