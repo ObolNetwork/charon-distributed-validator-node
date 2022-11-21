@@ -21,12 +21,6 @@ The following instructions aim to assist a group of users coordinating together 
 
 Ensure you have [docker](https://docs.docker.com/engine/install/) and [git](https://git-scm.com/downloads) installed.
 
-Ensure you have the [loki docker driver](https://grafana.com/docs/loki/latest/clients/docker-driver/) installed.
-
-```shell
-docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-```
-
 Also, make sure `docker` is running before executing the commands below.
 
 ## Step 1. Creating and backing up a private key for charon
@@ -41,7 +35,7 @@ git clone https://github.com/ObolNetwork/charon-distributed-validator-node.git
 cd charon-distributed-validator-node
 
 # Create your charon ENR private key, this will create a charon-enr-private-key file in the .charon directory
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.11.0 create enr
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.12.0 create enr
 ```
 
 You should expect to see a console output like
@@ -68,7 +62,7 @@ cp .env.create_dkg.sample .env.create_dkg
 # Populate the .env.create_dkg file with the cluster name, the fee recipient and withdrawal Ethereum addresses and the operator ENRs of all the operators participating in the DKG ceremony.
 
 # Run the `charon create dkg` command that generates DKG cluster-definition.json file.
-docker run --rm -v "$(pwd):/opt/charon" --env-file .env.create_dkg obolnetwork/charon:v0.11.0 create dkg
+docker run --rm -v "$(pwd):/opt/charon" --env-file .env.create_dkg obolnetwork/charon:v0.12.0 create dkg
 ```
 
 This command should output a file at `.charon/cluster-definition.json`. This file needs to be shared with the other operators in a cluster.
@@ -81,7 +75,7 @@ Every cluster member then participates in the DKG ceremony. For Charon v1, this 
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.11.0 dkg --p2p-bootnode-relay
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.12.0 dkg
 ```
 
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
@@ -244,7 +238,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
 2. How do I get my ENR if I want to generate it again?
 
    - `cd` to the directory where your private keys are located (ex: `cd /path/to/charon/enr/private/key`)
-   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.11.0 enr`. This prints the ENR on your screen.
+   - Run `docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.12.0 enr`. This prints the ENR on your screen.
    - **Please note that this ENR is not the same as the one generated when you created it for the first time**. This is because the process of generating ENRs includes the current timestamp.
 
 3. What do I do if lose my `charon-enr-private-key`?
@@ -265,7 +259,7 @@ Keep checking in for updates, [here](https://github.com/ObolNetwork/charon/#supp
    - The `docker-compose.yml` file contains the default configuration such that no custom configuration is required. As long as the canonical folder structure is maintained.
    - Some users might however want to override the default config. E.g., changing image versions, using external beacon API, using custom bootnodes, etc.
    - Instead of modifying `docker-compose.yml` directly, which causes git conflicts when pulling new versions of this repo, users can provide custom config in a `.env` file.
-   - This functionality is made possible by the [special env var syntax](https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files) in `docker-compose.yml` which defines a default if the env var isn't present. E.g., `${CHARON_VERSION:-v0.11.0}` defaults to `v0.11.0` or to the value of `CHARON_VERSION` env var if present.
+   - This functionality is made possible by the [special env var syntax](https://docs.docker.com/compose/environment-variables/#substitute-environment-variables-in-compose-files) in `docker-compose.yml` which defines a default if the env var isn't present. E.g., `${CHARON_VERSION:-v0.12.0}` defaults to `v0.12.0` or to the value of `CHARON_VERSION` env var if present.
    - Docker compose also automatically loads environment variables from a local `.env` file.
    - So just copy `.env.sample` to `.env` and the update any of the variables to your custom value.
    - Note that **only** variables defined in `docker-compose.yml` can be overridden this way.
