@@ -75,7 +75,7 @@ Every cluster member then participates in the DKG ceremony. For Charon v1, this 
 
 ```
 # Participate in DKG ceremony, this will create .charon/cluster-lock.json, .charon/deposit-data.json and .charon/validator_keys
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.12.0 dkg --p2p-bootnode-relay
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:v0.12.0 dkg
 ```
 
 Assuming the DKG is successful, a number of artefacts will be created in the `.charon` folder. These include:
