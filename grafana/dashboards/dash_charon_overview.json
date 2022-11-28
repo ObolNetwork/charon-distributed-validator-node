@@ -1181,7 +1181,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "time() - max(app_peerinfo_start_time_secs{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}) by (peer)",
+          "expr": "time() - max(app_peerinfo_start_time_secs{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}>0) by (peer)",
           "format": "table",
           "hide": false,
           "instant": true,
