@@ -60,3 +60,7 @@
     # Bind loki internal ports to host ports
     #ports:
       #- 3100:3100 # Metrics
+
+  #cadvisor:
+    # Disable cadvisor
+    #profiles: [disable]
