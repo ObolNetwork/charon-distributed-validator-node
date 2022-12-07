@@ -6,6 +6,20 @@ version: "3.8"
 # See .env.sample "Debug Config" section
 
 services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.46.0}
+    command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
+    privileged: true
+    volumes:
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:ro'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+      - '/dev/disk/:/dev/disk:ro'
+    devices:
+      - '/dev/kmsg:/dev/kmsg'
+    restart: unless-stopped
+
   node-exporter:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.4.0}
 
