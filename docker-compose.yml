@@ -45,7 +45,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.2.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.4.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -107,7 +107,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:${TEKU_VERSION:-22.10.2}
+    image: consensys/teku:${TEKU_VERSION:-22.12.0}
     command: |
       validator-client
       --config-file "/opt/teku/teku_config.yaml"
@@ -125,7 +125,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.40.1}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.41.0}
     user: ":"
     networks: [dvnode]
     volumes:
@@ -134,7 +134,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-9.2.4}
+    image: grafana/grafana:${GRAFANA_VERSION:-9.3.2}
     user: ":"
     ports:
       - ${MONITORING_PORT_GRAFANA:-3000}:3000
@@ -148,7 +148,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-2.7.0}
+    image: grafana/loki:${LOKI_VERSION:-2.7.1}
     user: ":"
     networks: [dvnode]
     command: -config.file=/etc/loki/loki.yml
