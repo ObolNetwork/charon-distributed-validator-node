@@ -21,5 +21,5 @@ services:
       - 3640:3640/tcp
     command: relay
     volumes:
-      - .charon:/opt/charon/.charon # Bootnode charon-enr-private-key generated and persisted across restarts in this folder
+      - .charon:/opt/charon/.charon # Relay charon-enr-private-key generated and persisted across restarts in this folder
     restart: on-failure
