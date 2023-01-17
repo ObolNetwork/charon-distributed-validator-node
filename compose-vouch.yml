@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  vouch:
+    build: vouch
+    networks: [ dvnode ]
+    depends_on: [ charon ]
+    restart: unless-stopped
+    environment:
+      VOUCH_BEACON_NODE_ADDRESS: http://charon:3600
+    volumes:
+      - .charon/validator_keys:/opt/validator_keys
+      - ./vouch/vouch.yml:/opt/vouch/vouch.yml
+      - ./vouch/run.sh:/opt/vouch/run.sh
