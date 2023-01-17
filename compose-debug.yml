@@ -36,10 +36,22 @@ services:
     volumes:
       - ./data/jaeger:/badger
 
+  loki:
+    image: grafana/loki:${LOKI_VERSION:-2.7.1}
+    user: ":"
+    networks: [ dvnode ]
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./data/loki:/opt/loki
+    restart: unless-stopped
+
   charon:
     environment:
       - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
       - CHARON_JAEGER_SERVICE=charon
+      - CHARON_LOKI_ADDRESSES=http://loki:3100/loki/api/v1/push
+      - CHARON_LOKI_SERVICE=charon
 
 networks:
   default:
