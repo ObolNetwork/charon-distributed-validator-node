@@ -39,7 +39,6 @@ services:
   loki:
     image: grafana/loki:${LOKI_VERSION:-2.7.1}
     user: ":"
-    networks: [ dvnode ]
     command: -config.file=/etc/loki/loki.yml
     volumes:
       - ./loki/loki.yml:/etc/loki/loki.yml

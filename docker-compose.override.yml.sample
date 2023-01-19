@@ -53,14 +53,3 @@
     # Bind prometheus internal ports to host ports
     #ports:
       #- 9090:9090 # Metrics
-
-  #loki:
-    # Disable loki
-    #profiles: [disable]
-    # Bind loki internal ports to host ports
-    #ports:
-      #- 3100:3100 # Metrics
-
-  #cadvisor:
-    # Disable cadvisor
-    #profiles: [disable]
