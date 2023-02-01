@@ -7,6 +7,7 @@
 🧑‍🎓 Please review our contribution guide https://github.com/ObolNetwork/charon/blob/main/docs/contributing.md
    - 🌱 Starting with an issue, outlining the problem and proposed solution, is highly encouraged.
    - 🧪 Make sure you completed all tests specified in the issue, if any.
+   - 📘 Create a Github issue in the docs repo if relevant to update Obol public documentation based on these changes.
    - 🐘🐁 We do trunk based development; small PRs on stable main branch.
 💀 Delete these instructions
 -->
