@@ -10,12 +10,8 @@ labels: Enhancement
 
 # 🛠️ Proposed solution
 
-### Link to Design Doc:
-<!--[Insert Link to Design doc]-->
-
-### Is there core team consensus on the proposed solution?
-- [ ] Yes
-- [ ] No
+- [ ] Approved design doc: *link*
+- [ ] Core team consensus on the proposed solution
 
 ### Detailed proposed solution
 <!--Describe the solution to be implemented-->
