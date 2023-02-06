@@ -4,7 +4,6 @@ version: "3.8"
 # To run the compose stack with mev-boost, run `docker-compose -f docker-compose.yml -f mevboost-compose.yml up`.
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
-# See .env.sample "Voluntary Exit Config" section
 
 services:
   #      _                     _
