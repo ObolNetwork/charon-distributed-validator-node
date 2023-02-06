@@ -53,3 +53,7 @@
     # Bind prometheus internal ports to host ports
     #ports:
       #- 9090:9090 # Metrics
+
+  #mev-boost:
+    #ports:
+      #- 18550:18550 # Metrics
