@@ -2,6 +2,7 @@ version: "3.8"
 
 # Docker-compose file to run mev-boost (https://boost.flashbots.net/).
 # To run the compose stack with mev-boost, run `docker-compose -f docker-compose.yml -f mevboost-compose.yml up`.
+# We use public relays from https://research.lido.fi/t/lido-on-ethereum-call-for-relay-providers/2844.
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 
