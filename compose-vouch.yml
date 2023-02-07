@@ -3,7 +3,6 @@ version: "3.8"
 services:
   vouch:
     build: vouch
-    networks: [ dvnode ]
     depends_on: [ charon ]
     restart: unless-stopped
     environment:
@@ -12,3 +11,8 @@ services:
       - .charon/validator_keys:/opt/validator_keys
       - ./vouch/vouch.yml:/opt/vouch/vouch.yml
       - ./vouch/run.sh:/opt/vouch/run.sh
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    external: true
