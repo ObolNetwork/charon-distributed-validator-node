@@ -56,6 +56,7 @@ services:
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
+      --builder=http://mev-boost:18550
       --http
       --http-address=0.0.0.0
       --http-port=5052
