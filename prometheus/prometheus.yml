@@ -9,7 +9,7 @@ remote_write:
     write_relabel_configs:
       - source_labels: [job]
         regex: "charon"
-        action: keep
+        action: keep # Keeps charon metrics and drop metrics from other containers.
 
 scrape_configs:
   - job_name: "geth"
