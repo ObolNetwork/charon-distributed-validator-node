@@ -8,14 +8,6 @@ labels: Enhancement
 
 <!--Describe in detail the problem to be solved by this feature/enhancement and why it is important. -->
 
-# 🛠️ Proposed solution
-
-- [ ] Approved design doc: *link*
-- [ ] Core team consensus on the proposed solution
-
-### Detailed proposed solution
-<!--Describe the solution to be implemented-->
-
 # 🧪 Tests
 
 <!--Delete any irrelevant item and add other mandatory tests that should be passing-->
