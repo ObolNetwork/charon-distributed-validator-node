@@ -108,11 +108,12 @@ services:
     image: consensys/teku:${TEKU_VERSION:-22.12.0}
     command: |
       validator-client
-      --config-file "/opt/teku/teku_config.yaml"
+      --config-file "/opt/teku_config.yaml"
     networks: [dvnode]
     volumes:
       - .charon/validator_keys:/opt/charon/validator_keys
-      - ./teku/teku_config.yaml:/opt/teku/teku_config.yaml
+      - ./teku/teku_config.yaml:/opt/teku_config.yaml
+      - ./teku:/opt/data
     restart: unless-stopped
 
   #                        _ _             _
