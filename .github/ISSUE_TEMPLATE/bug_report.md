@@ -1,11 +1,11 @@
 ---
-name: "\U0001F41EBug report"
-about: Report a bug or problem with running charon-distributed-validator-node
+name: "\U0001F41E Bug report"
+about: Report a bug or problem with running this repo
 labels: Bug
 ---
 <!--
 
-Hellooo! 😄 
+Hey there!
 
 To help us tend to your issue faster, please search our currently open issues before submitting a new one.
 Existing issues often contain information about workarounds, resolution, or progress updates.
@@ -18,15 +18,10 @@ Existing issues often contain information about workarounds, resolution, or prog
 
 <!-- ✍️--> A clear and concise description of the problem...
 
-### Has this worked before in a previous version?
-
-<!-- Did this behavior use to work in the previous version? -->
-<!-- ✍️--> Yes, the previous version in which this bug was not present was: ....
-
 ## 🔬 Minimal Reproduction
 
 <!--
-Please let us know how we can reproduce this issue. Include the exact method you used to run Charon along with any flags used in your beacon chain and/or validator. Make sure you don't upload any confidential files or private keys!
+Please let us know how we can reproduce this issue. Include the exact commands you are running with any flags used in your beacon chain and/or validator. Make sure you don't upload any confidential files or private keys!
 -->
 
 ## 🔥 Error

@@ -1,31 +1,32 @@
 ---
-name: "\U0001F680Feature request"
-about: Suggest a feature for charon-distributed-validator-node
+name: "\U0001F680 Feature or Improvement Ticket"
+about: Create a new feature or suggest an improvement
 labels: Enhancement
 ---
-<!--
 
-Hey! 😄 
+# 🎯 Problem to be solved
 
-To help us tend to your issue faster, please search our currently open issues before submitting a new one.
-Existing issues often contain information about workarounds, resolution, or progress updates.
+<!--Describe in detail the problem to be solved by this feature/enhancement and why it is important. -->
 
--->
+# 🧪 Tests
 
-# 🚀 Feature Request
+<!--Delete any irrelevant item and add other mandatory tests that should be passing-->
 
-## Problem to be solved
+- [ ] Works in local docker-compose
+- [ ] Has a attested on a testnet at least once
 
-<!-- --> A clear and concise description of the problem or missing capability...
+# 👐 Additional acceptance criteria
 
-## Proposed Solution
+<!--List any additional acceptance criteria for this issue to be marked as closed.-->
 
-<!-- --> If you have a solution in mind, please describe it.
+# ❌ Out of Scope
 
-## Describe alternatives you've considered
+<!--If there is anything to highlight as out of scope for this issue, please outline it here.-->
 
-<!-- --> Have you considered any alternative solutions or workarounds?
+<!--# ✅ Issue Creation Checklist
 
-## Out of Scope
-
-<!-- --> What do you consider to be beyond the scope of this ticket?
+Delete this section once you have validated that this ticket is
+- [ ] Feasible: it can be completed in one sprint (2 weeks) by a single person, otherwise split the ticket into multiple issues
+- [ ] Actionable: any contributor must be able to determine immediately what needs to be done to complete the ticket
+- [ ] Clear: all contributors have a shared understanding of what it means
+- [ ] Testable: there is an effective way to determine if the functionality works as expected -->
