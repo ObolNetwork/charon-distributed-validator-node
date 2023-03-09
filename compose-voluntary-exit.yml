@@ -7,7 +7,7 @@ version: "3.8"
 
 services:
   teku-exit:
-    image: consensys/teku:${TEKU_VERSION:-22.12.0}
+    image: consensys/teku:${TEKU_VERSION:-23.3.0}
     command: |
       voluntary-exit
       --beacon-node-api-endpoint="http://charon:3600"
