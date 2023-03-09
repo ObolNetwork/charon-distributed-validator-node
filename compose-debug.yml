@@ -7,7 +7,7 @@ version: "3.8"
 
 services:
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.46.0}
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.47.0}
     command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
     privileged: true
     volumes:
@@ -24,7 +24,7 @@ services:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.5.0}
 
   jaeger:
-    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.41.0}
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.42.0}
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
     environment:
@@ -37,7 +37,7 @@ services:
       - ./data/jaeger:/badger
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-2.7.1}
+    image: grafana/loki:${LOKI_VERSION:-2.7.4}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:
