@@ -84,11 +84,11 @@ services:
       - CHARON_LOG_FORMAT=${CHARON_LOG_FORMAT:-console}
       - CHARON_P2P_RELAYS=${CHARON_P2P_RELAYS:-https://0.relay.obol.tech}
       - CHARON_P2P_EXTERNAL_HOSTNAME=${CHARON_P2P_EXTERNAL_HOSTNAME:-} # Empty default required to avoid warnings.
-      - CHARON_P2P_TCP_ADDRESS=0.0.0.0:3610
+      - CHARON_P2P_TCP_ADDRESS=0.0.0.0:${CHARON_PORT_P2P_TCP:-3610}
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
     ports:
-      - ${CHARON_PORT_P2P_TCP:-3610}:3610/tcp       # P2P TCP libp2p
+      - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
