@@ -77,7 +77,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v0.14.2}
+    image: obolnetwork/charon:${CHARON_VERSION:-v0.14.3}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}

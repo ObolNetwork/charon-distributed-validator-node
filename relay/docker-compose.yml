@@ -8,7 +8,7 @@ services:
 #
   relay:
     # Pegged charon version (update this for each release).
-    image: obolnetwork/charon:v0.13.0
+    image: obolnetwork/charon:v0.14.3
     environment:
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:3610
       CHARON_HTTP_ADDRESS: 0.0.0.0:3640
