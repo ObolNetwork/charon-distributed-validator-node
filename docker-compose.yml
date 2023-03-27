@@ -52,7 +52,7 @@ services:
     command: |
       lighthouse bn
       --network=goerli
-      --checkpoint-sync-url=https://goerli.checkpoint-sync.ethdevops.io
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
