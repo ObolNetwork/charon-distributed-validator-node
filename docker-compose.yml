@@ -13,7 +13,7 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:${GETH_VERSION:-v1.11.4}
+    image: ethereum/client-go:${GETH_VERSION:-v1.11.5}
     ports:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
@@ -52,7 +52,7 @@ services:
     command: |
       lighthouse bn
       --network=goerli
-      --checkpoint-sync-url=https://goerli.checkpoint-sync.ethdevops.io
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
