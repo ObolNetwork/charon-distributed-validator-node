@@ -36,7 +36,7 @@
       "title": "Explore Charon Logs",
       "tooltip": "Navigate to Charon Logs Explorer",
       "type": "link",
-      "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22editorMode%22:%22builder%22,%22expr%22:%22%7Bservice%3D%5C%22$job%5C%22%7D%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
+      "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%7Bcluster_name%3D%5C%22$cluster_name%5C%22,%20cluster_hash%3D%5C%22$cluster_hash%5C%22,%20cluster_peer%3D%5C%22$cluster_peer%5C%22%7D%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22,%22datasource%22:%7B%22type%22:%22loki%22,%22uid%22:%22loki%22%7D,%22editorMode%22:%22builder%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
     },
     {
       "asDropdown": false,
@@ -67,7 +67,9 @@
           },
           "custom": {
             "align": "auto",
-            "displayMode": "json-view",
+            "cellOptions": {
+              "type": "json-view"
+            },
             "inspect": false
           },
           "mappings": [],
@@ -92,6 +94,7 @@
       "id": 19,
       "options": {
         "footer": {
+          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
@@ -101,7 +104,7 @@
         "frameIndex": 0,
         "showHeader": false
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -241,7 +244,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -409,6 +412,11 @@
                   "color": "semi-dark-orange",
                   "index": 7,
                   "text": "VC missing some validators"
+                },
+                "7": {
+                  "color": "light-purple",
+                  "index": 8,
+                  "text": "BeaconNode has zero peers"
                 }
               },
               "type": "value"
@@ -463,7 +471,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -641,7 +649,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -702,7 +710,9 @@
           },
           "custom": {
             "align": "center",
-            "displayMode": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false,
             "minWidth": 0,
             "width": 90
@@ -781,8 +791,11 @@
                 ]
               },
               {
-                "id": "custom.displayMode",
-                "value": "lcd-gauge"
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
               },
               {
                 "id": "custom.width",
@@ -805,8 +818,10 @@
                 "value": "⭐"
               },
               {
-                "id": "custom.displayMode",
-                "value": "auto"
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
               },
               {
                 "id": "mappings",
@@ -979,6 +994,7 @@
       "id": 54,
       "options": {
         "footer": {
+          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
@@ -994,7 +1010,7 @@
           }
         ]
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -1455,7 +1471,7 @@
             {
               "targetBlank": true,
               "title": "Show in log explorer",
-              "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22editorMode%22:%22builder%22,%22expr%22:%22%7Bservice%3D%5C%22$job%5C%22%7D%20%7C%3D%20%60Duty%20failed%60%20%7C%3D%20%60${__field.labels.duty}%60%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
+              "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22editorMode%22:%22builder%22,%22expr%22:%22%7Bcompose_service%3D%5C%22$job%5C%22%7D%20%7C%3D%20%60Duty%20failed%60%20%7C%3D%20%60${__field.labels.duty}%60%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
             }
           ],
           "mappings": [],
@@ -1560,7 +1576,7 @@
             {
               "targetBlank": true,
               "title": "Show in log explorer",
-              "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22editorMode%22:%22builder%22,%22expr%22:%22%7Bservice%3D%5C%22$job%5C%22%7D%20%7C%3D%20%60${__field.labels.msg}%60%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
+              "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22editorMode%22:%22builder%22,%22expr%22:%22%7Bcompose_service%3D%5C%22$job%5C%22%7D%20%7C%3D%20%60${__field.labels.msg}%60%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
             }
           ],
           "mappings": [],
@@ -1686,7 +1702,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -2116,7 +2132,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2210,7 +2227,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2305,7 +2323,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2397,7 +2416,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2517,7 +2537,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2623,7 +2644,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2688,7 +2710,9 @@
           },
           "custom": {
             "align": "auto",
-            "displayMode": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false
           },
           "mappings": [],
@@ -2696,7 +2720,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-blue"
+                "color": "light-blue",
+                "value": null
               },
               {
                 "color": "red",
@@ -2713,8 +2738,10 @@
             },
             "properties": [
               {
-                "id": "custom.displayMode",
-                "value": "color-text"
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               },
               {
                 "id": "mappings",
@@ -2772,13 +2799,15 @@
                   {
                     "targetBlank": true,
                     "title": "beaconcha.in",
-                    "url": "http://goerli.beaconcha.in/validator/${__data.fields[\"Public Key\"]}"
+                    "url": "http://${__data.fields[\"cluster_network\"]}.beaconcha.in/validator/${__data.fields[\"Public Key\"]}"
                   }
                 ]
               },
               {
-                "id": "custom.displayMode",
-                "value": "color-text"
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               }
             ]
           }
@@ -2793,6 +2822,7 @@
       "id": 56,
       "options": {
         "footer": {
+          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
@@ -2801,7 +2831,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "9.3.1",
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
@@ -2833,7 +2863,7 @@
               "__name__ 2": true,
               "cluster_hash": true,
               "cluster_name": true,
-              "cluster_network": true,
+              "cluster_network": false,
               "cluster_peer": true,
               "instance": true,
               "instance 1": true,
@@ -2844,11 +2874,23 @@
               "pubkey": true,
               "pubkey_full": false
             },
-            "indexByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Value": 9,
+              "cluster_hash": 1,
+              "cluster_name": 2,
+              "cluster_network": 8,
+              "cluster_peer": 3,
+              "instance": 4,
+              "job": 5,
+              "pubkey": 6,
+              "pubkey_full": 7
+            },
             "renameByName": {
               "Value": "Balance",
               "Value #A": "Effectiveness",
               "Value #B": "Balance",
+              "cluster_network": "Network",
               "pubkey": "Public Key",
               "pubkey_full": "Public Key"
             }
@@ -2859,7 +2901,8 @@
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 37,
+  "revision": 1,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [
     "charon",
