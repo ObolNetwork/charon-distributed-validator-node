@@ -18,7 +18,7 @@ services:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
     command: |
-      --goerli
+      --${NETWORK:-goerli}
       --http
       --http.addr=0.0.0.0
       --http.port=8545
@@ -45,13 +45,13 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.5.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.0.1}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
       lighthouse bn
-      --network=goerli
+      --network=--${NETWORK:-goerli}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
@@ -103,7 +103,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:${TEKU_VERSION:-23.3.0}
+    image: consensys/teku:${TEKU_VERSION:-23.3.1}
     command: |
       validator-client
       --config-file "/opt/teku_config.yaml"
@@ -122,7 +122,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.42.0}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.43.0}
     user: ":"
     networks: [dvnode]
     volumes:
@@ -131,7 +131,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-9.4.3}
+    image: grafana/grafana:${GRAFANA_VERSION:-9.4.7}
     user: ":"
     ports:
       - ${MONITORING_PORT_GRAFANA:-3000}:3000
