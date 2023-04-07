@@ -1,4 +1,5 @@
 beacon-node-api-endpoint: "http://charon:3600"
+beacon-node-ssz-blocks-enabled: false
 data-base-path: "/opt/data"
 metrics-enabled: true
 metrics-host-allowlist: "*"
