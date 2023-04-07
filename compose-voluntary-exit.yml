@@ -7,13 +7,13 @@ version: "3.8"
 
 services:
   teku-exit:
-    image: consensys/teku:${TEKU_VERSION:-23.3.0}
+    image: consensys/teku:${TEKU_VERSION:-23.3.1}
     command: |
       voluntary-exit
       --beacon-node-api-endpoint="http://charon:3600"
       --confirmation-enabled=false
       --validator-keys="/opt/charon/exit_keys:/opt/charon/exit_keys"
-      --epoch=${EXIT_EPOCH:-112260}
+      --epoch=${EXIT_EPOCH:-162304}
     volumes:
       - ".charon/exit_keys:/opt/charon/exit_keys"
 

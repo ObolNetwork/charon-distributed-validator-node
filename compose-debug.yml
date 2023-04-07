@@ -24,7 +24,7 @@ services:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.5.0}
 
   jaeger:
-    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.42.0}
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.43.0}
     ports:
       - ${MONITORING_PORT_JAEGER:-16686}:16686
     environment:
@@ -37,7 +37,7 @@ services:
       - ./data/jaeger:/badger
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-2.7.4}
+    image: grafana/loki:${LOKI_VERSION:-2.8.0}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:
@@ -49,7 +49,7 @@ services:
     environment:
       - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
       - CHARON_JAEGER_SERVICE=charon
-      - CHARON_LOKI_ADDRESSES=http://loki:3100/loki/api/v1/push
+      - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
 
 networks:
