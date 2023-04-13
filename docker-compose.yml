@@ -45,7 +45,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.0.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.0.2-rc.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
