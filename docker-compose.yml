@@ -101,9 +101,9 @@ services:
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
   # | | (_) | (_| |  __/\__ \ || (_| | |   
   # |_|\___/ \__,_|\___||___/\__\__,_|_|  
-  
+
   lodestar:
-    image: chainsafe/lodestar:latest
+    image: chainsafe/lodestar:next
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
