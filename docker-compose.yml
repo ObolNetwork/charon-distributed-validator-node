@@ -96,22 +96,22 @@ services:
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
 
-  #  _       _
-  # | |_ ___| | ___   _
-  # | __/ _ \ |/ / | | |
-  # | ||  __/   <| |_| |
-  #  \__\___|_|\_\\__,_|
-
-  teku:
-    image: consensys/teku:${TEKU_VERSION:-23.5.0}
-    command: |
-      validator-client
-      --config-file "/opt/teku_config.yaml"
+  #  _           _           _             
+  # | | ___   __| | ___  ___| |_ __ _ _ __ 
+  # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
+  # | | (_) | (_| |  __/\__ \ || (_| | |   
+  # |_|\___/ \__,_|\___||___/\__\__,_|_|  
+  
+  lodestar:
+    image: chainsafe/lodestar:latest
+    entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK:-goerli}
     volumes:
-      - .charon/validator_keys:/opt/charon/validator_keys
-      - ./teku/teku_config.yaml:/opt/teku_config.yaml
-      - ./teku:/opt/data
+      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - .charon/validator_keys:/home/charon/validator_keys
     restart: unless-stopped
 
   #                        _ _             _

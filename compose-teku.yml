@@ -1,0 +1,30 @@
+version: "3.8"
+
+# Docker-compose file to run teku validator client (https://boost.flashbots.net/).
+# To run the compose stack with teku, run `docker-compose -f docker-compose.yml -f compose-teku.yml up`.
+
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+
+services:
+  #  _       _
+  # | |_ ___| | ___   _
+  # | __/ _ \ |/ / | | |
+  # | ||  __/   <| |_| |
+  #  \__\___|_|\_\\__,_|
+
+  teku:
+    image: consensys/teku:${TEKU_VERSION:-23.3.1}
+    command: |
+      validator-client
+      --config-file "/opt/teku_config.yaml"
+    networks: [dvnode]
+    volumes:
+      - .charon/validator_keys:/opt/charon/validator_keys
+      - ./teku/teku_config.yaml:/opt/teku_config.yaml
+      - ./teku:/opt/data
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    external: true
