@@ -1,6 +1,6 @@
 version: "3.8"
 
-# Docker-compose file to run teku validator client (https://boost.flashbots.net/).
+# Docker-compose file to run teku validator client (https://docs.teku.consensys.net/introduction).
 # To run the compose stack with teku, run `docker-compose -f docker-compose.yml -f compose-teku.yml up`.
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
