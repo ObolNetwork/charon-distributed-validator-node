@@ -5,6 +5,7 @@ for f in /home/charon/validator_keys/keystore-*.json; do
 
     # Import keystore with password.
     node /usr/app/packages/cli/bin/lodestar validator import \
+        --dataDir="/opt/data" \
         --network="$NETWORK" \
         --importKeystores="$f" \
         --importKeystoresPassword="${f//json/txt}"
@@ -13,6 +14,7 @@ done
 echo "Imported all keys"
 
 node /usr/app/packages/cli/bin/lodestar validator \
+    --dataDir="/opt/data" \
     --network="$NETWORK" \
     --metrics=true \
     --metrics.address="0.0.0.0" \

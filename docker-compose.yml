@@ -103,7 +103,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|  
 
   lodestar:
-    image: chainsafe/lodestar:next
+    image: chainsafe/lodestar:v1.8.0
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
@@ -112,6 +112,7 @@ services:
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
+      - ./data/lodestar:/opt/data
     restart: unless-stopped
 
   #                        _ _             _
