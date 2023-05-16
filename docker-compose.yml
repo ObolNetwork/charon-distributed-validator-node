@@ -45,7 +45,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.0.2-rc.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.1.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -103,7 +103,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:${TEKU_VERSION:-23.3.1}
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
     command: |
       validator-client
       --config-file "/opt/teku_config.yaml"
