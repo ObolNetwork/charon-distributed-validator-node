@@ -1,0 +1,75 @@
+# The "Multiple Compose File" feature provides a very powerful way to override
+# any configuration in docker-compose.yml without needing to modify
+# git-checked-in files since that results in conflicts when upgrading this repo.
+# See https://docs.docker.com/compose/extends/#multiple-compose-files for more.
+
+# Just copy this file to `docker-compose.override.yml` and customise it to your liking.
+# `cp docker-compose.override.yml.sample docker-compose.override.yml`
+
+# Some example overrides are commented out below. Any uncommented section
+# below will automatically override the same section in
+# docker-compose.yml when ran with `docker-compose up`.
+# See https://docs.docker.com/compose/extends/#adding-and-overriding-configuration for details.
+
+# WARNING: This is for power users only and requires a deep understanding of Docker Compose
+# and how the local docker-compose.yml is configured.
+
+services:
+  geth:
+    # Disable geth
+    profiles: [disable]
+    # Bind geth internal ports to host ports
+    #ports:
+      #- 8545:8545 # JSON-RPC
+      #- 8551:8551 # AUTH-RPC
+      #- 6060:6060 # Metrics
+
+  lighthouse:
+    # Disable lighthouse
+    profiles: [disable]
+    # Bind lighthouse internal ports to host ports
+    #ports:
+      #- 5052:5052 # HTTP
+      #- 5054:5054 # Metrics
+
+  charon:
+    # Configure any additional env var flags in .env.charon.more
+    #env_file: [.env.charon.more]
+    # Bind charon internal ports to host ports
+    #ports:
+      #- 3600:3600/tcp # Validator API
+      #- 3620:3620/tcp # Monitoring
+    command: run --no-verify
+
+  teku:
+    # Disable teku
+    profiles: [disable]
+    # Bind teku internal ports to host ports
+    #ports:
+      #- 8008:8008 # Metrics
+  
+  lighthouse:
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v3.5.1}
+    entrypoint: /opt/lighthouse/run.sh
+    networks: [ dvnode ]
+    depends_on: [ charon ]
+    restart: unless-stopped
+    environment:
+      LIGHTHOUSE_BEACON_NODE_ADDRESS: http://charon:3600
+      ETH2_NETWORK: ${ETH2_NETWORK:-goerli}
+    volumes:
+      - ./lighthouse/run.sh:/opt/lighthouse/run.sh
+      - .charon/validator_keys:/opt/charon/validator_keys
+
+
+  #prometheus:
+    # Disable prometheus
+    #profiles: [disable]
+    # Bind prometheus internal ports to host ports
+    #ports:
+      #- 9090:9090 # Metrics
+
+  #mev-boost:
+    # Bind mev-boost internal ports to host ports
+    #ports:
+      #- 18550:18550 # Metrics

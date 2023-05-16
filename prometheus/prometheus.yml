@@ -30,4 +30,4 @@ scrape_configs:
       - targets: ["node-exporter:9100"]
   - job_name: "cadvisor"
     static_configs:
-      - targets: [ "cadvisor:8080" ]
+      - targets: ["cadvisor:8080"]

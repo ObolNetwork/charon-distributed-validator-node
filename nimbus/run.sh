@@ -25,6 +25,11 @@ for f in /home/validator_keys/keystore-*.json; do
   --data-dir=/home/user/data/${NODE} \
   /home/validator_keys/tmpkeys
 
+  # Import files into .cache for exit process (TODO:Check if this is needed)
+  source_path="/home/user/data/${NODE}/*"
+  destination_directory="/home/user/.cache/nimbus/BeaconNode/"
+  mkdir -p "$destination_directory" && cp "$source_file" "$destination_directory"
+
   # Delete tmpkeys/keystore-*.json file that was copied before.
   filename="$(basename ${f})"
   rm "${tmpkeys}/${filename}"
