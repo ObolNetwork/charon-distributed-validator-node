@@ -13,7 +13,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku:
-    image: consensys/teku:${TEKU_VERSION:-23.3.1}
+    image: consensys/teku:${TEKU_VERSION:-23.5.0}
     command: |
       validator-client
       --config-file "/opt/teku_config.yaml"
