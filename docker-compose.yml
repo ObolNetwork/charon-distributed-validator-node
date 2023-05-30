@@ -88,6 +88,7 @@ services:
       - CHARON_P2P_TCP_ADDRESS=0.0.0.0:${CHARON_PORT_P2P_TCP:-3610}
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
+      - CHARON_BUILDER_API=${BUILDER_API_ENABLED:-false}
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
@@ -113,6 +114,7 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK:-goerli}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
