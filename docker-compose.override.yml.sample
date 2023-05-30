@@ -40,12 +40,12 @@
       #- 3600:3600/tcp # Validator API
       #- 3620:3620/tcp # Monitoring
 
-  #teku:
-    # Disable teku
+  #lodestar:
+    # Disable lodestar
     #profiles: [disable]
-    # Bind teku internal ports to host ports
+    # Bind lodestar internal ports to host ports
     #ports:
-      #- 8008:8008 # Metrics
+      #- 5064:5064 # Metrics
 
   #prometheus:
     # Disable prometheus
