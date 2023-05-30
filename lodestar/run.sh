@@ -13,7 +13,7 @@ done
 
 echo "Imported all keys"
 
-node /usr/app/packages/cli/bin/lodestar validator \
+exec node /usr/app/packages/cli/bin/lodestar validator \
     --dataDir="/opt/data" \
     --network="$NETWORK" \
     --metrics=true \
