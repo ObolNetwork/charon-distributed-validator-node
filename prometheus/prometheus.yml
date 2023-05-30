@@ -22,9 +22,6 @@ scrape_configs:
   - job_name: "charon"
     static_configs:
       - targets: ["charon:3620"]
-  - job_name: "teku"
-    static_configs:
-      - targets: ["teku:8008"]
   - job_name: "lodestar"
     static_configs:
       - targets: [ "lodestar:5064" ]
