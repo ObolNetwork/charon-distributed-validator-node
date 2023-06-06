@@ -1,0 +1,33 @@
+version: "3.8"
+
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
+
+services:
+  #  _           _           _
+  # | | ___   __| | ___  ___| |_ __ _ _ __
+  # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
+  # | | (_) | (_| |  __/\__ \ || (_| | |
+  # |_|\___/ \__,_|\___||___/\__\__,_|_|
+
+  lodestar_vc:
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.8.0}
+    depends_on: [ charon ]
+    entrypoint: /opt/lodestar/run.sh
+    ports:
+      - ${LODESTAR_PORT_METRICS:-5064}:5064 # Metrics
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK:-goerli}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
+    volumes:
+      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - ../.charon/validator_keys:/home/charon/validator_keys
+      - ../data/lodestar_vc:/opt/data
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-compose_development_dvnode}
+    external: true

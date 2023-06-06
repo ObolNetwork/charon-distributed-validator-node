@@ -28,13 +28,11 @@ services:
       --validators-graffiti="Obol Distributed Validator"
       --validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000"
     volumes:
-      - ../../.charon/validator_keys:/opt/charon/validator_keys
-      - ./data/teku_vc:/opt/data
+      - ../.charon/validator_keys:/opt/charon/validator_keys
+      - ../data/teku_vc:/opt/data
     restart: unless-stopped
 
 networks:
   default:
     name: ${CHARON_DOCKER_NETWORK:-compose_development_dvnode}
     external: true
-
-# dc -f compose_development/execution_clients/geth.yml -f compose_development/consensus_clients/lighthouse.yml -f compose_development/charon.yml -f compose_development/validator_clients/teku.yml up -d

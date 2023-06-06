@@ -44,7 +44,7 @@ services:
     networks: [dvnode]
     volumes:
       - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus:/prometheus
+      - ../data/prometheus:/prometheus
     restart: unless-stopped
 
   grafana:
@@ -58,7 +58,7 @@ services:
       - ../grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
       - ../grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ../grafana/dashboards:/etc/dashboards
-      - ./data/grafana:/var/lib/grafana
+      - ../data/grafana:/var/lib/grafana
     restart: unless-stopped
 
 networks:

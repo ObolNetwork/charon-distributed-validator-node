@@ -33,7 +33,7 @@ services:
       --metrics-port=5054
       --metrics-allow-origin="*"
     volumes:
-      - ./data/lighthouse_bn:/opt/app/beacon
+      - ../data/lighthouse_bn:/opt/app/beacon
       - ../../jwt:/opt/jwt
     restart: unless-stopped
 

@@ -32,7 +32,7 @@ services:
       --metrics.addr=0.0.0.0
       --metrics.port=6060
     volumes:
-      - ./data/geth:/root/.ethereum
+      - ../data/geth:/root/.ethereum
       - ../../jwt:/root/jwt
     restart: unless-stopped
 
