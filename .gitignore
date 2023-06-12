@@ -10,3 +10,4 @@ cluster-lock.json
 .DS_Store
 data/
 .idea
+.charon
