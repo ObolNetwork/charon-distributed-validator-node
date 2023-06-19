@@ -1,5 +1,13 @@
 #!/bin/sh
 
+BUILDER_SELECTION="maxprofit"
+
+# Override builder selection if builder api is enabled to signal lodestar to always propose blinded blocks.
+if $BUILDER_API_ENABLED
+then
+  BUILDER_SELECTION="builderalways"
+fi
+
 for f in /home/charon/validator_keys/keystore-*.json; do
     echo "Importing key ${f}"
 
@@ -21,4 +29,5 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --metrics.port=5064 \
     --beaconNodes="$BEACON_NODE_ADDRESS" \
     --builder="$BUILDER_API_ENABLED" \
+    --builder.selection="$BUILDER_SELECTION" \
     --distributed
