@@ -119,7 +119,7 @@ services:
   lighthouse_vc:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
     entrypoint: /opt/lighthouse/run.sh
-    networks: [ dvnode ]
+    networks: [dvnode]
     depends_on: [ charon ]
     restart: unless-stopped
     environment:
