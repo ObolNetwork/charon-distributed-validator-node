@@ -20,7 +20,9 @@ Check the Obol [docs](https://docs.obol.tech/docs/int/quickstart) for detailed i
 # Examples
 
 In the `examples/` directory, you will find a collection of docker compose configuration files that demonstrate various clients and 
-their configurations for running a Distributed Validator Node. These files are with filenames as {EL}-{CL}-{VC}.yml. For example, nethermind_lodestar_teku.yml, erigon_prysm_nimbus.yml, etc.
+their configurations for running a Distributed Validator Node. These files are with filenames as {EC}-{CC}-{VC}.yml (where
+EC: Execution Client, CC: Consensus Client, VC: Validator Client). For example,
+if you wish to run a DV node with Nethermind EL, Teku CL and Lighthouse VC, you can run `nethermind_teku_lighthouse.yml`.
 
 ⚠️⚠️⚠️ **Important:**
 The configurations provided in the examples are meant for demonstration purposes only and may not be suitable for production environments.
