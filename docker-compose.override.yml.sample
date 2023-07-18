@@ -55,6 +55,8 @@
       #- 9090:9090 # Metrics
 
   #mev-boost:
+    # Disable mev-boost
+    #profiles: [disable]
     # Bind mev-boost internal ports to host ports
     #ports:
       #- 18550:18550 # Metrics
