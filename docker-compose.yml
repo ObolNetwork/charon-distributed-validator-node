@@ -144,7 +144,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.44.0}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.46.0}
     user: ":"
     networks: [dvnode]
     volumes:
@@ -153,7 +153,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-9.5.3}
+    image: grafana/grafana:${GRAFANA_VERSION:-10.0.3}
     user: ":"
     ports:
       - ${MONITORING_PORT_GRAFANA:-3000}:3000
