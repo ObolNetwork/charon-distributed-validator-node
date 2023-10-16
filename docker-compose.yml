@@ -108,8 +108,6 @@ services:
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
-    ports:
-      - ${LODESTAR_PORT_METRICS:-5064}:5064 # Metrics
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK:-goerli}
