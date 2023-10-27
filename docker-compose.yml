@@ -45,13 +45,13 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.5.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
       lighthouse bn
-      --network=${NETWORK:-goerli}
+      --network=${NETWORK:-holesky}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
@@ -104,7 +104,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.10.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.11.3}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -126,7 +126,7 @@ services:
   mev-boost:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.5.0}
     command: |
-      -${NETWORK:-goerli}
+      -${NETWORK:-holesky}
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
