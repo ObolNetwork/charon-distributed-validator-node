@@ -18,7 +18,7 @@ services:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
     command: |
-      --${NETWORK:-goerli}
+      --${NETWORK:-holesky}
       --http
       --http.addr=0.0.0.0
       --http.port=8545
@@ -52,7 +52,7 @@ services:
     command: |
       lighthouse bn
       --network=${NETWORK:-holesky}
-      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.holesky.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
@@ -110,7 +110,7 @@ services:
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
-      NETWORK: ${NETWORK:-goerli}
+      NETWORK: ${NETWORK:-holesky}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
@@ -130,7 +130,7 @@ services:
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-goerli.flashbots.net"}
+      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"}
     restart: unless-stopped
 
   #                        _ _             _
