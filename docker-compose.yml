@@ -171,23 +171,23 @@ services:
   #   \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|        \___|/ |\___|\___|\__\___/|_|
   #                                                   |__/
 
-  validator-ejector:
-    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-stable}
-    user: ":"
-    networks: [dvnode]
-    volumes:
-      - ./validator-ejector:/exitmessages
-    restart: unless-stopped
-    environment:
-      -  EXECUTION_NODE=http://geth:8545
-      -  CONSENSUS_NODE=http://lighthouse:5052
-      -  LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS:-0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb}
-      -  STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
-      -  OPERATOR_ID=${VE_OPERATOR_ID}
-      -  ORACLE_ADDRESSES_ALLOWLIST="[\"0x442af784a788a5bd6f42a01ebe9f287a871243fb\"]"
-      -  MESSAGES_LOCATION=/exitmessages
-      -  RUN_METRICS=true
-      -  DISABLE_SECURITY_DONT_USE_IN_PRODUCTION=${DISABLE_EJECTOR_SECURITY:-false}
+#  validator-ejector:
+#    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-stable}
+#    user: ":"
+#    networks: [dvnode]
+#    volumes:
+#      - ./validator-ejector:/exitmessages
+#    restart: unless-stopped
+#    environment:
+#      -  EXECUTION_NODE=http://geth:8545
+#      -  CONSENSUS_NODE=http://lighthouse:5052
+#      -  LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS:-0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb}
+#      -  STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
+#      -  OPERATOR_ID=${VE_OPERATOR_ID}
+#      -  ORACLE_ADDRESSES_ALLOWLIST="[\"0x442af784a788a5bd6f42a01ebe9f287a871243fb\"]"
+#      -  MESSAGES_LOCATION=/exitmessages
+#      -  RUN_METRICS=true
+#      -  DISABLE_SECURITY_DONT_USE_IN_PRODUCTION=${DISABLE_EJECTOR_SECURITY:-false}
 
   #  _ _     _                 _                      _ _
   # | (_) __| | ___         __| |_   __      _____  _(_) |_
