@@ -23,7 +23,7 @@ While the quick-start guide linked above is adequate for general-purpose deploym
   ```sh
   cp .env.sample .env
   ```
-2. grab your operator ID from [https://operators.lido.fi/](https://operators.lido.fi/)
+2. grab your operator ID from [https://operators-holesky.testnet.fi/](https://operators-holesky.testnet.fi/)
 3. find `VE_OPERATOR_ID` in `.env` and set it to your operator ID
 4. save and close `.env`
 
