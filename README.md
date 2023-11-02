@@ -17,30 +17,15 @@ A distributed validator node is a machine running:
 
 Check the Obol [docs](https://docs.obol.tech/docs/int/quickstart) for detailed instructions on how to get started using this repo.
 
-# Examples
+While the quick-start guide linked above is adequate for general-purpose deployments, this repository needs further setup:
 
-In the `examples/` directory, you will find a collection of docker compose configuration files that demonstrate various clients and 
-their configurations for running a Distributed Validator Node. These files are with filenames as {EC}-{CC}-{VC}.yml (where
-EC: Execution Client, CC: Consensus Client, VC: Validator Client). For example,
-if you wish to run a DV node with Nethermind EL, Teku CL and Lighthouse VC, you can run `nethermind_teku_lighthouse.yml`.
-
-⚠️⚠️⚠️ **Important:**
-The configurations provided in the examples are meant for demonstration purposes only and may not be suitable for production environments.
-These examples are primarily intended for advanced users who are familiar with Docker and have a good understanding of execution and consensus clients.
-Please exercise caution when using them and ensure that you thoroughly review and customize the configurations according to your specific requirements.
-
-To run any of the examples, use the following command:
-
-```
-docker compose -f examples/nethermind_teku_lighthouse.yml up
-```
-
-
-# Project Status
-
-It is still early days for the Obol Network and everything is under active development.
-It is NOT ready for mainnet.
-Keep checking in for updates, [here](https://dvt.obol.tech/) is the latest on charon's supported clients and duties.
+1. copy `.env.sample` to `.env`:
+  ```sh
+  cp .env.sample .env
+  ```
+2. grab your operator ID from [https://operators-holesky.testnet.fi/](https://operators-holesky.testnet.fi/)
+3. find `VE_OPERATOR_ID` in `.env` and set it to your operator ID
+4. save and close `.env`
 
 # FAQs
 

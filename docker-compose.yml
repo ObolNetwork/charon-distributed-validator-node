@@ -13,12 +13,12 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:${GETH_VERSION:-v1.12.2}
+    image: ethereum/client-go:${GETH_VERSION:-v1.13.4}
     ports:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
     command: |
-      --${NETWORK:-goerli}
+      --${NETWORK:-holesky}
       --http
       --http.addr=0.0.0.0
       --http.port=8545
@@ -45,14 +45,14 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.5.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
       lighthouse bn
-      --network=${NETWORK:-goerli}
-      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
+      --network=${NETWORK:-holesky}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.holesky.ethpandaops.io}
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
@@ -77,7 +77,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v0.17.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v0.17.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
@@ -97,21 +97,21 @@ services:
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
 
-  #  _           _           _             
-  # | | ___   __| | ___  ___| |_ __ _ _ __ 
+  #  _           _           _
+  # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
-  # | | (_) | (_| |  __/\__ \ || (_| | |   
-  # |_|\___/ \__,_|\___||___/\__\__,_|_|  
+  # | | (_) | (_| |  __/\__ \ || (_| | |
+  # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.10.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.11.3}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
-      NETWORK: ${NETWORK:-goerli}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
+      NETWORK: ${NETWORK:-holesky}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
@@ -126,11 +126,11 @@ services:
   mev-boost:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.5.0}
     command: |
-      -${NETWORK:-goerli} 
+      -${NETWORK:-holesky}
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-goerli.flashbots.net"}
+      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"}
     restart: unless-stopped
 
   #                        _ _             _
@@ -163,5 +163,50 @@ services:
       - ./data/grafana:/var/lib/grafana
     restart: unless-stopped
 
+
+  #             _ _     _       _                        _           _
+  # __   ____ _| (_) __| | __ _| |_ ___  _ __       ___ (_) ___  ___| |_ ___  _ __
+  # \ \ / / _` | | |/ _` |/ _` | __/ _ \| '__|____ / _ \| |/ _ \/ __| __/ _ \| '__|
+  #  \ V / (_| | | | (_| | (_| | || (_) | | |_____|  __/| |  __/ (__| || (_) | |
+  #   \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|        \___|/ |\___|\___|\__\___/|_|
+  #                                                   |__/
+
+#  validator-ejector:
+#    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-stable}
+#    user: ":"
+#    networks: [dvnode]
+#    volumes:
+#      - ./validator-ejector:/exitmessages
+#    restart: unless-stopped
+#    environment:
+#      -  EXECUTION_NODE=http://geth:8545
+#      -  CONSENSUS_NODE=http://lighthouse:5052
+#      -  LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS:-0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb}
+#      -  STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
+#      -  OPERATOR_ID=${VE_OPERATOR_ID}
+#      -  ORACLE_ADDRESSES_ALLOWLIST="[\"0x442af784a788a5bd6f42a01ebe9f287a871243fb\"]"
+#      -  MESSAGES_LOCATION=/exitmessages
+#      -  RUN_METRICS=true
+#      -  DISABLE_SECURITY_DONT_USE_IN_PRODUCTION=${DISABLE_EJECTOR_SECURITY:-false}
+
+  #  _ _     _                 _                      _ _
+  # | (_) __| | ___         __| |_   __      _____  _(_) |_
+  # | | |/ _` |/ _ \ _____ / _` \ \ / /____ / _ \ \/ / | __|
+  # | | | (_| | (_) |_____| (_| |\ V /_____|  __/>  <| | |_
+  # |_|_|\__,_|\___/       \__,_| \_/       \___/_/\_\_|\__|
+  #
+
+  lido-dv-exit:
+    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-latest}
+    user: ":"
+    networks: [dvnode]
+    volumes:
+      - ./validator-ejector:/exitmessages
+      - .charon:/charon
+    environment:
+      - LIDODVEXIT_BEACON_NODE_URL=http://lighthouse:5052
+      - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
+      - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
+    restart: on-failure
 networks:
   dvnode:
