@@ -112,6 +112,7 @@ services:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK:-holesky}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+      BUILDER_SELECTION: ${BUILDER_SELECTION:-builderonly}
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
