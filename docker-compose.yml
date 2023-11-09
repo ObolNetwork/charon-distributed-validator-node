@@ -172,7 +172,7 @@ services:
   #   \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|        \___|/ |\___|\___|\__\___/|_|
   #                                                   |__/
 
- validator-ejector:
+  validator-ejector:
    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-stable}
    user: ":"
    networks: [dvnode]
