@@ -1,6 +1,8 @@
 global:
   scrape_interval: 30s # Set the scrape interval to every 30 seconds.
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
+  external_labels:
+    service_owner: $OPERATOR_PROMETHEUS_LABEL # Replace with a unique identifier for this Prometheus instance
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
