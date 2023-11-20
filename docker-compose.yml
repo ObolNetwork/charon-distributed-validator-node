@@ -180,8 +180,8 @@ services:
      - ./validator-ejector:/exitmessages
    restart: unless-stopped
    environment:
-     -  EXECUTION_NODE=http://geth:8545
-     -  CONSENSUS_NODE=http://lighthouse:5052
+     -  EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://geth:8545}
+     -  CONSENSUS_NODE=${VE_BEACON_NODE_URL:-http://lighthouse:5052}
      -  LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS:-0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8}
      -  STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
      -  OPERATOR_ID=${VE_OPERATOR_ID}
@@ -205,7 +205,7 @@ services:
       - ./validator-ejector:/exitmessages
       - .charon:/charon
     environment:
-      - LIDODVEXIT_BEACON_NODE_URL=http://lighthouse:5052
+      - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://lighthouse:5052}
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
       - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
       - LIDODVEXIT_EXIT_EPOCH=256
