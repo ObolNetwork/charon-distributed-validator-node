@@ -56,7 +56,6 @@ services:
       --execution-endpoint=http://geth:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
-      --builder=${BUILDER_API_RELAY_URL:-https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz/}
       --http
       --http-address=0.0.0.0
       --http-port=5052
@@ -124,15 +123,15 @@ services:
   #  | '_ ` _ \ / _ \ \ / /____| '_ \ / _ \ / _ \/ __| __|
   #  | | | | | |  __/\ V /_____| |_) | (_) | (_) \__ \ |_
   #  |_| |_| |_|\___| \_/      |_.__/ \___/ \___/|___/\__|
-  # mev-boost:
-  #   image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.5.0}
-  #   command: |
-  #     -${NETWORK:-holesky}
-  #     -loglevel=debug
-  #     -addr=0.0.0.0:18550
-  #     -relay-check
-  #     -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"}
-  #   restart: unless-stopped
+  mev-boost:
+    image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.6.1a1}
+    command: |
+      -${NETWORK:-holesky}
+      -loglevel=debug
+      -addr=0.0.0.0:18550
+      -relay-check
+      -relays=${MEVBOOST_RELAYS:-"https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz"}
+    restart: unless-stopped
 
   #                        _ _             _
   #  _ __ ___   ___  _ __ (_) |_ ___  _ __(_)_ __   __ _
