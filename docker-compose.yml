@@ -13,7 +13,7 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:${GETH_VERSION:-v1.12.2}
+    image: ethereum/client-go:${GETH_VERSION:-v1.13.4}
     ports:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
@@ -45,7 +45,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.5.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -104,7 +104,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|  
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.10.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.11.3}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
