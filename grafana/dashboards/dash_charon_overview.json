@@ -23,8 +23,8 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 1,
-  "id": 10,
+  "graphTooltip": 2,
+  "id": 15,
   "links": [
     {
       "asDropdown": false,
@@ -47,7 +47,7 @@
         "cluster-labels"
       ],
       "targetBlank": false,
-      "title": "New link",
+      "title": "",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -521,6 +521,163 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "This panels shows any health checks that are failing. See <add link> for help troubleshooting.  \n\nNote the different severities:\n- **info**: Only informational, might not be an actual problem.\n- **warning**: Performance is degraded, operator intervention only required if this persists for a long time.\n- **critical**: Significant problem, validators probably not operation at all. Immediate operator intervention required.\n \n\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "noValue": "All checks are passing 🎉",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Severity"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "critical": {
+                        "color": "red",
+                        "index": 2,
+                        "text": "critical"
+                      },
+                      "info": {
+                        "color": "blue",
+                        "index": 0,
+                        "text": "info"
+                      },
+                      "warning": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "warning"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 75
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Check Name"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 0,
+        "y": 8
+      },
+      "id": 233,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(app_health_checks{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}) by (name,severity) > 0",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Failing Health Checks",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value": "",
+              "name": "Check Name",
+              "severity": "Severity"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "description": "- **Peer**: The peer's name (inferred from their *charon-enr-private-key*)\n- **You**: ⭐️ is this local charon node\n- **Connected**: Whether you are currently connected to this peer.\n- **Direct**: Whether the connection is *direct* (👍) or *relay* (👎) \n- **Latency**: The time messages take to travel to/from the peer.\n- **Version**: The version of the peer's charon node\n- **Supported**: Whether the peers charon version is supported/compatible or not.\n- **Uptime**\" The duration since peer was restarted.\n- **🚧Attest**: Number of attestation duties missed in the time window.\n- **🚧Propose**: Number of block proposal duties missed in the time window.\n- **🚧Other**: Number of other duties missed in the time window.\n\n",
       "fieldConfig": {
         "defaults": {
@@ -890,8 +1047,8 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 24,
-        "x": 0,
+        "w": 19,
+        "x": 5,
         "y": 8
       },
       "id": 85,
@@ -1195,8 +1352,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1257,21 +1413,6 @@
               "legendFormat": "{{git_hash}}",
               "range": true,
               "refId": "B"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "exemplar": false,
-              "expr": "rate(app_start_time_secs{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}) > 0",
-              "hide": false,
-              "instant": false,
-              "interval": "$interval",
-              "legendFormat": "Restarts",
-              "range": true,
-              "refId": "C"
             }
           ],
           "title": "Versions and Git Hashes",
@@ -1390,8 +1531,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "#ccccdb",
-                    "value": null
+                    "color": "#ccccdb"
                   },
                   {
                     "color": "green",
@@ -1468,8 +1608,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
-                    "value": null
+                    "color": "red"
                   },
                   {
                     "color": "#EAB839",
@@ -1545,8 +1684,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1636,7 +1774,7 @@
             },
             "textMode": "auto"
           },
-          "pluginVersion": "9.5.3",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1780,8 +1918,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-blue",
-                    "value": null
+                    "color": "light-blue"
                   },
                   {
                     "color": "red",
@@ -1952,9 +2089,14 @@
               "show": false
             },
             "showHeader": true,
-            "sortBy": []
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "Balance"
+              }
+            ]
           },
-          "pluginVersion": "9.5.3",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -2107,8 +2249,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2538,7 +2679,7 @@
               }
             ]
           },
-          "pluginVersion": "9.5.2",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -4073,7 +4214,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 34
+            "y": 42
           },
           "id": 127,
           "options": {
@@ -4179,7 +4320,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 34
+            "y": 42
           },
           "id": 129,
           "links": [],
@@ -4291,7 +4432,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 41
+            "y": 49
           },
           "id": 125,
           "options": {
@@ -4399,7 +4540,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 41
+            "y": 49
           },
           "id": 130,
           "links": [],
@@ -4484,10 +4625,11 @@
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 27
+            "y": 19
           },
           "id": 191,
           "options": {
+            "cellHeight": "sm",
             "footer": {
               "countRows": false,
               "fields": "",
@@ -4586,39 +4728,13 @@
               },
               "unit": "reqps"
             },
-            "overrides": [
-              {
-                "__systemRef": "hideSeriesFrom",
-                "matcher": {
-                  "id": "byNames",
-                  "options": {
-                    "mode": "exclude",
-                    "names": [
-                      "validators_by_pub_key",
-                      "validators"
-                    ],
-                    "prefix": "All except:",
-                    "readOnly": true
-                  }
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 29
+            "y": 21
           },
           "id": 142,
           "options": {
@@ -4713,7 +4829,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 29
+            "y": 21
           },
           "id": 138,
           "options": {
@@ -4798,13 +4914,38 @@
               },
               "unit": "none"
             },
-            "overrides": []
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "submit_beacon_block"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 36
+            "y": 28
           },
           "id": 144,
           "options": {
@@ -4906,7 +5047,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 36
+            "y": 28
           },
           "id": 145,
           "options": {
@@ -4929,7 +5070,7 @@
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "clamp_min((clamp(app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 1 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 4 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 5 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 6, 1, 1) OR on() vector(0))\n*\non()\n(\n    (\n0.5 * (1.0 - 10*(sum(increase(app_eth2_errors_total{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval])) / (sum(increase(app_eth2_latency_seconds_count{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval]))))) OR on() vector(0.5)\n    )\n    +\n    (\n        0.5 * (1.0 - clamp_max(histogram_quantile(0.99, sum(rate(app_eth2_latency_seconds_bucket{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval])) by (le)),1))\n    )\n), 0)",
+              "expr": "clamp_min((clamp(app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 1 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 4 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 5 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 6, 1, 1) OR on() vector(0))\n*\n(\n    (\n0.5 * (1.0 - 10*(sum(increase(app_eth2_errors_total{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval])) / (sum(increase(app_eth2_latency_seconds_count{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval]))))) OR on() vector(0.5)\n    )\n    +\n    (\n        0.5 * (1.0 - clamp_max(histogram_quantile(0.99, sum(rate(app_eth2_latency_seconds_bucket{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval])) by (le)),1))\n    )\n), 0)",
               "interval": "$interval",
               "legendFormat": "__auto",
               "range": true,
@@ -5006,7 +5147,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 43
+            "y": 35
           },
           "id": 147,
           "options": {
@@ -5113,7 +5254,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 158
+            "y": 166
           },
           "id": 136,
           "options": {
@@ -5207,7 +5348,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 158
+            "y": 166
           },
           "id": 143,
           "options": {
@@ -5298,7 +5439,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 165
+            "y": 173
           },
           "id": 139,
           "options": {
@@ -5657,7 +5798,7 @@
               "reverse": false
             }
           },
-          "pluginVersion": "9.5.2",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -6366,8 +6507,8 @@
       {
         "current": {
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "Obol Core Team 3 of 4",
+          "value": "Obol Core Team 3 of 4"
         },
         "datasource": {
           "type": "prometheus",
@@ -6394,8 +6535,8 @@
       {
         "current": {
           "selected": false,
-          "text": "8439eb3",
-          "value": "8439eb3"
+          "text": "2bb5f9e",
+          "value": "2bb5f9e"
         },
         "datasource": {
           "type": "prometheus",
@@ -6422,8 +6563,8 @@
       {
         "current": {
           "selected": false,
-          "text": "excited-group",
-          "value": "excited-group"
+          "text": "fine-jewelry",
+          "value": "fine-jewelry"
         },
         "datasource": {
           "type": "prometheus",
