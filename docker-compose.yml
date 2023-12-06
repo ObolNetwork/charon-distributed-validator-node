@@ -198,7 +198,7 @@ services:
   #
 
   lido-dv-exit:
-    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-latest}
+    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-2403635}
     user: ":"
     networks: [dvnode]
     volumes:
