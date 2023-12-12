@@ -174,7 +174,7 @@ services:
   #                                                   |__/
 
   validator-ejector:
-   image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-stable}
+   image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-1.3.0}
    user: ":"
    networks: [dvnode]
    volumes:
@@ -189,6 +189,7 @@ services:
      -  ORACLE_ADDRESSES_ALLOWLIST=["0x12A1D74F8697b9f4F1eEBb0a9d0FB6a751366399","0xD892c09b556b547c80B7d8c8cB8d75bf541B2284"]
      -  MESSAGES_LOCATION=/exitmessages
      -  RUN_METRICS=true
+     -  HTTP_PORT=8989
      -  DISABLE_SECURITY_DONT_USE_IN_PRODUCTION=${DISABLE_EJECTOR_SECURITY:-false}
 
   #  _ _     _                 _                      _ _
