@@ -8,11 +8,8 @@ remote_write:
       credentials: $PROM_REMOTE_WRITE_TOKEN
     write_relabel_configs:
       - source_labels: [job]
-        regex: "validator-ejector"
-        action: keep # Keeps validator-ejector metrics.
-      - source_labels: [job]
         regex: "charon"
-        action: keep # Keeps charon metrics.
+        action: keep # Keeps charon metrics and drop metrics from other containers.
 
 scrape_configs:
   - job_name: "geth"
