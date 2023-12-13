@@ -52,7 +52,12 @@ services:
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
 
+  lido-dv-exit:
+    environment:
+      - LIDODVEXIT_LOG_LEVEL=debug
+      - LIDODVEXIT_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
+
 networks:
   default:
-    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    name: ${CHARON_DOCKER_NETWORK:-lido-charon-distributed-validator-node_dvnode}
     external: true
