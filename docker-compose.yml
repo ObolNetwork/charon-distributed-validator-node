@@ -211,6 +211,8 @@ services:
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
       - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
       - LIDODVEXIT_EXIT_EPOCH=256
+      - LIDODVEXIT_LOG_LEVEL=${LIDO_DV_EXIT_LOG_LEVEL:-info}
     restart: on-failure
+
 networks:
   dvnode:
