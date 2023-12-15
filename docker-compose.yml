@@ -200,7 +200,7 @@ services:
   #
 
   lido-dv-exit:
-    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-990beba}
+    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-3d5c86a}
     user: ":"
     networks: [dvnode]
     volumes:
@@ -212,6 +212,7 @@ services:
       - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
       - LIDODVEXIT_EXIT_EPOCH=256
       - LIDODVEXIT_LOG_LEVEL=${LIDO_DV_EXIT_LOG_LEVEL:-info}
+      - LIDODVEXIT_VALIDATOR_QUERY_CHUNK_SIZE=${LIDO_DV_EXIT_VALIDATOR_QUERY_CHUNK_SIZE:-5}
     restart: on-failure
 
 networks:
