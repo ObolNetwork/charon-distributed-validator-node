@@ -88,6 +88,7 @@ services:
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
       - CHARON_BUILDER_API=${BUILDER_API_ENABLED:-true}
+      - CHARON_FEATURE_SET_ENABLE=qbft_timers_ab_test
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
