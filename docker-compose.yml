@@ -122,35 +122,6 @@ services:
       - ./data/lodestar:/opt/data
     restart: unless-stopped
 
-  #  _       _
-  # | |_ ___| | ___   _
-  # | __/ _ \ |/ / | | |
-  # | ||  __/   <| |_| |
-  #  \__\___|_|\_\\__,_|
-
-  teku:
-    image: consensys/teku:${TEKU_VERSION:-23.12.1}
-    command: |
-      validator-client
-      --beacon-node-api-endpoint=http://charon:3600
-      --data-base-path=/opt/data
-      --metrics-enabled=true
-      --metrics-host-allowlist=*
-      --metrics-interface=0.0.0.0
-      --metrics-port=8008
-      --network=auto
-      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-keystore-locking-enabled=false
-      --validators-graffiti="Obol Distributed Validator"
-      --validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000"
-      --validators-builder-registration-default-enabled=${BUILDER_API_ENABLED:-true}
-      --validators-proposer-blinded-blocks-enabled=${BUILDER_API_ENABLED:-true}
-    networks: [dvnode]
-    volumes:
-      - .charon/validator_keys:/opt/charon/validator_keys
-      - ./teku:/opt/data
-    restart: unless-stopped
-
   #      _                     _
   #  _ __ ___   _____   __    | |__   ___   ___  ___| |_
   #  | '_ ` _ \ / _ \ \ / /____| '_ \ / _ \ / _ \/ __| __|
