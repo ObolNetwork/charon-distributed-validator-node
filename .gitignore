@@ -11,3 +11,7 @@ cluster-lock.json
 data/
 .idea
 .charon
+# Teku directory for slashing protection files
+teku/validator/
+# Teku directory for storing logs
+teku/logs/
