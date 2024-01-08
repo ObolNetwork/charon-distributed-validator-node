@@ -13,7 +13,7 @@ services:
   #  |___/
 
   geth:
-    image: ethereum/client-go:${GETH_VERSION:-v1.13.5}
+    image: ethereum/client-go:${GETH_VERSION:-v1.13.8}
     ports:
       - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
@@ -32,6 +32,7 @@ services:
       --metrics.addr=0.0.0.0
       --metrics.port=6060
     networks: [dvnode]
+    stop_grace_period: 2m
     volumes:
       - ./data/geth:/root/.ethereum
       - ./jwt:/root/jwt
