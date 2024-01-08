@@ -32,6 +32,7 @@ services:
       --metrics.addr=0.0.0.0
       --metrics.port=6060
     networks: [dvnode]
+    stop_grace_period: 2m
     volumes:
       - ./data/geth:/root/.ethereum
       - ./jwt:/root/jwt
