@@ -1,8 +1,12 @@
 ---
 name: "\U0001F41E Bug report"
 about: Report a bug or problem with running this repo
-labels: Bug
+title: ''
+labels: ''
+assignees: ''
+
 ---
+
 <!--
 
 Hey there!
@@ -52,4 +56,3 @@ Please let us know how we can reproduce this issue. Include the exact commands y
 </pre>
 
 **Anything else relevant (validator index / public key)?**
-
