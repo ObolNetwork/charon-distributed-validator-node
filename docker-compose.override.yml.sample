@@ -35,6 +35,9 @@
   #charon:
     # Configure any additional env var flags in .env.charon.more
     #env_file: [.env.charon.more]
+    # Uncomment the extra_hosts section if you are trying to communicate with a CL running in a different docker network on the same machine 
+    #extra_hosts:
+      #- "host.docker.internal:host-gateway"
     # Bind charon internal ports to host ports
     #ports:
       #- 3600:3600/tcp # Validator API
