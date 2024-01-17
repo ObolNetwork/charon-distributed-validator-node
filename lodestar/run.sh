@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUILDER_SELECTION="maxprofit"
+BUILDER_SELECTION="executiononly"
 
 # If the builder API is enabled, override the builder selection to signal Lodestar to always propose blinded blocks.
 if [[ $BUILDER_API_ENABLED == "true" ]];
@@ -30,4 +30,5 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --beaconNodes="$BEACON_NODE_ADDRESS" \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
-    --distributed
+    --distributed \
+    --useProduceBlockV3=false

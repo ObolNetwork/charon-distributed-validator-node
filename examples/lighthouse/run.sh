@@ -17,6 +17,7 @@ for f in /opt/charon/validator_keys/keystore-*.json; do
   lighthouse --network "${NETWORK}" account validator import \
     --reuse-password \
     --keystore "${f}" \
+    --datadir="/opt/data" \
     --password-file "${f//json/txt}"
 done
 
