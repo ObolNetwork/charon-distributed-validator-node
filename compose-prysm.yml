@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+                                
+#  _ __  _ __ _   _ ___ _ __ ___  
+# | '_ \| '__| | | / __| '_ ` _ \ 
+# | |_) | |  | |_| \__ \ | | | | |
+# | .__/|_|   \__, |___/_| |_| |_|
+# |_|         |___/               
+  prysm:
+    build: prysm
+    networks: [ dvnode ]
+    depends_on: [ charon ]
+    restart: unless-stopped
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      ETH2_NETWORK: ${NETWORK:-goerli}
+    volumes:
+      - ./prysm:/home/prysm
+      - .charon/validator_keys:/home/charon/validator_keys
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    external: true
