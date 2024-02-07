@@ -17,7 +17,7 @@ services:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
       - ${NETHERMIND_PORT_P2P:-30303}:30303/udp # P2P UDP
     command: |
-      --config=${NETWORK:-goerli}
+      --config=${NETWORK:-holesky}
       --datadir=data
       --JsonRpc.Enabled=true
       --JsonRpc.JwtSecretFile="/root/jwt/jwt.hex"
@@ -43,11 +43,11 @@ services:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.5.0}
     networks: [dvnode]
     command: |
-      -${NETWORK:-goerli} 
+      -${NETWORK:-holesky} 
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-goerli.flashbots.net"}
+      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"}
     restart: unless-stopped
 
   #  _       _
@@ -62,7 +62,7 @@ services:
       - ${TEKU_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${TEKU_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
-      --network=${NETWORK:-goerli}
+      --network=${NETWORK:-holesky}
       --rest-api-enabled=true
       --rest-api-interface=0.0.0.0
       --rest-api-port=4000
@@ -74,7 +74,7 @@ services:
       --metrics-host-allowlist=*
       --metrics-interface=0.0.0.0
       --metrics-port=5054
-      --initial-state=https://goerli.checkpoint-sync.ethpandaops.io/eth/v2/debug/beacon/states/finalized
+      --initial-state=https://holesky.checkpoint-sync.ethpandaops.io/eth/v2/debug/beacon/states/finalized
       --builder-endpoint=http://mev_boost:18550
     networks: [dvnode]
     volumes:
@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
     environment:
       LIGHTHOUSE_BEACON_NODE_ADDRESS: http://charon:3600
-      NETWORK: ${NETWORK:-goerli}
+      NETWORK: ${NETWORK:-holesky}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
     volumes:
       - ./lighthouse/run.sh:/opt/lighthouse/run.sh

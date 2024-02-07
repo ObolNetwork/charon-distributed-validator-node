@@ -448,7 +448,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "( 1 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"mainnet\"} )\nor \n( 2 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"goerli\"} )\nor\n( 3 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"sepolia\"} )\nor\n( 4 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"gnosis\"} )",
+          "expr": "( 1 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"mainnet\"} )\nor \n( 2 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"holesky\"} )\nor\n( 3 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"sepolia\"} )\nor\n( 4 * app_version{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", cluster_network=\"gnosis\"} )",
           "format": "time_series",
           "hide": false,
           "instant": true,
@@ -6807,8 +6807,8 @@
       {
         "current": {
           "selected": false,
-          "text": "goerli",
-          "value": "goerli"
+          "text": "holesky",
+          "value": "holesky"
         },
         "datasource": {
           "type": "prometheus",
