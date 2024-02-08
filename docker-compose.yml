@@ -11,7 +11,7 @@ services:
   # | | | |  __/ |_| | | |  __/ |  | | | | | | | | | | (_| |
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.19.1}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.25.3}
     restart: unless-stopped
     ports:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
