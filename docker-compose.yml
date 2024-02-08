@@ -31,8 +31,8 @@ services:
       --Metrics.ExposePort=8008
     networks: [dvnode]
     volumes:
-      - ../data/nethermind:/nethermind/data
-      - ../jwt:/root/jwt
+      - ./data/nethermind:/nethermind/data
+      - ./jwt:/root/jwt
 
   #  _ _       _     _   _
   # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
@@ -124,7 +124,7 @@ services:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.6}
     networks: [dvnode]
     command: |
-      -${NETWORK:-holesky} 
+      -genesis-fork-version=${MEVBOOST_GENESIS_FORK_VERSION:-"0x01017000"}
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
