@@ -72,7 +72,7 @@ services:
       --rest-api-port=4000
       --rest-api-host-allowlist=*
       --data-path=/opt/data
-      --ee-endpoint=http://nethermind:8551
+      --ee-endpoint=http://geth:8551
       --ee-jwt-secret-file=/opt/jwt/jwt.hex
       --metrics-enabled=true
       --metrics-host-allowlist=*
