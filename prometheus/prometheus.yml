@@ -12,10 +12,10 @@ remote_write:
         action: keep # Keeps charon metrics and drop metrics from other containers.
 
 scrape_configs:
-  - job_name: "geth"
+  - job_name: "nethermind"
     metrics_path: /debug/metrics/prometheus
     static_configs:
-      - targets: ["geth:6060"]
+      - targets: ["nethermind:8008"]
   - job_name: "lighthouse"
     static_configs:
       - targets: ["lighthouse:5054"]
