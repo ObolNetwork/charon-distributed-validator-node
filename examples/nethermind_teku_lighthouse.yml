@@ -57,7 +57,7 @@ services:
   #  \__\___|_|\_\\__,_|
 
   teku_bn:
-    image: consensys/teku:${TEKU_VERSION:-23.5.0}
+    image: consensys/teku:${TEKU_VERSION:-24.1.1}
     ports:
       - ${TEKU_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${TEKU_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -74,7 +74,7 @@ services:
       --metrics-host-allowlist=*
       --metrics-interface=0.0.0.0
       --metrics-port=5054
-      --initial-state=https://goerli.checkpoint-sync.ethpandaops.io/eth/v2/debug/beacon/states/finalized
+      --initial-state=https://mainnet.checkpoint.sigp.io/eth/v2/debug/beacon/states/finalized
       --builder-endpoint=http://mev_boost:18550
     networks: [dvnode]
     volumes:
@@ -117,7 +117,7 @@ services:
   #      |___/
 
   lighthouse_vc:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.6.0}
     entrypoint: /opt/lighthouse/run.sh
     networks: [dvnode]
     depends_on: [ charon ]

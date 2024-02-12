@@ -17,15 +17,15 @@ A distributed validator node is a machine running:
 
 Check the Obol [docs](https://docs.obol.tech/docs/int/quickstart) for detailed instructions on how to get started using this repo.
 
-While the quick-start guide linked above is adequate for general-purpose deployments, this repository needs further setup:
+While the quick-start guide linked above is adequate for general-purpose deployments, this repository needs further setup for mainnet deployment:
 
-1. copy `.env.sample` to `.env`:
-  ```sh
-  cp .env.sample .env
-  ```
-2. grab your operator ID from [https://operators-holesky.testnet.fi/](https://operators-holesky.testnet.fi/)
-3. find `VE_OPERATOR_ID` in `.env` and set it to your operator ID
-4. save and close `.env`
+1. Copy `.env.sample.mainnet` to `.env`:
+    ```sh
+    cp .env.sample.mainnet .env
+    ```
+2. Grab your operator ID from the [lido dashboard](https://operators.lido.fi/)
+3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID
+4. Save and close `.env`
 
 # FAQs
 
