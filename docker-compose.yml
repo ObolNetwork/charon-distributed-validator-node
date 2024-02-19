@@ -145,6 +145,9 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    command: 
+      - "--config.expand-env"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     restart: unless-stopped
 
   grafana:
