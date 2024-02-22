@@ -1413,6 +1413,21 @@
               "legendFormat": "{{git_hash}}",
               "range": true,
               "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "rate(app_start_time_secs{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$interval]) > 0",
+              "hide": false,
+              "instant": false,
+              "interval": "$interval",
+              "legendFormat": "Restarts",
+              "range": true,
+              "refId": "C"
             }
           ],
           "title": "Versions and Git Hashes",
