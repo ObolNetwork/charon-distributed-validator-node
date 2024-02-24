@@ -5,38 +5,34 @@ version: "3.8"
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
-  #             _   _
-  #   __ _  ___| |_| |__
-  #  / _` |/ _ \ __| '_ \
-  # | (_| |  __/ |_| | | |
-  #  \__, |\___|\__|_| |_|
-  #  |___/
-
-  geth:
-    image: ethereum/client-go:${GETH_VERSION:-v1.13.11}
-    ports:
-      - ${GETH_PORT_P2P:-30303}:30303/tcp # P2P TCP
-      - ${GETH_PORT_P2P:-30303}:30303/udp # P2P UDP
-    command: |
-      --${NETWORK:-goerli}
-      --http
-      --http.addr=0.0.0.0
-      --http.port=8545
-      --http.vhosts="*"
-      --http.api="db,eth,net,engine,rpc,web3"
-      --authrpc.jwtsecret="/root/jwt/jwt.hex"
-      --authrpc.addr=0.0.0.0
-      --authrpc.port=8551
-      --authrpc.vhosts="*"
-      --metrics
-      --metrics.addr=0.0.0.0
-      --metrics.port=6060
-    networks: [dvnode]
-    stop_grace_period: 2m
-    volumes:
-      - ./data/geth:/root/.ethereum
-      - ./jwt:/root/jwt
+  #             _   _                         _           _
+  #  _ __   ___| |_| |__   ___ _ __ _ __ ___ (_)_ __   __| |
+  # | '_ \ / _ \ __| '_ \ / _ \ '__| '_ ` _ \| | '_ \ / _` |
+  # | | | |  __/ |_| | | |  __/ |  | | | | | | | | | | (_| |
+  # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
+  nethermind:
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.25.3}
     restart: unless-stopped
+    ports:
+      - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
+      - ${NETHERMIND_PORT_P2P:-30303}:30303/udp # P2P UDP
+    command: |
+      --config=${NETWORK:-holesky}
+      --datadir=data
+      --JsonRpc.Enabled=true
+      --JsonRpc.JwtSecretFile="/root/jwt/jwt.hex"
+      --JsonRpc.EngineHost=0.0.0.0
+      --JsonRpc.EnginePort=8551
+      --JsonRpc.Host=0.0.0.0
+      --JsonRpc.Port=8545
+      --Sync.SnapSync=true
+      --HealthChecks.Enabled=true
+      --Metrics.Enabled=true
+      --Metrics.ExposePort=8008
+    networks: [dvnode]
+    volumes:
+      - ./data/nethermind:/nethermind/data
+      - ./jwt:/root/jwt
 
   #  _ _       _     _   _
   # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
@@ -52,9 +48,9 @@ services:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
     command: |
       lighthouse bn
-      --network=${NETWORK:-goerli}
-      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.goerli.ethpandaops.io}
-      --execution-endpoint=http://geth:8551
+      --network=${NETWORK:-holesky}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.holesky.ethpandaops.io}
+      --execution-endpoint=http://nethermind:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
       --builder=http://mev-boost:18550
@@ -105,13 +101,13 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|  
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.15.0-rc.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.15.1}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
-      NETWORK: ${NETWORK:-goerli}
+      NETWORK: ${NETWORK:-holesky}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
@@ -125,14 +121,14 @@ services:
   #  | | | | | |  __/\ V /_____| |_) | (_) | (_) \__ \ |_
   #  |_| |_| |_|\___| \_/      |_.__/ \___/ \___/|___/\__|
   mev-boost:
-    image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.6}
+    image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.6.1a3}
     networks: [dvnode]
     command: |
-      -${NETWORK:-goerli} 
+      -${NETWORK:-holesky} 
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-goerli.flashbots.net"}
+      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net,https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz"}
     restart: unless-stopped
 
   #                        _ _             _
