@@ -139,14 +139,17 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.46.0}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.50.0}
     user: ":"
     networks: [dvnode]
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    environment:
+      - SERVICE_OWNER=dayo-local
+      - PROM_REMOTE_WRITE_TOKEN=obolsPApyotXywuWtpC3b4dijN=1R1YReIKBSQDEQ5Q!ds5y=hnVSedSIfVLbb0Mky4ANUsz!zG=r-Tv46bxk/y1c2zmk1Z5FfU1NQkmCON=milKszPSm11pH9lqXwjV
     command: 
-      - "--config.expand-env"
+      - "-config.expand-env"
       - "--config.file=/etc/prometheus/prometheus.yml"
     restart: unless-stopped
 
