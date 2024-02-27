@@ -3,12 +3,11 @@ global:
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
   external_labels:
     service_owner: ${SERVICE_OWNER} # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
-    PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN}
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
     authorization:
-      credentials: $PROM_REMOTE_WRITE_TOKEN
+      credentials: ${PROM_REMOTE_WRITE_TOKEN}
     write_relabel_configs:
       - source_labels: [job]
         regex: "charon"
