@@ -42,7 +42,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.0.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.1.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -74,7 +74,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v0.19.1}
+    image: obolnetwork/charon:${CHARON_VERSION:-v0.19.2}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
