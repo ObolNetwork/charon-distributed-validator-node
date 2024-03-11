@@ -1,0 +1,665 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name:  Cluster
+      folder: Charon
+      interval: 1m
+      rules:
+        - uid: fdd9f034-22e8-428b-9d7c-52e031bf8cee
+          title: ' Cluster BeaconNode Syncing '
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max((app_monitoring_readyz{cluster_hash="1c17ca2",cluster_name=" M1 Cluster #1"}[$__rate_interval])) by (cluster_name, cluster_hash) == 3'
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          dashboardUid: -d6qujIJVk
+          panelId: 141
+          noDataState: OK
+          execErrState: OK
+          for: 15m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "141"
+            summary: Beacon node is syncing for node {{$labels.cluster_peer}} in {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            cluster_peer: '{{$labels.cluster_peer}}'
+            severity: notify
+          isPaused: false
+        - uid: d1cf2f49-e3a9-4aaa-98d9-f478b1faa1d2
+          title:   Cluster Missed Attestations
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max(increase(core_tracker_failed_duties_total{duty="attester",cluster_name=" M1 Cluster #1", cluster_hash="1c17ca2"}[$__rate_interval])) by (cluster_hash, cluster_name) > 0 '
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          dashboardUid: -d6qujIJVk
+          panelId: 85
+          noDataState: OK
+          execErrState: OK
+          for: 5m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "85"
+            summary: Missed attestations in  cluster {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            severity: notify
+          isPaused: false
+        - uid: e874c008-2ff0-46ef-a1a1-bf62a60337cf
+          title:  Cluster in Unknown Status
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max((app_monitoring_readyz{cluster_name=" M1 Cluster #1", cluster_hash="1c17ca2", cluster_network="mainnet"}[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer,cluster_network) == 0'
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: count
+                refId: B
+                settings:
+                    mode: ""
+                type: reduce
+          dashboardUid: -d6qujIJVk
+          panelId: 87
+          noDataState: OK
+          execErrState: OK
+          for: 10m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "87"
+            summary: Node {{$labels.cluster_peer}} in lido cluster {{$labels.cluster_name}} is in unknown state
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+          isPaused: false
+        - uid: c23c531e-4386-466a-b9e8-3a3809148cb5
+          title:  Cluster Insufficient Peers
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max((app_monitoring_readyz{cluster_hash="1c17ca2",cluster_name=" M1 Cluster #1",cluster_peer!=""}[$__rate_interval])) by (cluster_name,cluster_hash,cluster_peer) == 4'
+                hide: false
+                intervalMs: 1000
+                legendFormat: '{{cluster_name}} {{cluster_peer}}'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: max
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          dashboardUid: -d6qujIJVk
+          panelId: 186
+          noDataState: OK
+          execErrState: OK
+          for: 10m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "186"
+            summary: Insufficient Peers for node {{$labels.cluster_peer}} in cluster {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            cluster_peer: '{{$labels.cluster_peer}}'
+            severity: warning
+          isPaused: false
+        - uid: a2cf313f-e5dc-4a3c-a3ff-d7e51b55183e
+          title:  Cluster Failure Rate
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: "floor(\n    100 * \n    (\n        max(increase(core_tracker_success_duties_total{cluster_hash=\"1c17ca2\",cluster_name=\" M1 Cluster #1\"}[$__range])) by (cluster_hash, cluster_name) / \n        max(increase(core_tracker_expect_duties_total{cluster_hash=\"1c17ca2\",cluster_name=\" M1 Cluster #1\"}[$__range])) by (cluster_hash, cluster_name)\n    )\n) < 95"
+                hide: false
+                instant: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          dashboardUid: -d6qujIJVk
+          panelId: 91
+          noDataState: OK
+          execErrState: OK
+          for: 6h
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "91"
+            summary: Cluster {{$labels.cluster_name}} success rate is less than {{$values.B}}%
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            severity: notify
+          isPaused: false
+        - uid: f5b9fb9d-66b8-49b6-813d-cdb2928425f2
+          title: ' Cluster VC missing validators '
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max((app_monitoring_readyz{cluster_hash="1c17ca2",cluster_name=" M1 Cluster #1", cluster_peer!=""}[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer) == 6'
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          noDataState: OK
+          execErrState: OK
+          for: 15m
+          annotations:
+            summary: VC missing some validators for node {{$labels.cluster_peer}} in cluster {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            cluster_peer: '{{$labels.cluster_peer}}'
+            severity: warning
+          isPaused: false
+        - uid: e7e9de6b-f7f4-4a69-85b4-0512f5ef0aec
+          title: High percentage failed sync message duty [External]
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: "(\n    sum(increase(core_tracker_failed_duties_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"Obol Core Team 3 of 4|Obol Mainnet #1| M1 Cluster #1|etherfi-mainnet-cluster-phase-m1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer)\n) \n/ \n(\n    sum(increase(core_tracker_failed_duties_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"Obol Core Team 3 of 4|Obol Mainnet #1| M1 Cluster #1|etherfi-mainnet-cluster-phase-m1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer) \n    + \n    sum(increase(core_bcast_broadcast_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"Obol Core Team 3 of 4|Obol Mainnet #1| M1 Cluster #1|etherfi-mainnet-cluster-phase-m1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer) \n) > 0.1"
+                hide: false
+                instant: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          noDataState: OK
+          execErrState: OK
+          for: 5m
+          annotations:
+            summary: High percentage failed sync message duty for node {{$labels.cluster_peer}} in cluster {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            cluster_peer: '{{$labels.cluster_peer}}'
+            service: charon
+            service_owner: charon-external
+          isPaused: false
+        - uid: f20e8a2f-8533-4524-bd5f-587e167c05ab
+          title:  Cluster - Number of Connected Relays
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: 'group (p2p_relay_connections{cluster_name=" M1 Cluster #1"}) by (cluster_peer)'
+                instant: false
+                interval: 2m
+                intervalMs: 15000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: min
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: ""
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: B
+                type: classic_conditions
+          dashboardUid: -d6qujIJVk
+          panelId: 156
+          noDataState: OK
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "156"
+            summary:  Cluster has no Connected Relays
+          isPaused: false
+        - uid: ee8dd3f8-bf16-4d1e-b644-ba01bb8c273b
+          title: Peer ping latency (900ms threshold)
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                exemplar: true
+                expr: 'histogram_quantile(0.90, sum(rate(p2p_ping_latency_secs_bucket{cluster_name=" M1 Cluster #1",cluster_hash="1c17ca2",cluster_peer="careful-rocket",peer=~"(careful-rocket|charming-rain|crazy-group|modern-painter)"}[2m])) by (le,peer))  '
+                interval: 2m
+                intervalMs: 15000
+                legendFormat: '{{peer}}'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0.9
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: -d6qujIJVk
+          panelId: 25
+          noDataState: OK
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: -d6qujIJVk
+            __panelId__: "25"
+            summary: Peer ping latency is greater than (900ms threshold)
+          isPaused: false
+        - uid: f9ba1bc8-3b3b-4bb7-9898-0c61d232027c
+          title: High percentage failed sync message duty (copy 2)
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: "(\n    sum(increase(core_tracker_failed_duties_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"charon-prater-0|charon-prater-1|canary-goerli-1|canary-goerli-2|charon-gnosis-0|charon-sepolia-1780|charon-perf-1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer,service_owner)\n) \n/ \n(\n    sum(increase(core_tracker_failed_duties_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"charon-prater-0|charon-prater-1|canary-goerli-1|canary-goerli-2|charon-gnosis-0|charon-sepolia-1780|charon-perf-1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer,service_owner) \n    + \n    sum(increase(core_bcast_broadcast_total{duty=\"sync_message\",cluster_hash!=\"\",cluster_name=~\"charon-prater-0|charon-prater-1|canary-goerli-1|canary-goerli-2|charon-gnosis-0|charon-sepolia-1780|charon-perf-1\"}[1h])) by (cluster_name,cluster_hash,cluster_peer,service_owner) \n) > 0.1"
+                hide: false
+                instant: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: "-100"
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: "-100"
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          noDataState: OK
+          execErrState: OK
+          for: 5m
+          annotations:
+            summary: High percentage failed sync message duty for node {{$labels.cluster_peer}} in cluster {{$labels.cluster_name}}
+          labels:
+            cluster_hash: '{{$labels.cluster_hash}}'
+            cluster_name: '{{$labels.cluster_name}}'
+            cluster_peer: '{{$labels.cluster_peer}}'
+            service: charon
+            service_owner: obol-platform
+            severity: warning
+          isPaused: false

@@ -145,6 +145,9 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    command: 
+      - "--enable-feature=expand-external-labels"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     restart: unless-stopped
 
   grafana:
@@ -156,6 +159,7 @@ services:
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
+      - ./grafana/alerts:/etc/grafana/provisioning/alerting
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
       - ./data/grafana:/var/lib/grafana
