@@ -15,7 +15,7 @@ A distributed validator node is a machine running:
 
 # Quickstart
 
-Check the Obol [docs](https://docs.obol.tech/docs/int/quickstart) for detailed instructions on how to get started using this repo.
+Check the Obol [docs](https://docs.obol.tech/docs/start/quickstart_overview) for detailed instructions on how to get started using this repo.
 
 # Examples
 
@@ -44,4 +44,4 @@ Keep checking in for updates, [here](https://dvt.obol.tech/) is the latest on ch
 
 # FAQs
 
-Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/int/faq/errors)
+Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/faq/errors)
