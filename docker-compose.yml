@@ -185,7 +185,7 @@ services:
   #                                                   |__/
 
   validator-ejector:
-    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-1.3.0}
+    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-1.5.0}
     user: ":"
     networks: [dvnode]
     volumes:
