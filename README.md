@@ -20,17 +20,23 @@ A distributed validator node is a machine running:
 **Operators are encouraged to use this repository to build and maintain their own configurations that work for their individual use case.**
 
 
-Check the Obol [docs](https://docs.obol.tech/docs/start/quickstart_group) for detailed instructions on how to get started using this repo.
+Check the Obol [docs](https://docs.obol.tech/docs/start/quickstart_group) for detailed instructions on how to get started using example repos. 
 
-This repo is configured to run on holesky, and needs further setup for a mainnet deployment:
+To configure this repo for a particular network, follow these instructions. If you do not, your node will fail to start. 
 
-1. Copy `.env.sample.mainnet` to `.env`:
+1. Copy `.env.sample.<network-name>` to `.env`:
     ```sh
+    # mainnet
     cp .env.sample.mainnet .env
+
+    # holesky
+    cp .env.sample.holesky .env
     ```
-2. Grab your operator ID from the [lido dashboard](https://operators.lido.fi/).
+2. Grab your operator ID from the lido [mainnet dashboard](https://operators.lido.fi/) or [testnet dashboard](https://operators-holesky.testnet.fi/).
 3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID.
 4. Save and close `.env`.
+
+You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo. 
 
 # FAQs
 

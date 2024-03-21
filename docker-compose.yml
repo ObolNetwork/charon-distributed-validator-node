@@ -50,8 +50,8 @@ services:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
     command: |
       lighthouse bn
-      --network=${NETWORK:-holesky}
-      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL:-https://checkpoint-sync.holesky.ethpandaops.io/}
+      --network=${NETWORK}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
       --execution-endpoint=http://nethermind:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
@@ -112,7 +112,7 @@ services:
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
-      NETWORK: ${NETWORK:-holesky}
+      NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${BUILDER_SELECTION:-builderonly}
     volumes:
@@ -129,11 +129,11 @@ services:
   mev-boost:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.7}
     command: |
-      -${NETWORK:-holesky}
+      -${NETWORK}
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS:-"https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net,https://0xb1d229d9c21298a87846c7022ebeef277dfc321fe674fa45312e20b5b6c400bfde9383f801848d7837ed5fc449083a12@relay-holesky.edennetwork.io,https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz,https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"}
+      -relays=${MEVBOOST_RELAYS}
     networks: [dvnode]
     restart: unless-stopped
 
@@ -194,10 +194,10 @@ services:
     environment:
       - EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://nethermind:8545}
       - CONSENSUS_NODE=${VE_BEACON_NODE_URL:-http://lighthouse:5052}
-      - LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS:-0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8}
+      - LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS}
       - STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
       - OPERATOR_ID=${VE_OPERATOR_ID}
-      - ORACLE_ADDRESSES_ALLOWLIST=${VE_ORACLE_ADDRESSES_ALLOWLIST:-["0x12A1D74F8697b9f4F1eEBb0a9d0FB6a751366399","0xD892c09b556b547c80B7d8c8cB8d75bf541B2284","0xf7aE520e99ed3C41180B5E12681d31Aa7302E4e5"]}
+      - ORACLE_ADDRESSES_ALLOWLIST=${VE_ORACLE_ADDRESSES_ALLOWLIST}
       - MESSAGES_LOCATION=/exitmessages
       - RUN_METRICS=true
       - HTTP_PORT=8989
@@ -221,7 +221,7 @@ services:
       - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://lighthouse:5052}
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
       - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
-      - LIDODVEXIT_EXIT_EPOCH=${LIDODVEXIT_EXIT_EPOCH:-256}
+      - LIDODVEXIT_EXIT_EPOCH=${LIDODVEXIT_EXIT_EPOCH}
       - LIDODVEXIT_LOG_LEVEL=${LIDO_DV_EXIT_LOG_LEVEL:-info}
       - LIDODVEXIT_VALIDATOR_QUERY_CHUNK_SIZE=${LIDO_DV_EXIT_VALIDATOR_QUERY_CHUNK_SIZE:-5}
     restart: on-failure
