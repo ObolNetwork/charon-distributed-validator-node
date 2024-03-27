@@ -157,7 +157,7 @@ services:
     image: grafana/grafana:${GRAFANA_VERSION:-10.3.1}
     user: ":"
     ports:
-      - ${MONITORING_IP_GRAFANA:-127.0.0.1}:${MONITORING_PORT_GRAFANA:-3000}:3000
+      - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
     networks: [dvnode]
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
