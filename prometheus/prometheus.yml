@@ -13,7 +13,6 @@ remote_write:
 
 scrape_configs:
   - job_name: "nethermind"
-    metrics_path: /debug/metrics/prometheus
     static_configs:
       - targets: ["nethermind:8008"]
   - job_name: "lighthouse"
