@@ -19,7 +19,7 @@ services:
       - ${NETHERMIND_IP_HTTP:-127.0.0.1}:${NETHERMIND_PORT_HTTP:-8545}:8545 # JSON-RPC
       - ${NETHERMIND_IP_ENGINE:-127.0.0.1}:${NETHERMIND_PORT_ENGINE:-8551}:8551 # ENGINE-API
     command: |
-      --config=${NETWORK:-holesky}
+      --config=${NETWORK}
       --datadir=data
       --HealthChecks.Enabled=true
       --JsonRpc.Enabled=true
@@ -28,6 +28,8 @@ services:
       --JsonRpc.EnginePort=8551
       --JsonRpc.Host=0.0.0.0
       --JsonRpc.Port=8545
+      --Metrics.Enabled=true
+      --Metrics.ExposePort=8008
       --Sync.SnapSync=true
       --Sync.AncientBodiesBarrier=4367322
       --Sync.AncientReceiptsBarrier=4367322
@@ -44,7 +46,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.1.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.1.3}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
