@@ -4,15 +4,6 @@ global:
   external_labels:
     service_owner: ${SERVICE_OWNER} # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
 
-remote_write:
-  - url: https://vm.monitoring.gcp.obol.tech/write
-    authorization:
-      credentials: ${PROM_REMOTE_WRITE_TOKEN}
-    write_relabel_configs:
-      - source_labels: [job]
-        regex: "charon"
-        action: keep # Keeps charon metrics and drop metrics from other containers.
-
 scrape_configs:
   - job_name: "nethermind"
     metrics_path: /debug/metrics/prometheus
