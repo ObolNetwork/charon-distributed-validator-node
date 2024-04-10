@@ -16,7 +16,7 @@ groups:
               datasourceUid: prometheus
               model:
                 editorMode: code
-                expr: 'max((app_monitoring_readyz[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer) == 3'
+                expr: 'max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 3'
                 hide: false
                 intervalMs: 1000
                 legendFormat: __auto
@@ -55,13 +55,13 @@ groups:
                 settings:
                     mode: dropNN
                 type: reduce
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 141
           noDataState: OK
           execErrState: OK
           for: 15m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "141"
             summary: Beacon node is syncing for node {{ $labels.cluster_peer }} in {{ $labels.cluster_name }}
           labels:
@@ -120,13 +120,13 @@ groups:
                 settings:
                     mode: dropNN
                 type: reduce
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 85
           noDataState: OK
           execErrState: OK
           for: 5m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "85"
             summary: Missed attestations in  cluster {{ $labels.cluster_name }}
           labels:
@@ -145,7 +145,7 @@ groups:
               datasourceUid: prometheus
               model:
                 editorMode: code
-                expr: 'max((app_monitoring_readyz[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer, cluster_network) == 0'
+                expr: 'max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer, cluster_network) == 0'
                 hide: false
                 intervalMs: 1000
                 legendFormat: __auto
@@ -184,13 +184,13 @@ groups:
                 settings:
                     mode: ""
                 type: reduce
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 87
           noDataState: OK
           execErrState: OK
           for: 10m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "87"
             summary: Node {{ $labels.cluster_peer }} in lido cluster {{ $labels.cluster_name }} is in unknown state
           labels:
@@ -208,7 +208,7 @@ groups:
               datasourceUid: prometheus
               model:
                 editorMode: code
-                expr: 'max((app_monitoring_readyz[$__rate_interval])) by (cluster_name,cluster_hash,cluster_peer) == 4'
+                expr: 'max((app_monitoring_readyz)) by (cluster_name,cluster_hash,cluster_peer) == 4'
                 hide: false
                 intervalMs: 1000
                 legendFormat: '{{cluster_name}} {{cluster_peer}}'
@@ -249,13 +249,13 @@ groups:
                 settings:
                     mode: dropNN
                 type: reduce
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 186
           noDataState: OK
           execErrState: OK
           for: 10m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "186"
             summary: Insufficient Peers for node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }}
           labels:
@@ -315,13 +315,13 @@ groups:
                 settings:
                     mode: dropNN
                 type: reduce
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 91
           noDataState: OK
           execErrState: OK
           for: 6h
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "91"
             summary: Cluster {{ $labels.cluster_name }} success rate is less than {{ $values.B }}%
           labels:
@@ -340,7 +340,7 @@ groups:
               datasourceUid: prometheus
               model:
                 editorMode: code
-                expr: 'max((app_monitoring_readyz[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer) == 6'
+                expr: 'max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 6'
                 hide: false
                 intervalMs: 1000
                 legendFormat: __auto
@@ -504,13 +504,13 @@ groups:
                 maxDataPoints: 43200
                 refId: B
                 type: classic_conditions
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 156
           noDataState: OK
           execErrState: Error
           for: 5m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "156"
             summary:  Cluster has no Connected Relays
           isPaused: false
@@ -588,13 +588,13 @@ groups:
                 maxDataPoints: 43200
                 refId: C
                 type: threshold
-          dashboardUid: -d6qujIJVk
+          dashboardUid: d6qujIJVk
           panelId: 25
           noDataState: OK
           execErrState: Error
           for: 5m
           annotations:
-            __dashboardUid__: -d6qujIJVk
+            __dashboardUid__: d6qujIJVk
             __panelId__: "25"
             summary: Peer ping latency is greater than (900ms threshold)
           isPaused: false
