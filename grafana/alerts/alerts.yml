@@ -27,7 +27,7 @@ groups:
               relativeTimeRange:
                 from: 300
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -45,7 +45,7 @@ groups:
                       type: query
                 datasource:
                     type: __expr__
-                    uid: "-100"
+                    uid: __expr__
                 expression: A
                 hide: false
                 intervalMs: 1000
@@ -92,7 +92,7 @@ groups:
               relativeTimeRange:
                 from: 600
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -156,7 +156,7 @@ groups:
               relativeTimeRange:
                 from: 600
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -219,7 +219,7 @@ groups:
               relativeTimeRange:
                 from: 60
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -287,7 +287,7 @@ groups:
               relativeTimeRange:
                 from: 900
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -351,7 +351,7 @@ groups:
               relativeTimeRange:
                 from: 300
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
@@ -369,7 +369,7 @@ groups:
                       type: query
                 datasource:
                     type: __expr__
-                    uid: "-100"
+                    uid: __expr__
                 expression: A
                 hide: false
                 intervalMs: 1000
@@ -389,6 +389,33 @@ groups:
             cluster_name: '{{ $labels.cluster_name }}'
             cluster_peer: '{{ $labels.cluster_peer }}'
             severity: warning
+          isPaused: false
+        - uid: fdhg9rxn9mmf4a
+          title: ' Cluster BeaconNode has zero peers '
+          condition: A
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 86400
+                to: 0
+              datasourceUid: obol-prometheus-ds
+              model:
+                expr: max((app_monitoring_readyz[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer) == 7
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 86400
+                refId: A
+          noDataState: OK
+          execErrState: Alerting
+          for: 15m
+          annotations:
+            summary: BeaconNode has zero peers for node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }}
+          labels:
+            cluster_hash: '{{ $labels.cluster_hash }}'
+            cluster_name: '{{ $labels.cluster_name }}'
+            cluster_peer: '{{ $labels.cluster_peer }}'
+            service: charon
           isPaused: false
         - uid: e7e9de6b-f7f4-4a69-85b4-0512f5ef0aec
           title: High percentage failed sync message duty
@@ -413,7 +440,7 @@ groups:
               relativeTimeRange:
                 from: 10800
                 to: 0
-              datasourceUid: "-100"
+              datasourceUid: __expr__
               model:
                 conditions:
                     - evaluator:
