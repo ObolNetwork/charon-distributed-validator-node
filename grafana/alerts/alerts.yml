@@ -392,7 +392,7 @@ groups:
           isPaused: false
         - uid: fdhg9rxn9mmf4a
           title: ' Cluster BeaconNode has zero peers '
-          condition: A
+          condition: B
           data:
             - refId: A
               relativeTimeRange:
@@ -400,14 +400,48 @@ groups:
                 to: 0
               datasourceUid: prometheus
               model:
-                expr: max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 7
-                instant: true
+                editorMode: code
+                expr: 'max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 7'
+                hide: false
                 intervalMs: 1000
                 legendFormat: __auto
                 maxDataPoints: 43200
+                range: true
                 refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
           noDataState: OK
-          execErrState: Alerting
+          execErrState: OK
           for: 15m
           annotations:
             summary: BeaconNode has zero peers for node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }}
