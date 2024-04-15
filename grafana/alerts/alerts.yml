@@ -396,15 +396,15 @@ groups:
           data:
             - refId: A
               relativeTimeRange:
-                from: 86400
+                from: 300
                 to: 0
-              datasourceUid: obol-prometheus-ds
+              datasourceUid: prometheus
               model:
-                expr: max((app_monitoring_readyz[$__rate_interval])) by (cluster_name, cluster_hash, cluster_peer) == 7
+                expr: max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 7
                 instant: true
                 intervalMs: 1000
                 legendFormat: __auto
-                maxDataPoints: 86400
+                maxDataPoints: 43200
                 refId: A
           noDataState: OK
           execErrState: Alerting
@@ -542,7 +542,7 @@ groups:
             summary:  Cluster has no Connected Relays
           isPaused: false
         - uid: ee8dd3f8-bf16-4d1e-b644-ba01bb8c273b
-          title: Peer ping latency (900ms threshold)
+          title: Peer ping latency (400ms threshold)
           condition: C
           data:
             - refId: A
@@ -595,7 +595,7 @@ groups:
                 conditions:
                     - evaluator:
                         params:
-                            - 0.9
+                            - 0.4
                         type: gt
                       operator:
                         type: and
@@ -623,6 +623,6 @@ groups:
           annotations:
             __dashboardUid__: d6qujIJVk
             __panelId__: "25"
-            summary: Peer ping latency is greater than (900ms threshold)
+            summary: Peer ping latency is greater than (400ms threshold)
           isPaused: false
           
