@@ -5,6 +5,71 @@ groups:
       folder: Charon
       interval: 1m
       rules:
+        - uid: f0e3fcb2-7325-47c0-a63b-c9d5cb31178f
+          title: ' Cluster BeaconNode Down '
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: prometheus
+              model:
+                editorMode: code
+                expr: 'max((app_monitoring_readyz)) by (cluster_name, cluster_hash, cluster_peer) == 2'
+                hide: false
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - A
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                hide: false
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+          dashboardUid: d6qujIJVk
+          panelId: 141
+          noDataState: OK
+          execErrState: OK
+          for: 10m
+          annotations:
+            __dashboardUid__: d6qujIJVk
+            __panelId__: "141"
+            summary: Beacon node is down for node {{ $labels.cluster_peer }} in {{ $labels.cluster_name }}
+          labels:
+            cluster_hash: '{{ $labels.cluster_hash }}'
+            cluster_name: '{{ $labels.cluster_name }}'
+            cluster_peer: '{{ $labels.cluster_peer }}'
+            severity: notify
+          isPaused: false
         - uid: fdd9f034-22e8-428b-9d7c-52e031bf8cee
           title: ' Cluster BeaconNode Syncing '
           condition: B
@@ -59,7 +124,7 @@ groups:
           panelId: 141
           noDataState: OK
           execErrState: OK
-          for: 15m
+          for: 10m
           annotations:
             __dashboardUid__: d6qujIJVk
             __panelId__: "141"
@@ -97,7 +162,7 @@ groups:
                 conditions:
                     - evaluator:
                         params:
-                            - 3
+                            - 1
                         type: gt
                       operator:
                         type: and
@@ -124,7 +189,7 @@ groups:
           panelId: 85
           noDataState: OK
           execErrState: OK
-          for: 5m
+          for: 10m
           annotations:
             __dashboardUid__: d6qujIJVk
             __panelId__: "85"
@@ -192,7 +257,7 @@ groups:
           annotations:
             __dashboardUid__: d6qujIJVk
             __panelId__: "87"
-            summary: Node {{ $labels.cluster_peer }} in lido cluster {{ $labels.cluster_name }} is in unknown state
+            summary: Node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }} is in unknown state
           labels:
             cluster_hash: '{{ $labels.cluster_hash }}'
             cluster_name: '{{ $labels.cluster_name }}'
@@ -381,7 +446,7 @@ groups:
                 type: reduce
           noDataState: OK
           execErrState: OK
-          for: 15m
+          for: 10m
           annotations:
             summary: VC missing some validators for node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }}
           labels:
@@ -442,7 +507,7 @@ groups:
                 type: reduce
           noDataState: OK
           execErrState: OK
-          for: 15m
+          for: 10m
           annotations:
             summary: BeaconNode has zero peers for node {{ $labels.cluster_peer }} in cluster {{ $labels.cluster_name }}
           labels:
@@ -569,7 +634,7 @@ groups:
           panelId: 156
           noDataState: OK
           execErrState: Error
-          for: 5m
+          for: 10m
           annotations:
             __dashboardUid__: d6qujIJVk
             __panelId__: "156"
