@@ -42,7 +42,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.1.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.1.3}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp   # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp   # P2P UDP
@@ -101,7 +101,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|  
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.16.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.17.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -137,7 +137,7 @@ services:
   # | | | | | | (_) | | | | | || (_) | |  | | | | | (_| |
   # |_| |_| |_|\___/|_| |_|_|\__\___/|_|  |_|_| |_|\__, |
   #                                                |___/
-
+  
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.50.1}
     user: ":"
@@ -145,10 +145,13 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
+    command: 
+      - "--enable-feature=expand-external-labels"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-10.3.3}
+    image: grafana/grafana:${GRAFANA_VERSION:-10.4.2}
     user: ":"
     ports:
       - ${MONITORING_PORT_GRAFANA:-3000}:3000
@@ -156,6 +159,7 @@ services:
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
+      - ./grafana/alerts:/etc/grafana/provisioning/alerting
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
       - ./data/grafana:/var/lib/grafana

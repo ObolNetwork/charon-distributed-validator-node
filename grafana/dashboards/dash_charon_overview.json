@@ -24,31 +24,32 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": 15,
   "links": [
-    {
-      "asDropdown": false,
-      "icon": "external link",
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "targetBlank": false,
-      "title": "Explore Charon Logs",
-      "tooltip": "Navigate to Charon Logs Explorer",
-      "type": "link",
-      "url": "/explore?orgId=1&left=%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%7Bcluster_name%3D%5C%22$cluster_name%5C%22,%20cluster_hash%3D%5C%22$cluster_hash%5C%22,%20cluster_peer%3D%5C%22$cluster_peer%5C%22%7D%20%7C%20logfmt%20%7C%20line_format%20%60%7B%7B.pretty%7D%7D%60%22,%22queryType%22:%22range%22,%22datasource%22:%7B%22type%22:%22loki%22,%22uid%22:%22loki%22%7D,%22editorMode%22:%22builder%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D"
-    },
     {
       "asDropdown": false,
       "icon": "external link",
       "includeVars": true,
       "keepTime": true,
-      "tags": ["cluster-labels"],
+      "tags": [
+        "cluster-labels"
+      ],
       "targetBlank": false,
       "title": "",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "info",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Explore Charon Logs",
+      "tooltip": "",
+      "type": "link",
+      "url": "/explore?schemaVersion=1&panes=%7B\"xlh\"%3A%7B\"datasource\"%3A\"loki\"%2C\"queries\"%3A%5B%7B\"refId\"%3A\"A\"%2C\"expr\"%3A\"\"%2C\"queryType\"%3A\"range\"%2C\"datasource\"%3A%7B\"type\"%3A\"loki\"%2C\"uid\"%3A\"loki\"%7D%7D%5D%2C\"range\"%3A%7B\"from\"%3A\"now-1h\"%2C\"to\"%3A\"now\"%7D%7D%7D&orgId=1"
     }
   ],
   "liveNow": false,
@@ -170,14 +171,17 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -246,7 +250,9 @@
         "minVizWidth": 200,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": true
         },
@@ -255,7 +261,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -322,7 +328,9 @@
         "minVizWidth": 200,
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -330,7 +338,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -426,10 +434,13 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 15,
           "valueSize": 15
@@ -437,7 +448,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -511,7 +522,6 @@
         }
       ],
       "title": "Cluster Info",
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -627,12 +637,14 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -833,7 +845,7 @@
                     "options": {
                       "0": {
                         "index": 0,
-                        "text": " ❌"
+                        "text": " ❌"
                       },
                       "1": {
                         "index": 1,
@@ -1038,6 +1050,48 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Builder API"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 0,
+                        "text": "❌"
+                      },
+                      "1": {
+                        "index": 1,
+                        "text": "✅"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 99
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Version"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 104
+              }
+            ]
           }
         ]
       },
@@ -1053,7 +1107,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "frameIndex": 0,
@@ -1065,7 +1121,7 @@
           }
         ]
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -1226,6 +1282,25 @@
           "legendFormat": "",
           "range": false,
           "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "max(app_peerinfo_builder_api_enabled{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}) by (peer)",
+          "format": "table",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "H",
+          "useBackend": false
         }
       ],
       "title": "Peer Connectivity and Missed Duties (🚧)",
@@ -1261,6 +1336,7 @@
               "Value #L": true,
               "Value #M": true
             },
+            "includeByName": {},
             "indexByName": {
               "Time 1": 9,
               "Time 10": 22,
@@ -1295,7 +1371,7 @@
               "Value #E": "🚧Other",
               "Value #F": "You",
               "Value #G": "Supported",
-              "Value #H": "Aggregate",
+              "Value #H": "Builder API",
               "Value #I": "Exit",
               "Value #J": "ClockDiff",
               "Value #K": "Direct",
@@ -1417,6 +1493,21 @@
           "legendFormat": "{{git_hash}}",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rate(app_start_time_secs{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}) > 0",
+          "hide": false,
+          "instant": false,
+          "interval": "$interval",
+          "legendFormat": "Restarts",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Versions and Git Hashes",
@@ -1776,17 +1867,21 @@
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["last"],
+          "calcs": [
+            "last"
+          ],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 15,
           "valueSize": 15
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -1904,7 +1999,6 @@
         }
       ],
       "title": "Current Status",
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -2094,9 +2188,13 @@
         "cellHeight": "sm",
         "footer": {
           "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
+          "fields": [
+            "Value #B"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
         },
         "showHeader": true,
         "sortBy": [
@@ -2106,7 +2204,7 @@
           }
         ]
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -2216,6 +2314,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -2229,6 +2328,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 3,
             "pointSize": 5,
@@ -2482,7 +2582,7 @@
                     "options": {
                       "0": {
                         "index": 0,
-                        "text": " ❌"
+                        "text": " ❌"
                       },
                       "1": {
                         "index": 1,
@@ -2675,7 +2775,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "frameIndex": 0,
@@ -2687,7 +2789,7 @@
           }
         ]
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.4.0",
       "targets": [
         {
           "datasource": {
@@ -2990,6 +3092,11 @@
           },
           "custom": {
             "fillOpacity": 100,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineWidth": 0
           },
           "links": [],
@@ -3062,6 +3169,11 @@
           },
           "custom": {
             "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineWidth": 1
           },
           "mappings": [],
@@ -3134,6 +3246,11 @@
           },
           "custom": {
             "fillOpacity": 100,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineWidth": 0
           },
           "links": [
@@ -3208,6 +3325,11 @@
           },
           "custom": {
             "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineWidth": 1
           },
           "mappings": [],
@@ -3279,6 +3401,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3292,6 +3415,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3338,8 +3462,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
-          "sort": "none"
+          "mode": "multi",
+          "sort": "desc"
         }
       },
       "targets": [
@@ -3374,6 +3498,11 @@
           },
           "custom": {
             "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineWidth": 1
           },
           "mappings": [],
@@ -3446,6 +3575,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3460,6 +3590,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "pointSize": 5,
@@ -3504,8 +3635,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
-          "sort": "none"
+          "mode": "multi",
+          "sort": "desc"
         }
       },
       "pluginVersion": "9.2.5",
@@ -3540,6 +3671,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3554,6 +3686,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "pointSize": 1,
@@ -3632,7 +3765,9 @@
       "id": 242,
       "options": {
         "legend": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -3675,6 +3810,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3688,6 +3824,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -3768,6 +3905,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -3782,6 +3920,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "pointSize": 5,
@@ -4774,7 +4913,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "frameIndex": 0,
@@ -4802,7 +4943,9 @@
         {
           "id": "labelsToFields",
           "options": {
-            "keepLabels": ["version"],
+            "keepLabels": [
+              "version"
+            ],
             "mode": "rows"
           }
         }
@@ -5058,7 +5201,9 @@
               "id": "byNames",
               "options": {
                 "mode": "exclude",
-                "names": ["submit_beacon_block"],
+                "names": [
+                  "submit_beacon_block"
+                ],
                 "prefix": "All except:",
                 "readOnly": true
               }
@@ -6624,17 +6769,24 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "1m",
   "revision": 1,
   "schemaVersion": 39,
-  "tags": ["cluster-labels", "charon"],
+  "tags": [
+    "cluster-labels",
+    "charon"
+  ],
   "templating": {
     "list": [
       {
         "current": {
           "selected": true,
-          "text": ["mainnet"],
-          "value": ["mainnet"]
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
         },
         "description": "",
         "hide": 0,
@@ -6644,12 +6796,12 @@
         "name": "cluster_network",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "All",
             "value": "$__all"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "mainnet",
             "value": "mainnet"
           },
@@ -6682,8 +6834,8 @@
       {
         "current": {
           "selected": false,
-          "text": "01node",
-          "value": "01node"
+          "text": "test-cluster",
+          "value": "test-cluster"
         },
         "datasource": {
           "type": "prometheus",
@@ -6710,8 +6862,8 @@
       {
         "current": {
           "selected": false,
-          "text": "c2ce374",
-          "value": "c2ce374"
+          "text": "41eb9d9",
+          "value": "41eb9d9"
         },
         "datasource": {
           "type": "prometheus",
@@ -6738,8 +6890,8 @@
       {
         "current": {
           "selected": false,
-          "text": "busy-hospital",
-          "value": "busy-hospital"
+          "text": "thoughtful-sister",
+          "value": "thoughtful-sister"
         },
         "datasource": {
           "type": "prometheus",
@@ -6766,8 +6918,8 @@
       {
         "current": {
           "selected": false,
-          "text": "charon-3",
-          "value": "charon-3"
+          "text": "charon",
+          "value": "charon"
         },
         "datasource": {
           "type": "prometheus",
@@ -6978,17 +7130,6 @@
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
-      },
-      {
-        "current": {},
-        "hide": 0,
-        "includeAll": false,
-        "multi": false,
-        "name": "cluster_networ",
-        "options": [],
-        "query": "",
-        "skipUrlSync": false,
-        "type": "custom"
       }
     ]
   },
@@ -6999,7 +7140,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Charon Overview",
-  "uid": "charon_overview_dashboard",
-  "version": 70,
+  "uid": "d6qujIJVk",
+  "version": 2,
   "weekStart": ""
 }
