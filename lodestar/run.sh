@@ -34,3 +34,4 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
     --distributed
+    --useProduceBlockV3=false
