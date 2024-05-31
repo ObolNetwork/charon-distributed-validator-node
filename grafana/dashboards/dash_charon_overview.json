@@ -381,13 +381,9 @@
       "title": "Beacon Node Score",
       "transformations": [
         {
-          "id": "filterFieldsByName",
+          "id": "filterByRefId",
           "options": {
-            "include": {
-              "names": [
-                "C {charon_version=\"v0.19.2\", cluster_hash=\"ebb6d04\", cluster_name=\"Obol Mainnet #1\", cluster_network=\"mainnet\", cluster_peer=\"calm-game\", instance=\"charon:3620\", job=\"charon\"}"
-              ]
-            }
+            "include": "C"
           }
         }
       ],
