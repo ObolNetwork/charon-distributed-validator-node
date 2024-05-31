@@ -181,7 +181,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -261,7 +261,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -338,7 +338,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -347,14 +347,50 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(clamp(app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 1 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 4 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 5 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 6, 1, 1) OR on() vector(0))\n*\n(\n    (\n0.5 * (1.0 - 10*(sum(increase(app_eth2_errors_total{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$__range])) / (sum(increase(app_eth2_latency_seconds_count{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\",  endpoint !=\"submit_validator_registrations\"}[$__range]))))) OR on() vector(0.5)\n    )\n    +\n    (\n        0.5 * (1.0 - clamp_max(histogram_quantile(0.99, sum(rate(app_eth2_latency_seconds_bucket{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", endpoint !=\"submit_validator_registrations\"}[$__range])) by (le)),1))\n    )\n)",
+          "expr": "(clamp(app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 1 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 4 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 5 OR app_monitoring_readyz{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"} == 6, 1, 1) OR on() vector(0))\n",
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(\n    (\n0.5 * (1.0 - 10*(sum(increase(app_eth2_errors_total{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"}[$__range])) / (sum(increase(app_eth2_latency_seconds_count{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\",  endpoint !=\"submit_validator_registrations\"}[$__range]))))) OR on() vector(0.5)\n    )\n    +\n    (\n        0.5 * (1.0 - clamp_max(histogram_quantile(0.99, sum(rate(app_eth2_latency_seconds_bucket{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\", endpoint !=\"submit_validator_registrations\"}[$__range])) by (le)),1))\n    )\n)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A * $B",
+          "hide": false,
+          "refId": "C",
+          "type": "math"
         }
       ],
       "title": "Beacon Node Score",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "C {charon_version=\"v0.19.2\", cluster_hash=\"ebb6d04\", cluster_name=\"Obol Mainnet #1\", cluster_network=\"mainnet\", cluster_peer=\"calm-game\", instance=\"charon:3620\", job=\"charon\"}"
+              ]
+            }
+          }
+        }
+      ],
       "type": "gauge"
     },
     {
@@ -448,7 +484,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -644,7 +680,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1121,7 +1157,7 @@
           }
         ]
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1881,7 +1917,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2204,7 +2240,7 @@
           }
         ]
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2789,7 +2825,7 @@
           }
         ]
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -6890,8 +6926,8 @@
       {
         "current": {
           "selected": false,
-          "text": "thoughtful-sister",
-          "value": "thoughtful-sister"
+          "text": "calm-game",
+          "value": "calm-game"
         },
         "datasource": {
           "type": "prometheus",
@@ -7141,6 +7177,6 @@
   "timezone": "",
   "title": "Charon Overview",
   "uid": "d6qujIJVk",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
