@@ -40,4 +40,4 @@ You will need a `.charon/` folder from a completed DKG present to complete the s
 
 # FAQs
 
-Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/int/faq/errors).
+Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/faq/errors).
