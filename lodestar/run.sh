@@ -33,5 +33,4 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --beaconNodes="$BEACON_NODE_ADDRESS" \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
-    --distributed \
-    --useProduceBlockV3=false
+    --distributed
