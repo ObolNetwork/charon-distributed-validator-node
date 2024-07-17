@@ -21,7 +21,7 @@ for f in /home/charon/validator_keys/keystore-*.json; do
     echo "Importing key ${f}"
 
     # Extract pubkey from keystore file
-    PUBKEY=$(grep '"pubkey"' "$f" | awk -F'"' '{print $4}')
+    PUBKEY="0x$(grep '"pubkey"' "$f" | awk -F'"' '{print $4}')"
 
     PUBKEY_DIR="${KEYSTORES_DIR}/${PUBKEY}"
 
