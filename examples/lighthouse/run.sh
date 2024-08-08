@@ -24,7 +24,7 @@ done
 echo "Starting lighthouse validator client for ${NODE}"
 exec lighthouse --network "${NETWORK}" validator \
   --beacon-nodes ${LIGHTHOUSE_BEACON_NODE_ADDRESS} \
-  --suggested-fee-recipient "0x0000000000000000000000000000000000000000" \
+  --suggested-fee-recipient "${FEE_RECIPIENT}" \
   --metrics \
   --metrics-address "0.0.0.0" \
   --metrics-allow-origin "*" \
