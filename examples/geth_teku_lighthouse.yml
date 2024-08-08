@@ -47,7 +47,7 @@ services:
     image: flashbots/mev-boost:${MEVBOOST_VERSION:-1.5.0}
     networks: [dvnode]
     command: |
-      -${NETWORK:-holesky} 
+      -${NETWORK:-holesky}
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
@@ -93,7 +93,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v0.15.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.0.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://teku_bn:4000}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
@@ -103,7 +103,7 @@ services:
       - CHARON_P2P_TCP_ADDRESS=0.0.0.0:${CHARON_PORT_P2P_TCP:-3610}
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
-      - BUILDER_API_ENABLED=${BUILDER_API_ENABLED:-false}
+      - CHARON_BUILDER_API=${BUILDER_API_ENABLED:-false}
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
@@ -121,7 +121,7 @@ services:
   #      |___/
 
   lighthouse_vc:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v4.2.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v5.3.0}
     entrypoint: /opt/lighthouse/run.sh
     networks: [dvnode]
     depends_on: [ charon ]

@@ -31,4 +31,5 @@ exec lighthouse --network "${NETWORK}" validator \
   --metrics-port "5064" \
   --use-long-timeouts \
   --datadir="/opt/data" \
-  --builder-proposals=$BUILDER_API_ENABLED
+  --distributed \
+  $( [ "$BUILDER_API_ENABLED" = "true" ] && echo "--builder-proposals" )
