@@ -1,0 +1,4 @@
+networks:
+  default:
+    name: rocketpool_net
+    external: true

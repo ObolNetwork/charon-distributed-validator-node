@@ -1,0 +1,33 @@
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
+
+services:
+  # | |     | |         
+  # | |_ ___| | ___   _ 
+  # | __/ _ \ |/ / | | |
+  # | ||  __/   <| |_| |
+  #  \__\___|_|\_\\__,_|
+  teku-vc:
+    image: consensys/teku:${TEKU_VERSION:-24.8.0}
+    depends_on: [ charon ]
+    restart: unless-stopped
+    environment:
+      - NETWORK=${NETWORK:-auto}
+      - BUILDER_API_ENABLED=${BUILDER_API_ENABLED:-false}
+      - FEE_RECIPIENT=${FEE_RECIPIENT:-0x0000000000000000000000000000000000000000}
+    entrypoint:
+      - /opt/charon/teku/docker-entrypoint-vc.sh
+      - /opt/teku/bin/teku
+      - validator-client
+      - --beacon-node-api-endpoints=http://charon:3600
+      - --log-destination=CONSOLE
+      - --validator-keys=/opt/charon/validator_keys:/opt/charon/validator_keys
+      - --validators-keystore-locking-enabled=false
+      - --metrics-enabled=true
+      - --metrics-port=8008
+      - --metrics-interface=0.0.0.0
+      - --metrics-host-allowlist=*
+    volumes:
+      - ../.charon/validator_keys:/opt/charon/validator_keys
+      - ../teku:/opt/charon/teku
