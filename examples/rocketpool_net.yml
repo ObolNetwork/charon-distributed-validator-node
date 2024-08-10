@@ -3,6 +3,9 @@
 # git-checked-in files since that results in conflicts when upgrading this repo.
 # See https://docs.docker.com/compose/extends/#multiple-compose-files for more.
 
+# set CHARON_BEACON_NODE_ENDPOINTS="http://rocketpool_eth2:5052" in .env
+
 networks:
   default:
-    name: dvnode
+    name: rocketpool_net
+    external: true

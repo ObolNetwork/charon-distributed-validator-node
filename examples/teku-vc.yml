@@ -17,7 +17,7 @@ services:
       - BUILDER_API_ENABLED=${BUILDER_API_ENABLED:-false}
       - FEE_RECIPIENT=${FEE_RECIPIENT:-0x0000000000000000000000000000000000000000}
     entrypoint:
-      - /opt/charon/teku/docker-entrypoint-vc.sh
+      - /opt/charon/teku/run-vc.sh
       - /opt/teku/bin/teku
       - validator-client
       - --beacon-node-api-endpoints=http://charon:3600
