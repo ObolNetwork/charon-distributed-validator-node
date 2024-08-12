@@ -3,7 +3,7 @@
 BUILDER_SELECTION="executiononly"
 
 # If the builder API is enabled, override the builder selection to signal Lodestar to always propose blinded blocks.
-if [[ $BUILDER_API_ENABLED == "true" ]];
+if [ "$BUILDER_API_ENABLED" = "true" ];
 then
   BUILDER_SELECTION="builderonly"
 fi
@@ -16,7 +16,7 @@ for f in /home/charon/validator_keys/keystore-*.json; do
         --dataDir="/opt/data" \
         --network="$NETWORK" \
         --importKeystores="$f" \
-        --importKeystoresPassword="${f//json/txt}"
+        --importKeystoresPassword="${f%.json}.txt"
 done
 
 echo "Imported all keys"
