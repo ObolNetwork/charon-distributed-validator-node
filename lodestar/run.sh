@@ -37,7 +37,7 @@ for f in /home/charon/validator_keys/keystore-*.json; do
     install -m 600 "$f" "${PUBKEY_DIR}/voting-keystore.json"
 
     # Copy the corresponding password file
-    PASSWORD_FILE="${f//json/txt}"
+    PASSWORD_FILE="${f%.json}.txt"
     install -m 600 "${PASSWORD_FILE}" "${SECRETS_DIR}/${PUBKEY}"
 
     IMPORTED_COUNT=$((IMPORTED_COUNT + 1))
