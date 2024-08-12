@@ -1,7 +1,5 @@
-# The "Multiple Compose File" feature provides a very powerful way to override
-# any configuration in docker-compose.yml without needing to modify
-# git-checked-in files since that results in conflicts when upgrading this repo.
-# See https://docs.docker.com/compose/extends/#multiple-compose-files for more.
+# include this file to link various other services together such as your validator client, charon, your eth1 and eth2 clients, prometheus, and grafana
+# if you are using a RocketPool reverse-hybrid configuration include rocketpool_net.yml instead of this file
 
 networks:
   default:

@@ -1,9 +1,5 @@
-# The "Multiple Compose File" feature provides a very powerful way to override
-# any configuration in docker-compose.yml without needing to modify
-# git-checked-in files since that results in conflicts when upgrading this repo.
-# See https://docs.docker.com/compose/extends/#multiple-compose-files for more.
-
-# set CHARON_BEACON_NODE_ENDPOINTS="http://rocketpool_eth2:5052" in .env
+# include this file instead of network.yml file if you are using a RocketPool reverse-hybrid configuration
+# to get Charon to use the RocketPool eth2 client, set CHARON_BEACON_NODE_ENDPOINTS="http://rocketpool_eth2:5052" in .env
 
 networks:
   default:
