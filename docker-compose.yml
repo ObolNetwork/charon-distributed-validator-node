@@ -226,7 +226,7 @@ services:
       - LIDODVEXIT_EXIT_EPOCH=${LIDODVEXIT_EXIT_EPOCH}
       - LIDODVEXIT_LOG_LEVEL=${LIDO_DV_EXIT_LOG_LEVEL:-info}
       - LIDODVEXIT_VALIDATOR_QUERY_CHUNK_SIZE=${LIDO_DV_EXIT_VALIDATOR_QUERY_CHUNK_SIZE:-5}
-    restart: unless-stopped
+    restart: on-failure
 
 networks:
   dvnode:
