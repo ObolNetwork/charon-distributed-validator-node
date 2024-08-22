@@ -8,21 +8,47 @@ then
   BUILDER_SELECTION="builderonly"
 fi
 
+DATA_DIR="/opt/data"
+KEYSTORES_DIR="${DATA_DIR}/keystores"
+SECRETS_DIR="${DATA_DIR}/secrets"
+
+mkdir -p "${KEYSTORES_DIR}" "${SECRETS_DIR}"
+
+IMPORTED_COUNT=0
+EXISTING_COUNT=0
+
 for f in /home/charon/validator_keys/keystore-*.json; do
     echo "Importing key ${f}"
 
-    # Import keystore with password.
-    node /usr/app/packages/cli/bin/lodestar validator import \
-        --dataDir="/opt/data" \
-        --network="$NETWORK" \
-        --importKeystores="$f" \
-        --importKeystoresPassword="${f%.json}.txt"
+    # Extract pubkey from keystore file
+    PUBKEY="0x$(grep '"pubkey"' "$f" | awk -F'"' '{print $4}')"
+
+    PUBKEY_DIR="${KEYSTORES_DIR}/${PUBKEY}"
+
+    # Skip import if keystore already exists
+    if [ -d "${PUBKEY_DIR}" ]; then
+        EXISTING_COUNT=$((EXISTING_COUNT + 1))
+        continue
+    fi
+
+    mkdir -p "${PUBKEY_DIR}"
+
+    # Copy the keystore file to persisted keys backend
+    install -m 600 "$f" "${PUBKEY_DIR}/voting-keystore.json"
+
+    # Copy the corresponding password file
+    PASSWORD_FILE="${f%.json}.txt"
+    install -m 600 "${PASSWORD_FILE}" "${SECRETS_DIR}/${PUBKEY}"
+
+    IMPORTED_COUNT=$((IMPORTED_COUNT + 1))
 done
 
-echo "Imported all keys"
+echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
 exec node /usr/app/packages/cli/bin/lodestar validator \
-    --dataDir="/opt/data" \
+    --dataDir="$DATA_DIR" \
+    --keystoresDir="$KEYSTORES_DIR" \
+    --secretsDir="$SECRETS_DIR" \
     --network="$NETWORK" \
     --metrics=true \
     --metrics.address="0.0.0.0" \
