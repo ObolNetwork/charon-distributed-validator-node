@@ -6922,8 +6922,8 @@
       {
         "current": {
           "selected": false,
-          "text": "calm-game",
-          "value": "calm-game"
+          "text": "thoughtful-sister",
+          "value": "thoughtful-sister"
         },
         "datasource": {
           "type": "prometheus",
