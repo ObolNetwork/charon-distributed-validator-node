@@ -26,10 +26,11 @@ scrape_configs:
       - targets: ["charon:3620"]
   - job_name: "lodestar"
     static_configs:
-      - targets: [ "lodestar:5064" ]
+      - targets: ["lodestar:5064"]
   - job_name: "node-exporter"
     static_configs:
       - targets: ["node-exporter:9100"]
+  # Debug
   - job_name: "cadvisor"
     static_configs:
-      - targets: [ "cadvisor:8080" ]
+      - targets: ["cadvisor:8080"]
