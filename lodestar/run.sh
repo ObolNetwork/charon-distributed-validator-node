@@ -5,7 +5,7 @@ BUILDER_SELECTION="executiononly"
 # If the builder API is enabled, override the builder selection to signal Lodestar to always propose blinded blocks.
 if [ "$BUILDER_API_ENABLED" = "true" ];
 then
-  BUILDER_SELECTION="builderonly"
+  BUILDER_SELECTION="builderalways"
 fi
 
 DATA_DIR="/opt/data"
