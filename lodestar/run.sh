@@ -1,12 +1,7 @@
 #!/bin/sh
 
-BUILDER_SELECTION="executiononly"
-
-# If the builder API is enabled, override the builder selection to signal Lodestar to always propose blinded blocks.
-if [ "$BUILDER_API_ENABLED" = "true" ];
-then
-  BUILDER_SELECTION="builderalways"
-fi
+# Remove the existing keystores to avoid keystore locking issues.
+rm -rf /opt/data/cache /opt/data/secrets /opt/data/keystores
 
 DATA_DIR="/opt/data"
 KEYSTORES_DIR="${DATA_DIR}/keystores"
