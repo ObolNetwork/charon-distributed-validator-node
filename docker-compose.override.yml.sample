@@ -22,7 +22,7 @@
     #ports:
       #- 8545:8545 # JSON-RPC
       #- 8551:8551 # AUTH-RPC
-      #- 6060:6060 # Metrics
+      #- 8008:8008 # Metrics
 
   #lighthouse:
     # Disable lighthouse
@@ -35,9 +35,6 @@
   #charon:
     # Configure any additional env var flags in .env.charon.more
     #env_file: [.env.charon.more]
-    # Uncomment the extra_hosts section if you are trying to communicate with a CL running in a different docker network on the same machine 
-    #extra_hosts:
-      #- "host.docker.internal:host-gateway"
     # Bind charon internal ports to host ports
     #ports:
       #- 3600:3600/tcp # Validator API

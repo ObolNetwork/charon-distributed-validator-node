@@ -1,8 +1,6 @@
 global:
   scrape_interval: 30s # Set the scrape interval to every 30 seconds.
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
-  external_labels:
-    service_owner: ${SERVICE_OWNER} # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
@@ -15,7 +13,6 @@ remote_write:
 
 scrape_configs:
   - job_name: "nethermind"
-    metrics_path: /debug/metrics/prometheus
     static_configs:
       - targets: ["nethermind:8008"]
   - job_name: "lighthouse"
@@ -27,10 +24,10 @@ scrape_configs:
   - job_name: "lodestar"
     static_configs:
       - targets: ["lodestar:5064"]
+  # Debug
   - job_name: "node-exporter"
     static_configs:
       - targets: ["node-exporter:9100"]
-  # Debug
   - job_name: "cadvisor"
     static_configs:
       - targets: ["cadvisor:8080"]
