@@ -148,7 +148,7 @@ services:
     user: ":"
     networks: [dvnode]
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
     restart: unless-stopped
 

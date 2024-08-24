@@ -1,0 +1,13 @@
+scrape_configs:
+  - job_name: "nethermind"
+    static_configs:
+      - targets: ["nethermind:8008"]
+  - job_name: "lighthouse"
+    static_configs:
+      - targets: ["lighthouse:5054"]
+  - job_name: "charon"
+    static_configs:
+      - targets: ["charon:3620"]
+  - job_name: "lodestar"
+    static_configs:
+      - targets: ["lodestar:5064"]
