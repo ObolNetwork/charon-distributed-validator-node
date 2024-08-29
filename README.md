@@ -32,7 +32,7 @@ Please exercise caution when using them and ensure that you thoroughly review an
 To run any of the examples, use the following command:
 
 ```
-docker compose -f examples/nethermind_teku_lighthouse.yml up
+docker compose --env-file ./.env -f examples/geth_teku_lighthouse.yml up
 ```
 
 
