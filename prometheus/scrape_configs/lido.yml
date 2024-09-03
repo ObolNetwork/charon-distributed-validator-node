@@ -1,0 +1,4 @@
+scrape_configs:
+  - job_name: "validator-ejector"
+    static_configs:
+      - targets: [ "validator-ejector:8989" ]
