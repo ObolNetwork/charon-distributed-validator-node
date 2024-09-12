@@ -170,15 +170,5 @@ services:
       - ./data/grafana:/var/lib/grafana
     restart: unless-stopped
 
-  loki:
-    image: grafana/loki:${LOKI_VERSION:-2.8.2}
-    user: ":"
-    networks: [dvnode]
-    command: -config.file=/etc/loki/loki.yml
-    volumes:
-      - ./loki/loki.yml:/etc/loki/loki.yml
-      - ./data/loki:/opt/loki
-    restart: unless-stopped
-
 networks:
   dvnode:
