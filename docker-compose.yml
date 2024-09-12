@@ -143,11 +143,9 @@ services:
     user: ":"
     networks: [dvnode]
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
-    command: 
-      - "--enable-feature=expand-external-labels"
-      - "--config.file=/etc/prometheus/prometheus.yml"
+    entrypoint: /etc/prometheus/run.sh
     restart: unless-stopped
 
   grafana:
