@@ -142,6 +142,9 @@ services:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.50.1}
     user: ":"
     networks: [dvnode]
+    environment:
+      - PROM_REMOTE_WRITE_TOKEN=${PROM_REMOTE_WRITE_TOKEN}
+      - SERVICE_OWNER=${SERVICE_OWNER}
     volumes:
       - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
