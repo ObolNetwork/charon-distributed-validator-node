@@ -11,3 +11,4 @@ cluster-lock.json
 data/
 .idea
 .charon
+prometheus/prometheus.yml
