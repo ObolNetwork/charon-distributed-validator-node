@@ -724,4 +724,3 @@ groups:
             __panelId__: "25"
             summary: Peer ping latency is greater than (400ms threshold)
           isPaused: false
-          
