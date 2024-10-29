@@ -54,6 +54,7 @@ services:
       lighthouse bn
       --network=${NETWORK}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      --checkpoint-sync-url-timeout=600
       --execution-endpoint=http://nethermind:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
