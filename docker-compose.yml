@@ -52,6 +52,7 @@ services:
       lighthouse bn
       --network=${NETWORK}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      --checkpoint-sync-url-timeout=600
       --execution-endpoint=http://nethermind:8551
       --execution-jwt=/opt/jwt/jwt.hex
       --datadir=/opt/app/beacon/
@@ -148,8 +149,8 @@ services:
     user: ":"
     networks: [dvnode]
     environment:
-      - PROM_REMOTE_WRITE_TOKEN=${PROM_REMOTE_WRITE_TOKEN}
-      - SERVICE_OWNER=${SERVICE_OWNER}
+      PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN:-"obol-monitoring-token-needed"}
+      SERVICE_OWNER: ${SERVICE_OWNER:-"obol-cdvn"}
     volumes:
       - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
