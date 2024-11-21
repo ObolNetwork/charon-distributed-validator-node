@@ -91,8 +91,8 @@ services:
       CHARON_P2P_RELAYS: ${CHARON_P2P_RELAYS:-https://0.relay.obol.tech,https://1.relay.obol.tech/}
       CHARON_P2P_EXTERNAL_HOSTNAME: ${CHARON_P2P_EXTERNAL_HOSTNAME:-} # Empty default required to avoid warnings.
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:${CHARON_PORT_P2P_TCP:-3610}
-      CHARON_VALIDATOR_API_ADDRESS: 0.0.0.0:3600
-      CHARON_MONITORING_ADDRESS: 0.0.0.0:3620
+      CHARON_VALIDATOR_API_ADDRESS: 0.0.0.0:${CHARON_PORT_VALIDATOR_API:-3600}
+      CHARON_MONITORING_ADDRESS: 0.0.0.0:${CHARON_PORT_MONITORING:-3620}
       CHARON_BUILDER_API: ${BUILDER_API_ENABLED:-false}
       CHARON_FEATURE_SET_ENABLE: ${CHARON_FEATURE_SET_ENABLE:-}
       CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
@@ -104,7 +104,7 @@ services:
       - .charon:/opt/charon/.charon
     restart: unless-stopped
     healthcheck:
-      test: wget -qO- http://localhost:3620/readyz
+      test: wget -qO- http://localhost:${CHARON_PORT_MONITORING:-3620}/readyz
 
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
@@ -120,7 +120,7 @@ services:
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
-      BEACON_NODE_ADDRESS: http://charon:3600
+      BEACON_NODE_ADDRESS: http://charon:${CHARON_PORT_VALIDATOR_API:-3600}
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-false}
       BUILDER_SELECTION: ${BUILDER_SELECTION:-builderalways}
