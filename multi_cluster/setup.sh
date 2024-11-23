@@ -5,11 +5,11 @@ current_cluster_name=default
 usage() {
  echo "Usage: $0 [OPTIONS]"
  echo ""
- echo "Create a multi-cluster setup from a traditional single cluster setup."
+ echo "    Create a multi cluster setup from a traditional single cluster setup."
  echo ""
  echo "Options:"
- echo " -h          Display this help message."
- echo " -c string   Name of the current cluster. (default: \"default\")"
+ echo "    -h          Display this help message."
+ echo "    -c string   Name of the current cluster. (default: \"default\")"
 }
 
 while getopts "hc:" opt; do
@@ -28,17 +28,22 @@ while getopts "hc:" opt; do
  esac
 done
 
+if [ "$current_cluster_name" = "default" ]; then
+  echo "WARN: -c flag not specified. Using default cluster name 'default'."
+fi
+
 cluster_dir=./clusters/${current_cluster_name}
 
-# Check if clusters dir already exists.
+# Check if clusters directory already exists.
 if test -d ./clusters; then
   echo "./clsuters directory already exists. Cannot setup already set multi cluster CDVN."
   exit 1
 fi
 
-# Create cluster's dir.
+# Create clusters directory.
 mkdir -p ${cluster_dir}
 
+# Delete ./clusters dir if the script exits with non-zero code.
 cleanupClusterDir() {
     if [ "$1" != "0" ]; then
       rm -rf ./clusters
@@ -46,17 +51,17 @@ cleanupClusterDir() {
 }
 trap 'cleanupClusterDir $?' EXIT
 
-# Copy .charon folder to cluster's dir.
+# Copy .charon folder to clusters directory (if it exists).
 if test -d ./.charon; then
   cp -r .charon ${cluster_dir}/
 fi
 
-# Copy .env file to cluster's dir.
+# Copy .env file to clusters directory (if it exists).
 if test ./.env; then
   cp .env ${cluster_dir}/
 fi
 
-# Copy docker-compose.yml to cluster's dir.
+# Copy docker-compose.yml to clusters directory (if it exists).
 if test ./docker-compose.yml; then
   cp ./docker-compose.yml ${cluster_dir}/
 fi
@@ -83,32 +88,44 @@ else
   mv ${cluster_dir}/.env~ ${cluster_dir}/.env
 fi
 
-# Create data dir
+  # Create data dir.
 mkdir ${cluster_dir}/data
 
-# Copy lodestar files and data
+# Copy lodestar files and data.
 cp -r ./lodestar ${cluster_dir}/
 if test -d ./data/lodestar; then
   cp -r ./data/lodestar ${cluster_dir}/data/
 fi
 
-# Copy prometheus files and data
+# Copy prometheus files and data.
 cp -r ./prometheus ${cluster_dir}/
 if test -d ./data/prometheus; then
   cp -r ./data/prometheus ${cluster_dir}/data/
 fi
 
-# Add the EL + CL + MEV-boost network
+# Add the base network on which EL + CL + MEV-boost + Grafana run.
 sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml~
 mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 
-# Include the other services in the EL + CL + MEV-boost network
+# Include the base network in the cluster-specific services' network config.
 sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml~
 mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 
-# Stop the cluster-related containers that are running in root directory (i.e.: charon, VC).
-docker compose --profile cluster down
-# Start the base containers in root directory (i.e.: EL, CL).
-docker compose --profile base up -d
-# Start the cluster-related containers in cluster-specific directory (i.e.: charon, VC).
-docker compose --profile cluster -f ${cluster_dir}/docker-compose.yml up -d
+# If containers were already started, restart the cluster with the new setup.
+if [[ $(docker compose ps -aq) ]]; then
+  echo "Restarting the cluster-specific containers from the new multi cluster directory ${cluster_dir}"
+  # Stop the cluster-specific containers that are running in root directory - Charon, Lodestar, Prometheus.
+  docker compose --profile cluster down
+  # Start the base containers in the root directory.
+  docker compose --profile base up -d
+  # Start the cluster-specific containers in cluster-specific directory (i.e.: charon, VC).
+  docker compose --profile cluster -f ${cluster_dir}/docker-compose.yml up -d
+fi
+
+echo "Multi cluster setup is complete."
+echo "CDVN is divided in two:"
+echo "  1. Ethereum node (EL + CL) and Grafana."
+echo "  2. Multiple clusters, each consisting of Charon + Validator client + Prometheus."
+echo "All existing cluster-specific files from the CDVN directory are copied to the first cluster in the multi cluster setup at ${cluster_dir}."
+echo "Separate clusters can be managed using the cluster.sh script."
+echo "Ethereum node (EL + CL) and Grafana can be managed using the base.sh script."
