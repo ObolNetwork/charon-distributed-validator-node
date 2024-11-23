@@ -43,3 +43,83 @@ docker compose -f examples/nethermind_teku_lighthouse.yml up
 # FAQs
 
 Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/faq/errors)
+
+<!-- TODO: move this guide to the docs -->
+# Multi cluster setup
+
+There is an option to run multiple Charon clusters using the same Execution Client, Consensus Client and Grafana. This way you can operate multiple clusters for different purposes, without putting much more pressure on your system.
+
+## Setup
+
+If you already have running validator node in Docker, the Docker containers will be moved to the new multi cluster setup.
+
+```bash
+./multi_cluster/setup.sh -c {YOUR_CLUSTER_NAME}
+```
+
+You can inspect what you have in the `./clusters/` directory. Each subfolder is a cluster with the following structure:
+
+```directory
+clusters
+└───{YOUR_CLUSTER_NAME}     # cluster name
+│   │   .charon             # folder including secret material used by charon
+│   │   data                # data from the validator client and prometheus
+│   │   lodestar            # scripts used by lodestar
+│   │   prometheus          # scripts and configs used by prometheus
+│   │   .env                # environment variables used by the cluster
+│   │   docker-compose.yml  # docker compose used by the cluster
+│                           # N.B.: only services with profile "cluster" are ran
+└───{YOUR_CLUSTER_NAME_2}
+└───{YOUR_CLUSTER_NAME_...}
+└───{YOUR_CLUSTER_NAME_N}
+```
+
+Note that those folders and files are copied from the root directory. Meaning all configurations and setup you have already done, will be copied to this first cluster of the multi cluster setup.
+
+## Manage cluster
+
+Manage the Charon + Validator Client + Prometheus containers of each cluster found in `./clusters/`.
+
+### Add cluster
+
+```bash
+./multi_cluster/cluster.sh add {YOUR_CLUSTER_NAME}
+```
+
+Note that only the `.env`, `lodestar/`, `prometheus/` and `docker-compose.yml` files and directories are coiped from the root directory to the new cluster. `.charon/` and `data/` folders are expected to be from a brand new cluster that you will setup in the `./clusters/{YOUR_CLUSTER_NAME}` directory.
+
+### Start cluster
+
+It is expected that you have already done the regular procedure from cluster setup and you have `./clusters/{YOUR_CLUSTER_NAME}/.charon/` folder.
+
+```bash
+./multi_cluster/cluster.sh start {YOUR_CLUSTER_NAME}
+```
+
+### Stop cluster
+
+```bash
+./multi_cluster/cluster.sh stop {YOUR_CLUSTER_NAME}
+```
+
+### Delete cluster
+
+```bash
+./multi_cluster/cluster.sh delete {YOUR_CLUSTER_NAME}
+```
+
+## Manage base node
+
+Manage the EL + CL + Grafana containers.
+
+### Start base node
+
+```bash
+./multi_cluster/base.sh start
+```
+
+### Stop base node
+
+```bash
+./multi_cluster/base.sh stop
+```
