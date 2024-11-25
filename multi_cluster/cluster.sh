@@ -54,9 +54,6 @@ add() {
   find_port() {
     # Port number from which to start the search of free port.
     port=$1
-    # Comma separated list of strings with ports to be explicitly excluded.
-    # This is to prevent reusing the same port from inside the script (i.e.: if find_port is called multiple times, to avoid resulting in the same port)
-    exclude=$2
 
     is_occupied=1
     # run loop until is_occupied is empty
@@ -82,16 +79,6 @@ add() {
         continue
       fi
 
-      # Check if the port is not from the ports to be excluded.
-      for i in ${exclude//,/ }
-      do
-        # If the port matches the potentially excluded port, mark as occupied, increment by 1 and break the loop.
-        if [ $port -eq $i ]; then
-          is_occupied=1
-          port=$(($port+1))
-          break
-        fi
-      done
     done
 
     # Echo the free port.
@@ -99,7 +86,7 @@ add() {
   }
 
   # Try to find free and unallocated to another cluster ports.
-  p2p_port="$(find_port "3610" "CHARON_PORT_P2P_TCP" "")"
+  p2p_port="$(find_port "3610")"
 
   # Create dir for the cluster.
   mkdir -p ./clusters/$cluster_name
