@@ -90,7 +90,7 @@ else
   mv ${cluster_dir}/.env~ ${cluster_dir}/.env
 fi
 
-  # Create data dir.
+# Create data dir.
 mkdir ${cluster_dir}/data
 
 # Copy lodestar files and data.
