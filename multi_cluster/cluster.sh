@@ -34,7 +34,7 @@ check_clusters_dir_does_not_exist() {
 }
 
 # Check if cluster with the specified cluster_name already exists.
-ckeck_cluster_already_exists() {
+check_cluster_already_exists() {
   if test -d ./clusters/$cluster_name; then
     echo "./clsuters/$cluster_name directory already exists."
     exit 1
@@ -42,7 +42,7 @@ ckeck_cluster_already_exists() {
 }
 
 # Check if cluster with the specified cluster_name does not exist.
-ckeck_cluster_does_not_exist() {
+check_cluster_does_not_exist() {
   if test ! -d ./clusters/$cluster_name; then
     echo "./clsuters/$cluster_name directory does not exist."
     exit 1
@@ -217,7 +217,7 @@ case "$subcommand" in
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
-    ckeck_cluster_already_exists
+    check_cluster_already_exists
     add
     exit 0
     ;;
@@ -225,7 +225,7 @@ case "$subcommand" in
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
-    ckeck_cluster_does_not_exist
+    check_cluster_does_not_exist
     delete
     exit 0
     ;;
@@ -233,7 +233,7 @@ case "$subcommand" in
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
-    ckeck_cluster_does_not_exist
+    check_cluster_does_not_exist
     start
     exit 0
     ;;
@@ -241,7 +241,7 @@ case "$subcommand" in
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
-    ckeck_cluster_does_not_exist
+    check_cluster_does_not_exist
     stop
     exit 0
     ;;
