@@ -1,6 +1,7 @@
 #!/bin/bash
 
 current_cluster_name=default
+cluster_already_set=
 
 usage() {
  echo "Usage: $0 [OPTIONS]"
@@ -54,6 +55,7 @@ trap 'cleanupClusterDir $?' EXIT
 # Copy .charon folder to clusters directory (if it exists).
 if test -d ./.charon; then
   cp -r .charon ${cluster_dir}/
+  cluster_already_set=1
 fi
 
 # Copy .env file to clusters directory (if it exists).
@@ -126,6 +128,12 @@ echo "Multi cluster setup is complete."
 echo "CDVN is divided in two:"
 echo "  1. Ethereum node (EL + CL) and Grafana."
 echo "  2. Multiple clusters, each consisting of Charon + Validator client + Prometheus."
-echo "All existing cluster-specific files from the CDVN directory are copied to the first cluster in the multi cluster setup at ${cluster_dir}."
+if [ -z ${cluster_already_set+x} ] ; then
+  echo "Existing cluster was not found. You can create your new cluster from ${cluster_dir}."
+else
+  echo "All existing cluster-specific files from the CDVN directory are copied to the first cluster in the multi cluster setup at ${cluster_dir}."
+  echo "Those are the .charon folder, data/lodestar and data/prometheus."
+  echo "If you are using the multi cluster setup, you should refer to the configurations and data found in ${cluster_dir} from now on."
+fi
 echo "Separate clusters can be managed using the cluster.sh script."
 echo "Ethereum node (EL + CL) and Grafana can be managed using the base.sh script."
