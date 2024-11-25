@@ -124,6 +124,29 @@ if [[ $(docker compose ps -aq) ]]; then
   docker compose --profile cluster -f ${cluster_dir}/docker-compose.yml up -d
 fi
 
+migrated_readme() {
+  cat > $1 << EOL
+THIS DIRECTORY HAS BEEN MIGRATED TO $2.
+YOU SHOULD REFER TO CONFIGURATIONS AND DATA IN $2.
+EOL
+}
+
+# Decomission cluster-specific directories and files
+if test -d ./.charon; then
+  mv ./.charon ./.charon-migrated-to-multi
+  migrated_readme "./.charon-migrated-to-multi/README.md" "${cluster_dir}/.charon"
+fi
+
+if test -d ./data/lodestar; then
+  mv ./data/lodestar ./data/lodestar-migrated-to-multi
+  migrated_readme "./data/lodestar-migrated-to-multi/README.md" "${cluster_dir}/data/lodestar"
+fi
+
+if test -d ./data/prometheus; then
+  mv ./data/prometheus ./data/prometheus-migrated-to-multi
+  migrated_readme "./data/prometheus-migrated-to-multi/README.md" "${cluster_dir}/data/prometheus"
+fi
+
 echo "Multi cluster setup is complete."
 echo "CDVN is divided in two:"
 echo "  1. Ethereum node (EL + CL) and Grafana."
