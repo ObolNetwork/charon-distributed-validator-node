@@ -54,12 +54,9 @@ add() {
   find_port() {
     # Port number from which to start the search of free port.
     port=$1
-    # Env variable of a port, found in other clusters' .env, which value should be excluded (i.e.: CHARON_PORT_P2P_TCP).
-    # This is to prevent reusing same ports between clusters.
-    cluster_var=$2
     # Comma separated list of strings with ports to be explicitly excluded.
     # This is to prevent reusing the same port from inside the script (i.e.: if find_port is called multiple times, to avoid resulting in the same port)
-    exclude=$3
+    exclude=$2
 
     is_occupied=1
     # run loop until is_occupied is empty
@@ -71,8 +68,8 @@ add() {
       fi
       # Check if TCP port is used by another cluster from the ./clusters directory.
       for cluster in ./clusters/*; do
-        # Check if it is used by evaluating the variable we look for, passed by `cluster_var`.
-        p2p_cluster_port=$(. ./$cluster/.env; printf '%s' "${!cluster_var}")
+        # Check if it is used by the p2p TCP port of this cluster.
+        p2p_cluster_port=$(. ./$cluster/.env; printf '%s' "${CHARON_PORT_P2P_TCP}")
         # If the free port is the same as the port in the cluster, mark as occupied and break the loop.
         if [ $port -eq $p2p_cluster_port ]; then
           is_occupied=1
@@ -103,8 +100,6 @@ add() {
 
   # Try to find free and unallocated to another cluster ports.
   p2p_port="$(find_port "3610" "CHARON_PORT_P2P_TCP" "")"
-  validator_port="$(find_port "3600" "CHARON_PORT_VALIDATOR_API" "$p2p_port")"
-  monitoring_port="$(find_port "3620" "CHARON_PORT_MONITORING" "$p2p_port,$validator_port")"
 
   # Create dir for the cluster.
   mkdir -p ./clusters/$cluster_name
@@ -120,23 +115,7 @@ add() {
     cp ./docker-compose.yml ${cluster_dir}/
   fi
 
-  # Write the found free ports in the .env file.
-  if grep -xq "CHARON_PORT_VALIDATOR_API=.*" ./.env; then
-    echo "CHARON_PORT_VALIDATOR_API already set, overwriting it with port $validator_port"
-    sed "s|CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=$validator_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
-  else
-    sed "s|#CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=$validator_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
-  fi
-  mv ${cluster_dir}/.env.tmp ${cluster_dir}/.env
-
-  if grep -xq "CHARON_PORT_MONITORING=.*" ./.env; then
-    echo "CHARON_PORT_MONITORING already set, overwriting it with port $monitoring_port"
-    sed "s|CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=$monitoring_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
-  else
-    sed "s|#CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=$monitoring_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
-  fi
-  mv ${cluster_dir}/.env.tmp ${cluster_dir}/.env
-
+  # Write the found free port in the .env file.
   if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
     echo "CHARON_PORT_P2P_TCP already set, overwriting it with port $p2p_port"
     sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$p2p_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
@@ -167,8 +146,6 @@ add() {
 
   echo "Added new cluster $cluster_name with the following cluster-specific config:"
   echo "CHARON_PORT_P2P_TCP: $p2p_port"
-  echo "CHARON_PORT_VALIDATOR_API: $validator_port"
-  echo "CHARON_PORT_MONITORING: $monitoring_port"
   echo ""
   echo "You can start it by running $0 start $cluster_name"
 }
