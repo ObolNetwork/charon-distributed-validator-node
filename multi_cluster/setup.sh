@@ -113,6 +113,11 @@ mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml~
 mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 
+if ! docker info > /dev/null 2>&1; then
+  echo "Docker daemon is not running, please start Docker first."
+  exit 1
+fi
+
 # If containers were already started, restart the cluster with the new setup.
 if [[ $(docker compose ps -aq) ]]; then
   echo "Restarting the cluster-specific containers from the new multi cluster directory ${cluster_dir}"
