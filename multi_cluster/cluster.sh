@@ -79,6 +79,63 @@ add() {
         continue
       fi
 
+      # Check if TCP port is used by the base.
+
+      # Fetch the NETHERMIND_PORT_P2P from the base .env file.
+      nethermind_p2p_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_P2P}")
+      # If the NETHERMIND_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+      if [ -z "$nethermind_p2p_port" ]; then
+        if [ "$port" -eq "30303" ]; then
+          port=$(($port+1))
+          continue
+        fi
+      # If the NETHERMIND_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
+      elif [ $port -eq $nethermind_p2p_port ]; then
+        port=$(($port+1))
+        continue
+      fi
+
+      # Fetch the NETHERMIND_PORT_HTTP from the base .env file.
+      nethermind_http_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_HTTP}")
+      # If the NETHERMIND_PORT_HTTP is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+      if [ -z "$nethermind_http_port" ]; then
+        if [ "$port" -eq "8545" ]; then
+          port=$(($port+1))
+          continue
+        fi
+      # If the NETHERMIND_PORT_HTTP is set and the free port is the same, increment the port by 1 and continue the loop.
+      elif [ $port -eq $nethermind_http_port ]; then
+        port=$(($port+1))
+        continue
+      fi
+
+      # Fetch the NETHERMIND_PORT_ENGINE from the base .env file.
+      nethermind_engine_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_ENGINE}")
+      # If the NETHERMIND_PORT_ENGINE is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+      if [ -z "$nethermind_engine_port" ]; then
+        if [ "$port" -eq "8551" ]; then
+          port=$(($port+1))
+          continue
+        fi
+      # If the NETHERMIND_PORT_ENGINE is set and the free port is the same, increment the port by 1 and continue the loop.
+      elif [ $port -eq $nethermind_engine_port ]; then
+        port=$(($port+1))
+        continue
+      fi
+
+      # Fetch the LIGHTHOUSE_PORT_P2P from the base .env file.
+      lighthouse_p2p_port=$(. ./.env; printf '%s' "${LIGHTHOUSE_PORT_P2P}")
+      # If the LIGHTHOUSE_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+      if [ -z "$lighthouse_p2p_port" ]; then
+        if [ "$port" -eq "9000" ]; then
+          port=$(($port+1))
+          continue
+        fi
+      # If the LIGHTHOUSE_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
+      elif [ $port -eq $lighthouse_p2p_port ]; then
+        port=$(($port+1))
+        continue
+      fi
     done
 
     # Echo the free port.
