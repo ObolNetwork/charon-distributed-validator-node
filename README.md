@@ -47,7 +47,9 @@ Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech
 <!-- TODO: move this guide to the docs -->
 # Multi cluster setup
 
-There is an option to run multiple Charon clusters using the same Execution Client, Consensus Client and Grafana. This way you can operate multiple clusters for different purposes, without putting much more pressure on your system.
+There is an option to run multiple Charon clusters using the same Execution Layer Client (EL), Consensus Layer Client (CL) and Grafana. This way you can operate multiple clusters for different purposes, without putting much more pressure on your system.
+
+The way this is achieved is by separating the EL, CL and Grafana from the Charon node, Validator Client (VC) and Prometheus. Instead of having `.charon/` folder in the root directory it is moved to `clusters/{CLUSTER_NAME}/.charon`. Moreover, the VC and Prometheus data is now per cluster as well, moved from `data/lodestar` and `data/prometheus` to `clusters/{CLUSTER_NAME}/data/lodestar` and `clusters/{CLUSTER_NAME}/data/prometheus`, respectively. `docker-compose.yml` and `.env` are also used per cluster. There are also supporting scripts for the Charon node and the VC.
 
 ## Setup
 
