@@ -54,18 +54,36 @@ trap 'cleanupClusterDir $?' EXIT
 
 # Copy .charon folder to clusters directory (if it exists).
 if test -d ./.charon; then
-  cp -r .charon ${cluster_dir}/
-  cluster_already_set=1
+  owner="$(ls -ld ".charon" | awk '{print $3}')"
+  if [ "x${owner}" = "x${USER}" ]; then
+    cp -r .charon ${cluster_dir}/
+    cluster_already_set=1
+  else
+    echo "current user ${USER} is not owner of .charon/"
+    exit 1
+  fi
 fi
 
 # Copy .env file to clusters directory (if it exists).
 if test ./.env; then
-  cp .env ${cluster_dir}/
+  owner="$(ls -ld ".env" | awk '{print $3}')"
+  if [ "x${owner}" = "x${USER}" ]; then
+    cp .env ${cluster_dir}/
+  else
+    echo "current user ${USER} is not owner of .env"
+    exit 1
+  fi
 fi
 
 # Copy docker-compose.yml to clusters directory (if it exists).
 if test ./docker-compose.yml; then
-  cp ./docker-compose.yml ${cluster_dir}/
+  owner="$(ls -ld "docker-compose.yml" | awk '{print $3}')"
+  if [ "x${owner}" = "x${USER}" ]; then
+    cp ./docker-compose.yml ${cluster_dir}/
+  else
+    echo "current user ${USER} is not owner of docker-compose.yml"
+    exit 1
+  fi
 fi
 
 # Write default charon ports in .env file if they are not set.
@@ -93,16 +111,44 @@ fi
 # Create data dir.
 mkdir ${cluster_dir}/data
 
-# Copy lodestar files and data.
-cp -r ./lodestar ${cluster_dir}/
-if test -d ./data/lodestar; then
-  cp -r ./data/lodestar ${cluster_dir}/data/
+# Copy lodestar files.
+owner="$(ls -ld "lodestar" | awk '{print $3}')"
+if [ "x${owner}" = "x${USER}" ]; then
+  cp -r ./lodestar ${cluster_dir}/
+else
+  echo "current user ${USER} is not owner of lodestar/"
+  exit 1
 fi
 
-# Copy prometheus files and data.
-cp -r ./prometheus ${cluster_dir}/
+# Copy lodestar data, if it exists.
+if test -d ./data/lodestar; then
+  owner="$(ls -ld "data/lodestar" | awk '{print $3}')"
+  if [ "x${owner}" = "x${USER}" ]; then
+    cp -r ./data/lodestar ${cluster_dir}/data/
+  else
+    echo "current user ${USER} is not owner of data/lodestar/"
+    exit 1
+  fi
+fi
+
+# Copy prometheus files.
+owner="$(ls -ld "prometheus" | awk '{print $3}')"
+if [ "x${owner}" = "x${USER}" ]; then
+  cp -r ./prometheus ${cluster_dir}/
+else
+  echo "current user ${USER} is not owner of prometheus/"
+  exit 1
+fi
+
+# Copy prometheus data, if it exists.
 if test -d ./data/prometheus; then
-  cp -r ./data/prometheus ${cluster_dir}/data/
+  owner="$(ls -ld "data/prometheus" | awk '{print $3}')"
+  if [ "x${owner}" = "x${USER}" ]; then
+    cp -r ./data/prometheus ${cluster_dir}/data/
+  else
+    echo "current user ${USER} is not owner of data/prometheus/"
+    exit 1
+  fi
 fi
 
 # Add the base network on which EL + CL + MEV-boost + Grafana run.
