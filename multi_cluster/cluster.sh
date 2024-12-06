@@ -2,8 +2,9 @@
 
 unset -v cluster_name
 skip_port_free_check=
+p2p_default_port=3610
 
-usage() {
+usage_base() {
  echo "Usage: $0 [OPTIONS] COMMAND"
  echo ""
  echo "    Manage a validator cluster (Charon + VC + Prometheus), found in ./clusters directory."
@@ -13,6 +14,44 @@ usage() {
  echo "    delete string   Delete a validator cluster from the ./clusters directory."
  echo "    start  string   Start a validator cluster, found in the ./clusters directory."
  echo "    stop   string   Stop a validator cluster, found in the ./clusters directory."
+ echo ""
+ echo "Options:"
+ echo "    -h          Display this help message."
+}
+
+usage_add() {
+ echo "Usage: $0 add [OPTIONS] NAME"
+ echo ""
+ echo "    Add a new cluster with specified name."
+ echo ""
+ echo "Options:"
+ echo "    -h          Display this help message."
+ echo "    -s          Skip free port checking with netstat/ss."
+ echo "    -p integer  Override the default port (3610) from which to start the search of a free port."
+}
+
+usage_delete() {
+ echo "Usage: $0 delete [OPTIONS] NAME"
+ echo ""
+ echo "    Delete an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
+ echo ""
+ echo "Options:"
+ echo "    -h          Display this help message."
+}
+
+usage_start() {
+ echo "Usage: $0 start [OPTIONS] NAME"
+ echo ""
+ echo "    Start an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
+ echo ""
+ echo "Options:"
+ echo "    -h          Display this help message."
+}
+
+usage_stop() {
+ echo "Usage: $0 stop [OPTIONS] NAME"
+ echo ""
+ echo "    Stop an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
  echo ""
  echo "Options:"
  echo "    -h          Display this help message."
@@ -52,14 +91,15 @@ check_cluster_does_not_exist() {
 
 # Add cluster to the ./clusters/{cluster_name} directory.
 add() {
-  # Port number from which to start the search of free port.
-  port=3610
+  # Try to find free and unallocated to another cluster ports.
+  # Port number from which to start the search of free port, default is 3610.
+  port=$p2p_default_port
 
   is_occupied=1
-  # run loop until is_occupied is empty
+  # Run loop until is_occupied is empty.
   while [[ -n "$is_occupied" ]]; do
     # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
-    if [ ! -z ${skip_port_free_check+x} ] ; then
+    if [ -z ${skip_port_free_check} ] ; then
       if [ -x "$(command -v netstat)" ]; then
         if is_occupied=$(netstat -taln | grep $port); then
           port=$(($port+1))
@@ -74,6 +114,9 @@ add() {
         echo "Neither netstat or ss commands found. Please install either of those to check for free ports or add the -p flag to skip port check."
         exit 1
       fi
+    else
+      # Assume port is not occupied if no netstat/ss check.
+      is_occupied=
     fi
     # Check if TCP port is used by another cluster from the ./clusters directory.
     for cluster in ./clusters/*; do
@@ -150,8 +193,6 @@ add() {
     fi
   done
 
-  # Try to find free and unallocated to another cluster ports.
-  p2p_port=$port
 
   # Create dir for the cluster.
   mkdir -p ./clusters/$cluster_name
@@ -169,10 +210,10 @@ add() {
 
   # Write the found free port in the .env file.
   if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
-    echo "CHARON_PORT_P2P_TCP already set, overwriting it with port $p2p_port"
-    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$p2p_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
+    echo "CHARON_PORT_P2P_TCP already set, overwriting it with port $port"
+    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
   else
-    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$p2p_port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
+    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
   fi
   mv ${cluster_dir}/.env.tmp ${cluster_dir}/.env
 
@@ -197,7 +238,7 @@ add() {
   mv ${cluster_dir}/docker-compose.yml.tmp ${cluster_dir}/docker-compose.yml
 
   echo "Added new cluster $cluster_name with the following cluster-specific config:"
-  echo "CHARON_PORT_P2P_TCP: $p2p_port"
+  echo "CHARON_PORT_P2P_TCP: $port"
   echo ""
   echo "You can start it by running $0 start $cluster_name"
 }
@@ -227,11 +268,11 @@ stop() {
 while getopts ":h" opt; do
  case $opt in
   h)
-    usage
+    usage_base
     exit 0
     ;;
   \?) # unknown flag
-    usage
+    usage_base
     exit 1
     ;;
  esac
@@ -243,6 +284,25 @@ subcommand=$1; shift
 # Execute subcommand.
 case "$subcommand" in
   add)
+    while getopts ":hsp:" opt; do
+      case $opt in
+        h)
+          usage_add
+          exit 0
+        ;;
+        s )
+          skip_port_free_check=true
+        ;;
+        p )
+          p2p_default_port=${OPTARG};
+        ;;
+        ? ) # Invalid option
+          usage_add
+          exit 1
+        ;;
+      esac
+    done
+    shift "$((OPTIND -1))"
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
@@ -251,6 +311,19 @@ case "$subcommand" in
     exit 0
     ;;
   delete)
+      while getopts ":h" opt; do
+      case $opt in
+        h)
+          usage_delete
+          exit 0
+        ;;
+        ? ) # Invalid option
+          usage_delete
+          exit 1
+        ;;
+      esac
+    done
+    shift $((OPTIND-1))
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
@@ -259,6 +332,19 @@ case "$subcommand" in
     exit 0
     ;;
   start)
+      while getopts ":h" opt; do
+      case $opt in
+        h)
+          usage_start
+          exit 0
+        ;;
+        ? ) # Invalid option
+          usage_start
+          exit 1
+        ;;
+      esac
+    done
+    shift $((OPTIND-1))
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
@@ -267,6 +353,19 @@ case "$subcommand" in
     exit 0
     ;;
   stop)
+      while getopts ":h" opt; do
+      case $opt in
+        h)
+          usage_stop
+          exit 0
+        ;;
+        ? ) # Invalid option
+          usage_stop
+          exit 1
+        ;;
+      esac
+    done
+    shift $((OPTIND-1))
     cluster_name=$1
     check_missing_cluster_name
     check_clusters_dir_does_not_exist
@@ -275,7 +374,7 @@ case "$subcommand" in
     exit 0
     ;;
   * )
-    usage
+    usage_base
     exit 1
     ;;
 esac
