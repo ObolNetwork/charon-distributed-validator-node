@@ -4,29 +4,29 @@ current_cluster_name=default
 cluster_already_set=
 
 usage() {
- echo "Usage: $0 [OPTIONS]"
- echo ""
- echo "    Create a multi cluster setup from a traditional single cluster setup."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
- echo "    -c string   Name of the current cluster. (default: \"default\")"
+  echo "Usage: $0 [OPTIONS]"
+  echo ""
+  echo "    Create a multi cluster setup from a traditional single cluster setup."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
+  echo "    -c string   Name of the current cluster. (default: \"default\")"
 }
 
 while getopts "hc:" opt; do
- case $opt in
-   h)
+  case $opt in
+  h)
     usage
     exit 0
     ;;
-   c)
+  c)
     current_cluster_name=${OPTARG}
     ;;
-   \?)
+  \?)
     usage
     exit 1
     ;;
- esac
+  esac
 done
 
 if [ "$current_cluster_name" = "default" ]; then
@@ -46,9 +46,9 @@ mkdir -p ${cluster_dir}
 
 # Delete ./clusters dir if the script exits with non-zero code.
 cleanupClusterDir() {
-    if [ "$1" != "0" ]; then
-      rm -rf ./clusters
-    fi
+  if [ "$1" != "0" ]; then
+    rm -rf ./clusters
+  fi
 }
 trap 'cleanupClusterDir $?' EXIT
 
@@ -90,21 +90,21 @@ fi
 if grep -xq "CHARON_PORT_VALIDATOR_API=.*" ./.env; then
   echo "CHARON_PORT_VALIDATOR_API already set, using the set port instead of the default 3600"
 else
-  sed 's|#CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=3600|' ${cluster_dir}/.env > ${cluster_dir}/.env~
+  sed 's|#CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=3600|' ${cluster_dir}/.env >${cluster_dir}/.env~
   mv ${cluster_dir}/.env~ ${cluster_dir}/.env
 fi
 
 if grep -xq "CHARON_PORT_MONITORING=.*" ./.env; then
   echo "CHARON_PORT_MONITORING already set, using the set port instead of the default 3620"
 else
-  sed 's|#CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=3620|' ${cluster_dir}/.env > ${cluster_dir}/.env~
+  sed 's|#CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=3620|' ${cluster_dir}/.env >${cluster_dir}/.env~
   mv ${cluster_dir}/.env~ ${cluster_dir}/.env
 fi
 
 if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
   echo "CHARON_PORT_P2P_TCP already set, using the set port instead of the default 3610"
 else
-  sed 's|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=3610|' ${cluster_dir}/.env > ${cluster_dir}/.env~
+  sed 's|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=3610|' ${cluster_dir}/.env >${cluster_dir}/.env~
   mv ${cluster_dir}/.env~ ${cluster_dir}/.env
 fi
 
@@ -152,14 +152,14 @@ if test -d ./data/prometheus; then
 fi
 
 # Add the base network on which EL + CL + MEV-boost + Grafana run.
-sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml~
+sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml~
 mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 
 # Include the base network in the cluster-specific services' network config.
-sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml~
+sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml~
 mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
 
-if ! docker info > /dev/null 2>&1; then
+if ! docker info >/dev/null 2>&1; then
   echo "Docker daemon is not running, please start Docker first."
   exit 1
 fi
@@ -176,7 +176,7 @@ if [[ $(docker compose ps -aq) ]]; then
 fi
 
 migrated_readme() {
-  cat > $1 << EOL
+  cat >$1 <<EOL
 THIS DIRECTORY HAS BEEN MIGRATED TO $2.
 YOU SHOULD REFER TO CONFIGURATIONS AND DATA IN $2.
 EOL
@@ -202,7 +202,7 @@ echo "Multi cluster setup is complete."
 echo "CDVN is divided in two:"
 echo "  1. Ethereum node (EL + CL) and Grafana."
 echo "  2. Multiple clusters, each consisting of Charon + Validator client + Prometheus."
-if [ -z ${cluster_already_set+x} ] ; then
+if [ -z ${cluster_already_set+x} ]; then
   echo "Existing cluster was not found. You can create your new cluster from ${cluster_dir}."
 else
   echo "All existing cluster-specific files from the CDVN directory are copied to the first cluster in the multi cluster setup at ${cluster_dir}."

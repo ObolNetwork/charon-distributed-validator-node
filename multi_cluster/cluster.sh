@@ -5,70 +5,70 @@ skip_port_free_check=
 p2p_default_port=3610
 
 usage_base() {
- echo "Usage: $0 [OPTIONS] COMMAND"
- echo ""
- echo "    Manage a validator cluster (Charon + VC + Prometheus), found in ./clusters directory."
- echo ""
- echo "Commands:"
- echo "    add    string   Add a validator cluster to the ./clusters directory."
- echo "    delete string   Delete a validator cluster from the ./clusters directory."
- echo "    start  string   Start a validator cluster, found in the ./clusters directory."
- echo "    stop   string   Stop a validator cluster, found in the ./clusters directory."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
+  echo "Usage: $0 [OPTIONS] COMMAND"
+  echo ""
+  echo "    Manage a validator cluster (Charon + VC + Prometheus), found in ./clusters directory."
+  echo ""
+  echo "Commands:"
+  echo "    add    string   Add a validator cluster to the ./clusters directory."
+  echo "    delete string   Delete a validator cluster from the ./clusters directory."
+  echo "    start  string   Start a validator cluster, found in the ./clusters directory."
+  echo "    stop   string   Stop a validator cluster, found in the ./clusters directory."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
 }
 
 usage_add() {
- echo "Usage: $0 add [OPTIONS] NAME"
- echo ""
- echo "    Add a new cluster with specified name."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
- echo "    -s          Skip free port checking with netstat/ss."
- echo "    -p integer  Override the default port (3610) from which to start the search of a free port."
- echo ""
- echo "Example:"
- echo "  $0 add second-cluster"
- echo "  $0 add -s third-cluster-without-free-port-check"
- echo "  $0 add -p 3615 fourth-cluster-with-custom-port"
+  echo "Usage: $0 add [OPTIONS] NAME"
+  echo ""
+  echo "    Add a new cluster with specified name."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
+  echo "    -s          Skip free port checking with netstat/ss."
+  echo "    -p integer  Override the default port (3610) from which to start the search of a free port."
+  echo ""
+  echo "Example:"
+  echo "  $0 add second-cluster"
+  echo "  $0 add -s third-cluster-without-free-port-check"
+  echo "  $0 add -p 3615 fourth-cluster-with-custom-port"
 }
 
 usage_delete() {
- echo "Usage: $0 delete [OPTIONS] NAME"
- echo ""
- echo "    Delete an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
- echo ""
- echo "Example:"
- echo "  $0 delete my-second-cluster"
+  echo "Usage: $0 delete [OPTIONS] NAME"
+  echo ""
+  echo "    Delete an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
+  echo ""
+  echo "Example:"
+  echo "  $0 delete my-second-cluster"
 }
 
 usage_start() {
- echo "Usage: $0 start [OPTIONS] NAME"
- echo ""
- echo "    Start an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
- echo ""
- echo "Example:"
- echo "  $0 start my-second-cluster"
+  echo "Usage: $0 start [OPTIONS] NAME"
+  echo ""
+  echo "    Start an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
+  echo ""
+  echo "Example:"
+  echo "  $0 start my-second-cluster"
 }
 
 usage_stop() {
- echo "Usage: $0 stop [OPTIONS] NAME"
- echo ""
- echo "    Stop an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
- echo ""
- echo "Options:"
- echo "    -h          Display this help message."
- echo ""
- echo "Example:"
- echo "  $0 stop my-second-cluster"
+  echo "Usage: $0 stop [OPTIONS] NAME"
+  echo ""
+  echo "    Stop an existing cluster with the specified name. A cluster name is a folder in ./clusters dir."
+  echo ""
+  echo "Options:"
+  echo "    -h          Display this help message."
+  echo ""
+  echo "Example:"
+  echo "  $0 stop my-second-cluster"
 }
 
 # Check if cluster_name variable is set.
@@ -113,15 +113,15 @@ add() {
   # Run loop until is_occupied is empty.
   while [[ -n "$is_occupied" ]]; do
     # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
-    if [ -z ${skip_port_free_check} ] ; then
+    if [ -z ${skip_port_free_check} ]; then
       if [ -x "$(command -v netstat)" ]; then
         if is_occupied=$(netstat -taln | grep $port); then
-          port=$(($port+1))
+          port=$(($port + 1))
           continue
         fi
       elif [ -x "$(command -v ss)" ]; then
         if is_occupied=$(ss -taln | grep $port); then
-          port=$(($port+1))
+          port=$(($port + 1))
           continue
         fi
       else
@@ -135,7 +135,10 @@ add() {
     # Check if TCP port is used by another cluster from the ./clusters directory.
     for cluster in ./clusters/*; do
       # Check if it is used by the p2p TCP port of this cluster.
-      p2p_cluster_port=$(. ./$cluster/.env; printf '%s' "${CHARON_PORT_P2P_TCP}")
+      p2p_cluster_port=$(
+        . ./$cluster/.env
+        printf '%s' "${CHARON_PORT_P2P_TCP}"
+      )
       # If the free port is the same as the port in the cluster, mark as occupied and break the loop.
       if [ $port -eq $p2p_cluster_port ]; then
         is_occupied=1
@@ -144,69 +147,80 @@ add() {
     done
     # If the port was occupied by any cluster, increment the port by 1 and continue the loop.
     if [ ! -z "$is_occupied" ]; then
-      port=$(($port+1))
+      port=$(($port + 1))
       continue
     fi
 
     # Check if TCP port is used by the base.
 
     # Fetch the NETHERMIND_PORT_P2P from the base .env file.
-    nethermind_p2p_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_P2P}")
+    nethermind_p2p_port=$(
+      . ./.env
+      printf '%s' "${NETHERMIND_PORT_P2P}"
+    )
     # If the NETHERMIND_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_p2p_port" ]; then
       if [ "$port" -eq "30303" ]; then
-        port=$(($port+1))
+        port=$(($port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
     elif [ $port -eq $nethermind_p2p_port ]; then
-      port=$(($port+1))
+      port=$(($port + 1))
       continue
     fi
 
     # Fetch the NETHERMIND_PORT_HTTP from the base .env file.
-    nethermind_http_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_HTTP}")
+    nethermind_http_port=$(
+      . ./.env
+      printf '%s' "${NETHERMIND_PORT_HTTP}"
+    )
     # If the NETHERMIND_PORT_HTTP is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_http_port" ]; then
       if [ "$port" -eq "8545" ]; then
-        port=$(($port+1))
+        port=$(($port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_HTTP is set and the free port is the same, increment the port by 1 and continue the loop.
     elif [ $port -eq $nethermind_http_port ]; then
-      port=$(($port+1))
+      port=$(($port + 1))
       continue
     fi
 
     # Fetch the NETHERMIND_PORT_ENGINE from the base .env file.
-    nethermind_engine_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_ENGINE}")
+    nethermind_engine_port=$(
+      . ./.env
+      printf '%s' "${NETHERMIND_PORT_ENGINE}"
+    )
     # If the NETHERMIND_PORT_ENGINE is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_engine_port" ]; then
       if [ "$port" -eq "8551" ]; then
-        port=$(($port+1))
+        port=$(($port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_ENGINE is set and the free port is the same, increment the port by 1 and continue the loop.
     elif [ $port -eq $nethermind_engine_port ]; then
-      port=$(($port+1))
+      port=$(($port + 1))
       continue
     fi
 
     # Fetch the LIGHTHOUSE_PORT_P2P from the base .env file.
-    lighthouse_p2p_port=$(. ./.env; printf '%s' "${LIGHTHOUSE_PORT_P2P}")
+    lighthouse_p2p_port=$(
+      . ./.env
+      printf '%s' "${LIGHTHOUSE_PORT_P2P}"
+    )
     # If the LIGHTHOUSE_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$lighthouse_p2p_port" ]; then
       if [ "$port" -eq "9000" ]; then
-        port=$(($port+1))
+        port=$(($port + 1))
         continue
       fi
     # If the LIGHTHOUSE_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
     elif [ $port -eq $lighthouse_p2p_port ]; then
-      port=$(($port+1))
+      port=$(($port + 1))
       continue
     fi
   done
-
 
   # Create dir for the cluster.
   mkdir -p ./clusters/$cluster_name
@@ -225,9 +239,9 @@ add() {
   # Write the found free port in the .env file.
   if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
     echo "CHARON_PORT_P2P_TCP already set, overwriting it with port $port"
-    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
+    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env >${cluster_dir}/.env.tmp
   else
-    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env > ${cluster_dir}/.env.tmp
+    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env >${cluster_dir}/.env.tmp
   fi
   mv ${cluster_dir}/.env.tmp ${cluster_dir}/.env
 
@@ -244,11 +258,11 @@ add() {
   cp -r ./lodestar ${cluster_dir}/
 
   # Add the base network on which EL + CL + MEV-boost + Grafana run.
-  sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml.tmp
+  sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml.tmp
   mv ${cluster_dir}/docker-compose.yml.tmp ${cluster_dir}/docker-compose.yml
 
   # Include the base network in the cluster-specific services' network config.
-  sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml > ${cluster_dir}/docker-compose.yml.tmp
+  sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml.tmp
   mv ${cluster_dir}/docker-compose.yml.tmp ${cluster_dir}/docker-compose.yml
 
   echo "Added new cluster $cluster_name with the following cluster-specific config:"
@@ -259,10 +273,9 @@ add() {
 
 delete() {
   read -r -p "Are you sure you want to delete the cluster? This will delete your private keys, which will be unrecoverable if you do not have backup! [y/N] " response
-  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
-  then
-      rm -rf ./clusters/$cluster_name
-      echo "Delete cluster $cluster_name."
+  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    rm -rf ./clusters/$cluster_name
+    echo "Delete cluster $cluster_name."
   fi
 }
 
@@ -280,7 +293,7 @@ stop() {
 
 # Match global flags
 while getopts ":h" opt; do
- case $opt in
+  case $opt in
   h)
     usage_base
     exit 0
@@ -289,106 +302,107 @@ while getopts ":h" opt; do
     usage_base
     exit 1
     ;;
- esac
+  esac
 done
 
 # Capture the subcommand passed.
-shift "$((OPTIND -1))"
-subcommand=$1; shift
+shift "$((OPTIND - 1))"
+subcommand=$1
+shift
 # Execute subcommand.
 case "$subcommand" in
-  add)
-    while getopts ":hsp:" opt; do
-      case $opt in
-        h)
-          usage_add
-          exit 0
-        ;;
-        s )
-          skip_port_free_check=true
-        ;;
-        p )
-          p2p_default_port=${OPTARG};
-        ;;
-        ? ) # Invalid option
-          usage_add
-          exit 1
-        ;;
-      esac
-    done
-    shift "$((OPTIND -1))"
-    cluster_name=$1
-    check_missing_cluster_name
-    check_clusters_dir_does_not_exist
-    check_cluster_already_exists
-    add
-    exit 0
-    ;;
-  delete)
-      while getopts ":h" opt; do
-      case $opt in
-        h)
-          usage_delete
-          exit 0
-        ;;
-        ? ) # Invalid option
-          usage_delete
-          exit 1
-        ;;
-      esac
-    done
-    shift $((OPTIND-1))
-    cluster_name=$1
-    check_missing_cluster_name
-    check_clusters_dir_does_not_exist
-    check_cluster_does_not_exist
-    delete
-    exit 0
-    ;;
-  start)
-      while getopts ":h" opt; do
-      case $opt in
-        h)
-          usage_start
-          exit 0
-        ;;
-        ? ) # Invalid option
-          usage_start
-          exit 1
-        ;;
-      esac
-    done
-    shift $((OPTIND-1))
-    cluster_name=$1
-    check_missing_cluster_name
-    check_clusters_dir_does_not_exist
-    check_cluster_does_not_exist
-    start
-    exit 0
-    ;;
-  stop)
-      while getopts ":h" opt; do
-      case $opt in
-        h)
-          usage_stop
-          exit 0
-        ;;
-        ? ) # Invalid option
-          usage_stop
-          exit 1
-        ;;
-      esac
-    done
-    shift $((OPTIND-1))
-    cluster_name=$1
-    check_missing_cluster_name
-    check_clusters_dir_does_not_exist
-    check_cluster_does_not_exist
-    stop
-    exit 0
-    ;;
-  * )
-    usage_base
-    exit 1
-    ;;
+add)
+  while getopts ":hsp:" opt; do
+    case $opt in
+    h)
+      usage_add
+      exit 0
+      ;;
+    s)
+      skip_port_free_check=true
+      ;;
+    p)
+      p2p_default_port=${OPTARG}
+      ;;
+    ?) # Invalid option
+      usage_add
+      exit 1
+      ;;
+    esac
+  done
+  shift "$((OPTIND - 1))"
+  cluster_name=$1
+  check_missing_cluster_name
+  check_clusters_dir_does_not_exist
+  check_cluster_already_exists
+  add
+  exit 0
+  ;;
+delete)
+  while getopts ":h" opt; do
+    case $opt in
+    h)
+      usage_delete
+      exit 0
+      ;;
+    ?) # Invalid option
+      usage_delete
+      exit 1
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  cluster_name=$1
+  check_missing_cluster_name
+  check_clusters_dir_does_not_exist
+  check_cluster_does_not_exist
+  delete
+  exit 0
+  ;;
+start)
+  while getopts ":h" opt; do
+    case $opt in
+    h)
+      usage_start
+      exit 0
+      ;;
+    ?) # Invalid option
+      usage_start
+      exit 1
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  cluster_name=$1
+  check_missing_cluster_name
+  check_clusters_dir_does_not_exist
+  check_cluster_does_not_exist
+  start
+  exit 0
+  ;;
+stop)
+  while getopts ":h" opt; do
+    case $opt in
+    h)
+      usage_stop
+      exit 0
+      ;;
+    ?) # Invalid option
+      usage_stop
+      exit 1
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  cluster_name=$1
+  check_missing_cluster_name
+  check_clusters_dir_does_not_exist
+  check_cluster_does_not_exist
+  stop
+  exit 0
+  ;;
+*)
+  usage_base
+  exit 1
+  ;;
 esac
