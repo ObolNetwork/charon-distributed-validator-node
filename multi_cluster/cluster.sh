@@ -46,7 +46,7 @@ usage_delete() {
   echo "    -h          Display this help message."
   echo ""
   echo "Example:"
-  echo "  $0 delete my-second-cluster"
+  echo "  $0 delete second-cluster"
 }
 
 usage_start() {
@@ -58,7 +58,7 @@ usage_start() {
   echo "    -h          Display this help message."
   echo ""
   echo "Example:"
-  echo "  $0 start my-second-cluster"
+  echo "  $0 start second-cluster"
 }
 
 usage_stop() {
@@ -70,7 +70,7 @@ usage_stop() {
   echo "    -h          Display this help message."
   echo ""
   echo "Example:"
-  echo "  $0 stop my-second-cluster"
+  echo "  $0 stop second-cluster"
 }
 
 # Check if cluster_name variable is set.
