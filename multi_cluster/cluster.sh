@@ -1,6 +1,7 @@
 #!/bin/bash
 
 unset -v cluster_name
+skip_port_free_check=
 
 usage() {
  echo "Usage: $0 [OPTIONS] COMMAND"
@@ -51,99 +52,106 @@ check_cluster_does_not_exist() {
 
 # Add cluster to the ./clusters/{cluster_name} directory.
 add() {
-  find_port() {
-    # Port number from which to start the search of free port.
-    port=$1
+  # Port number from which to start the search of free port.
+  port=3610
 
-    is_occupied=1
-    # run loop until is_occupied is empty
-    while [[ -n "$is_occupied" ]]; do
-      # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
-      if is_occupied=$(netstat -taln | grep $port); then
-        port=$(($port+1))
-        continue
-      fi
-      # Check if TCP port is used by another cluster from the ./clusters directory.
-      for cluster in ./clusters/*; do
-        # Check if it is used by the p2p TCP port of this cluster.
-        p2p_cluster_port=$(. ./$cluster/.env; printf '%s' "${CHARON_PORT_P2P_TCP}")
-        # If the free port is the same as the port in the cluster, mark as occupied and break the loop.
-        if [ $port -eq $p2p_cluster_port ]; then
-          is_occupied=1
-          break
-        fi
-      done
-      # If the port was occupied by any cluster, increment the port by 1 and continue the loop.
-      if [ ! -z "$is_occupied" ]; then
-        port=$(($port+1))
-        continue
-      fi
-
-      # Check if TCP port is used by the base.
-
-      # Fetch the NETHERMIND_PORT_P2P from the base .env file.
-      nethermind_p2p_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_P2P}")
-      # If the NETHERMIND_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
-      if [ -z "$nethermind_p2p_port" ]; then
-        if [ "$port" -eq "30303" ]; then
+  is_occupied=1
+  # run loop until is_occupied is empty
+  while [[ -n "$is_occupied" ]]; do
+    # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
+    if [ ! -z ${skip_port_free_check+x} ] ; then
+      if [ -x "$(command -v netstat)" ]; then
+        if is_occupied=$(netstat -taln | grep $port); then
           port=$(($port+1))
           continue
         fi
-      # If the NETHERMIND_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
-      elif [ $port -eq $nethermind_p2p_port ]; then
-        port=$(($port+1))
-        continue
-      fi
-
-      # Fetch the NETHERMIND_PORT_HTTP from the base .env file.
-      nethermind_http_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_HTTP}")
-      # If the NETHERMIND_PORT_HTTP is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
-      if [ -z "$nethermind_http_port" ]; then
-        if [ "$port" -eq "8545" ]; then
+      elif [ -x "$(command -v ss)" ]; then
+        if is_occupied=$(ss -taln | grep $port); then
           port=$(($port+1))
           continue
         fi
-      # If the NETHERMIND_PORT_HTTP is set and the free port is the same, increment the port by 1 and continue the loop.
-      elif [ $port -eq $nethermind_http_port ]; then
-        port=$(($port+1))
-        continue
+      else
+        echo "Neither netstat or ss commands found. Please install either of those to check for free ports or add the -p flag to skip port check."
+        exit 1
       fi
-
-      # Fetch the NETHERMIND_PORT_ENGINE from the base .env file.
-      nethermind_engine_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_ENGINE}")
-      # If the NETHERMIND_PORT_ENGINE is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
-      if [ -z "$nethermind_engine_port" ]; then
-        if [ "$port" -eq "8551" ]; then
-          port=$(($port+1))
-          continue
-        fi
-      # If the NETHERMIND_PORT_ENGINE is set and the free port is the same, increment the port by 1 and continue the loop.
-      elif [ $port -eq $nethermind_engine_port ]; then
-        port=$(($port+1))
-        continue
-      fi
-
-      # Fetch the LIGHTHOUSE_PORT_P2P from the base .env file.
-      lighthouse_p2p_port=$(. ./.env; printf '%s' "${LIGHTHOUSE_PORT_P2P}")
-      # If the LIGHTHOUSE_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
-      if [ -z "$lighthouse_p2p_port" ]; then
-        if [ "$port" -eq "9000" ]; then
-          port=$(($port+1))
-          continue
-        fi
-      # If the LIGHTHOUSE_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
-      elif [ $port -eq $lighthouse_p2p_port ]; then
-        port=$(($port+1))
-        continue
+    fi
+    # Check if TCP port is used by another cluster from the ./clusters directory.
+    for cluster in ./clusters/*; do
+      # Check if it is used by the p2p TCP port of this cluster.
+      p2p_cluster_port=$(. ./$cluster/.env; printf '%s' "${CHARON_PORT_P2P_TCP}")
+      # If the free port is the same as the port in the cluster, mark as occupied and break the loop.
+      if [ $port -eq $p2p_cluster_port ]; then
+        is_occupied=1
+        break
       fi
     done
+    # If the port was occupied by any cluster, increment the port by 1 and continue the loop.
+    if [ ! -z "$is_occupied" ]; then
+      port=$(($port+1))
+      continue
+    fi
 
-    # Echo the free port.
-    echo $port
-  }
+    # Check if TCP port is used by the base.
+
+    # Fetch the NETHERMIND_PORT_P2P from the base .env file.
+    nethermind_p2p_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_P2P}")
+    # If the NETHERMIND_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+    if [ -z "$nethermind_p2p_port" ]; then
+      if [ "$port" -eq "30303" ]; then
+        port=$(($port+1))
+        continue
+      fi
+    # If the NETHERMIND_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
+    elif [ $port -eq $nethermind_p2p_port ]; then
+      port=$(($port+1))
+      continue
+    fi
+
+    # Fetch the NETHERMIND_PORT_HTTP from the base .env file.
+    nethermind_http_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_HTTP}")
+    # If the NETHERMIND_PORT_HTTP is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+    if [ -z "$nethermind_http_port" ]; then
+      if [ "$port" -eq "8545" ]; then
+        port=$(($port+1))
+        continue
+      fi
+    # If the NETHERMIND_PORT_HTTP is set and the free port is the same, increment the port by 1 and continue the loop.
+    elif [ $port -eq $nethermind_http_port ]; then
+      port=$(($port+1))
+      continue
+    fi
+
+    # Fetch the NETHERMIND_PORT_ENGINE from the base .env file.
+    nethermind_engine_port=$(. ./.env; printf '%s' "${NETHERMIND_PORT_ENGINE}")
+    # If the NETHERMIND_PORT_ENGINE is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+    if [ -z "$nethermind_engine_port" ]; then
+      if [ "$port" -eq "8551" ]; then
+        port=$(($port+1))
+        continue
+      fi
+    # If the NETHERMIND_PORT_ENGINE is set and the free port is the same, increment the port by 1 and continue the loop.
+    elif [ $port -eq $nethermind_engine_port ]; then
+      port=$(($port+1))
+      continue
+    fi
+
+    # Fetch the LIGHTHOUSE_PORT_P2P from the base .env file.
+    lighthouse_p2p_port=$(. ./.env; printf '%s' "${LIGHTHOUSE_PORT_P2P}")
+    # If the LIGHTHOUSE_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
+    if [ -z "$lighthouse_p2p_port" ]; then
+      if [ "$port" -eq "9000" ]; then
+        port=$(($port+1))
+        continue
+      fi
+    # If the LIGHTHOUSE_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
+    elif [ $port -eq $lighthouse_p2p_port ]; then
+      port=$(($port+1))
+      continue
+    fi
+  done
 
   # Try to find free and unallocated to another cluster ports.
-  p2p_port="$(find_port "3610")"
+  p2p_port=$port
 
   # Create dir for the cluster.
   mkdir -p ./clusters/$cluster_name
