@@ -2,27 +2,25 @@
 
 # shellcheck disable=SC1090,SC1091,SC2012
 
-current_cluster_name=default
 cluster_already_set=
 
 usage() {
-  echo "Usage: $0 [OPTIONS]"
+  echo "Usage: $0 [OPTIONS] NAME"
   echo ""
-  echo "    Create a multi cluster setup from a traditional single cluster setup."
+  echo "    Create a multi cluster setup from a traditional single cluster setup. Name of the first cluster should be specified."
   echo ""
   echo "Options:"
   echo "    -h          Display this help message."
-  echo "    -c string   Name of the current cluster. (default: \"default\")"
+  echo ""
+  echo "Example:"
+  echo "  $0 initial-cluster"
 }
 
-while getopts "hc:" opt; do
+while getopts "h:" opt; do
   case $opt in
   h)
     usage
     exit 0
-    ;;
-  c)
-    current_cluster_name=${OPTARG}
     ;;
   \?)
     usage
@@ -30,12 +28,16 @@ while getopts "hc:" opt; do
     ;;
   esac
 done
+shift "$((OPTIND - 1))"
+cluster_name=$1
 
-if [ "$current_cluster_name" = "default" ]; then
-  echo "WARN: -c flag not specified. Using default cluster name 'default'."
+if [ -z "$cluster_name" ]; then
+  echo 'Missing cluster name argument.' >&2
+  usage
+  exit 1
 fi
 
-cluster_dir=./clusters/${current_cluster_name}
+cluster_dir=./clusters/${cluster_name}
 
 # Check if clusters directory already exists.
 if test -d ./clusters; then
