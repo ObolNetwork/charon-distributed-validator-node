@@ -28,6 +28,11 @@ usage_add() {
  echo "    -h          Display this help message."
  echo "    -s          Skip free port checking with netstat/ss."
  echo "    -p integer  Override the default port (3610) from which to start the search of a free port."
+ echo ""
+ echo "Example:"
+ echo "  $0 add second-cluster"
+ echo "  $0 add -s third-cluster-without-free-port-check"
+ echo "  $0 add -p 3615 fourth-cluster-with-custom-port"
 }
 
 usage_delete() {
@@ -37,6 +42,9 @@ usage_delete() {
  echo ""
  echo "Options:"
  echo "    -h          Display this help message."
+ echo ""
+ echo "Example:"
+ echo "  $0 delete my-second-cluster"
 }
 
 usage_start() {
@@ -46,6 +54,9 @@ usage_start() {
  echo ""
  echo "Options:"
  echo "    -h          Display this help message."
+ echo ""
+ echo "Example:"
+ echo "  $0 start my-second-cluster"
 }
 
 usage_stop() {
@@ -55,6 +66,9 @@ usage_stop() {
  echo ""
  echo "Options:"
  echo "    -h          Display this help message."
+ echo ""
+ echo "Example:"
+ echo "  $0 stop my-second-cluster"
 }
 
 # Check if cluster_name variable is set.
