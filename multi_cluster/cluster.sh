@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=SC1090
+# shellcheck disable=SC1091
+
 unset -v cluster_name
 skip_port_free_check=
 p2p_default_port=3610
@@ -89,15 +92,15 @@ check_clusters_dir_does_not_exist() {
 
 # Check if cluster with the specified cluster_name already exists.
 check_cluster_already_exists() {
-  if test -d ./clusters/$cluster_name; then
-    echo "./clsuters/$cluster_name directory already exists."
+  if test -d "./clusters/${cluster_name}"; then
+    echo "./clsuters/${cluster_name} directory already exists."
     exit 1
   fi
 }
 
 # Check if cluster with the specified cluster_name does not exist.
 check_cluster_does_not_exist() {
-  if test ! -d ./clusters/$cluster_name; then
+  if test ! -d "./clusters/${cluster_name}"; then
     echo "./clsuters/$cluster_name directory does not exist."
     exit 1
   fi
@@ -115,13 +118,13 @@ add() {
     # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
     if [ -z ${skip_port_free_check} ]; then
       if [ -x "$(command -v netstat)" ]; then
-        if is_occupied=$(netstat -taln | grep $port); then
-          port=$(($port + 1))
+        if is_occupied=$(netstat -taln | grep "$port"); then
+          port=$((port + 1))
           continue
         fi
       elif [ -x "$(command -v ss)" ]; then
-        if is_occupied=$(ss -taln | grep $port); then
-          port=$(($port + 1))
+        if is_occupied=$(ss -taln | grep "$port"); then
+          port=$((port + 1))
           continue
         fi
       else
@@ -136,18 +139,18 @@ add() {
     for cluster in ./clusters/*; do
       # Check if it is used by the p2p TCP port of this cluster.
       p2p_cluster_port=$(
-        . ./$cluster/.env
-        printf '%s' "${CHARON_PORT_P2P_TCP}"
+        . "./${cluster}/.env"
+        printf '%s' "$CHARON_PORT_P2P_TCP"
       )
       # If the free port is the same as the port in the cluster, mark as occupied and break the loop.
-      if [ $port -eq $p2p_cluster_port ]; then
+      if [ "$port" -eq "$p2p_cluster_port" ]; then
         is_occupied=1
         break
       fi
     done
     # If the port was occupied by any cluster, increment the port by 1 and continue the loop.
-    if [ ! -z "$is_occupied" ]; then
-      port=$(($port + 1))
+    if [ -n "$is_occupied" ]; then
+      port=$((port + 1))
       continue
     fi
 
@@ -161,12 +164,12 @@ add() {
     # If the NETHERMIND_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_p2p_port" ]; then
       if [ "$port" -eq "30303" ]; then
-        port=$(($port + 1))
+        port=$((port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
-    elif [ $port -eq $nethermind_p2p_port ]; then
-      port=$(($port + 1))
+    elif [ "$port" -eq "$nethermind_p2p_port" ]; then
+      port=$((port + 1))
       continue
     fi
 
@@ -178,92 +181,92 @@ add() {
     # If the NETHERMIND_PORT_HTTP is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_http_port" ]; then
       if [ "$port" -eq "8545" ]; then
-        port=$(($port + 1))
+        port=$((port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_HTTP is set and the free port is the same, increment the port by 1 and continue the loop.
-    elif [ $port -eq $nethermind_http_port ]; then
-      port=$(($port + 1))
+    elif [ "$port" -eq "$nethermind_http_port" ]; then
+      port=$((port + 1))
       continue
     fi
 
     # Fetch the NETHERMIND_PORT_ENGINE from the base .env file.
     nethermind_engine_port=$(
       . ./.env
-      printf '%s' "${NETHERMIND_PORT_ENGINE}"
+      printf '%s' "$NETHERMIND_PORT_ENGINE"
     )
     # If the NETHERMIND_PORT_ENGINE is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$nethermind_engine_port" ]; then
       if [ "$port" -eq "8551" ]; then
-        port=$(($port + 1))
+        port=$((port + 1))
         continue
       fi
     # If the NETHERMIND_PORT_ENGINE is set and the free port is the same, increment the port by 1 and continue the loop.
-    elif [ $port -eq $nethermind_engine_port ]; then
-      port=$(($port + 1))
+    elif [ "$port" -eq "$nethermind_engine_port" ]; then
+      port=$((port + 1))
       continue
     fi
 
     # Fetch the LIGHTHOUSE_PORT_P2P from the base .env file.
     lighthouse_p2p_port=$(
       . ./.env
-      printf '%s' "${LIGHTHOUSE_PORT_P2P}"
+      printf '%s' "$LIGHTHOUSE_PORT_P2P"
     )
     # If the LIGHTHOUSE_PORT_P2P is not set and the free port is the same as the default one, increment the port by 1 and continue the loop.
     if [ -z "$lighthouse_p2p_port" ]; then
       if [ "$port" -eq "9000" ]; then
-        port=$(($port + 1))
+        port=$((port + 1))
         continue
       fi
     # If the LIGHTHOUSE_PORT_P2P is set and the free port is the same, increment the port by 1 and continue the loop.
-    elif [ $port -eq $lighthouse_p2p_port ]; then
-      port=$(($port + 1))
+    elif [ "$port" -eq "$lighthouse_p2p_port" ]; then
+      port=$((port + 1))
       continue
     fi
   done
 
   # Create dir for the cluster.
-  mkdir -p ./clusters/$cluster_name
-  cluster_dir=./clusters/$cluster_name
+  mkdir -p "./clusters/${cluster_name}"
+  cluster_dir="./clusters/${cluster_name}"
 
   # Copy .env from root dir to cluster's dir (if it exists).
   if test ./.env; then
-    cp .env ${cluster_dir}/
+    cp .env "${cluster_dir}/"
   fi
 
   # Copy docker-compose.yml from root dir to cluster's dir (if it exists).
   if test ./docker-compose.yml; then
-    cp ./docker-compose.yml ${cluster_dir}/
+    cp ./docker-compose.yml "$cluster_dir"/
   fi
 
   # Write the found free port in the .env file.
   if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
     echo "CHARON_PORT_P2P_TCP already set, overwriting it with port $port"
-    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env >${cluster_dir}/.env.tmp
+    sed "s|CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" "${cluster_dir}/.env" >"${cluster_dir}/.env.tmp"
   else
-    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" ${cluster_dir}/.env >${cluster_dir}/.env.tmp
+    sed "s|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=$port|" "${cluster_dir}/.env" >"${cluster_dir}/.env.tmp"
   fi
-  mv ${cluster_dir}/.env.tmp ${cluster_dir}/.env
+  mv "${cluster_dir}/.env.tmp" "${cluster_dir}/.env"
 
   # Create data dir.
-  mkdir ${cluster_dir}/data
+  mkdir "${cluster_dir}/data"
 
   # Copy prometheus files and data.
-  cp -r ./prometheus ${cluster_dir}/
+  cp -r ./prometheus "${cluster_dir}/"
   if test -d ./data/prometheus; then
-    cp -r ./data/prometheus ${cluster_dir}/data/
+    cp -r ./data/prometheus "${cluster_dir}/data/"
   fi
 
   # Copy lodestar files.
-  cp -r ./lodestar ${cluster_dir}/
+  cp -r ./lodestar "${cluster_dir}/"
 
   # Add the base network on which EL + CL + MEV-boost + Grafana run.
-  sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml.tmp
-  mv ${cluster_dir}/docker-compose.yml.tmp ${cluster_dir}/docker-compose.yml
+  sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" "${cluster_dir}/docker-compose.yml" >"${cluster_dir}/docker-compose.yml.tmp"
+  mv "${cluster_dir}/docker-compose.yml.tmp" "${cluster_dir}/docker-compose.yml"
 
   # Include the base network in the cluster-specific services' network config.
-  sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml.tmp
-  mv ${cluster_dir}/docker-compose.yml.tmp ${cluster_dir}/docker-compose.yml
+  sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" "${cluster_dir}/docker-compose.yml" >"${cluster_dir}/docker-compose.yml.tmp"
+  mv "${cluster_dir}/docker-compose.yml.tmp" "${cluster_dir}/docker-compose.yml"
 
   echo "Added new cluster $cluster_name with the following cluster-specific config:"
   echo "CHARON_PORT_P2P_TCP: $port"
@@ -274,19 +277,19 @@ add() {
 delete() {
   read -r -p "Are you sure you want to delete the cluster? This will delete your private keys, which will be unrecoverable if you do not have backup! [y/N] " response
   if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    rm -rf ./clusters/$cluster_name
+    rm -rf "./clusters/$cluster_name"
     echo "Delete cluster $cluster_name."
   fi
 }
 
 start() {
-  docker compose --profile cluster -f ./clusters/${cluster_name}/docker-compose.yml up -d
+  docker compose --profile cluster -f "./clusters/${cluster_name}/docker-compose.yml" up -d
   echo "Started cluster $cluster_name"
   echo "You can stop it by running $0 stop $cluster_name"
 }
 
 stop() {
-  docker compose --profile cluster -f ./clusters/${cluster_name}/docker-compose.yml down
+  docker compose --profile cluster -f "./clusters/${cluster_name}/docker-compose.yml" down
   echo "Stopped cluster $cluster_name"
   echo "You can start it again by running $0 start $cluster_name"
 }

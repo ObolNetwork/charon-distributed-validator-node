@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# shellcheck disable=SC1090
+# shellcheck disable=SC1091
+# shellcheck disable=SC2012
+
 current_cluster_name=default
 cluster_already_set=
 
@@ -42,7 +46,7 @@ if test -d ./clusters; then
 fi
 
 # Create clusters directory.
-mkdir -p ${cluster_dir}
+mkdir -p "$cluster_dir"
 
 # Delete ./clusters dir if the script exits with non-zero code.
 cleanupClusterDir() {
@@ -55,8 +59,8 @@ trap 'cleanupClusterDir $?' EXIT
 # Copy .charon folder to clusters directory (if it exists).
 if test -d ./.charon; then
   owner="$(ls -ld ".charon" | awk '{print $3}')"
-  if [ "x${owner}" = "x${USER}" ]; then
-    cp -r .charon ${cluster_dir}/
+  if [ "$owner" = "$USER" ]; then
+    cp -r .charon "$cluster_dir"/
     cluster_already_set=1
   else
     echo "current user ${USER} is not owner of .charon/"
@@ -67,8 +71,8 @@ fi
 # Copy .env file to clusters directory (if it exists).
 if test ./.env; then
   owner="$(ls -ld ".env" | awk '{print $3}')"
-  if [ "x${owner}" = "x${USER}" ]; then
-    cp .env ${cluster_dir}/
+  if [ "${owner}" = "${USER}" ]; then
+    cp .env "$cluster_dir"/
   else
     echo "current user ${USER} is not owner of .env"
     exit 1
@@ -78,8 +82,8 @@ fi
 # Copy docker-compose.yml to clusters directory (if it exists).
 if test ./docker-compose.yml; then
   owner="$(ls -ld "docker-compose.yml" | awk '{print $3}')"
-  if [ "x${owner}" = "x${USER}" ]; then
-    cp ./docker-compose.yml ${cluster_dir}/
+  if [ "${owner}" = "${USER}" ]; then
+    cp ./docker-compose.yml "$cluster_dir"/
   else
     echo "current user ${USER} is not owner of docker-compose.yml"
     exit 1
@@ -90,31 +94,31 @@ fi
 if grep -xq "CHARON_PORT_VALIDATOR_API=.*" ./.env; then
   echo "CHARON_PORT_VALIDATOR_API already set, using the set port instead of the default 3600"
 else
-  sed 's|#CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=3600|' ${cluster_dir}/.env >${cluster_dir}/.env~
-  mv ${cluster_dir}/.env~ ${cluster_dir}/.env
+  sed 's|#CHARON_PORT_VALIDATOR_API=|CHARON_PORT_VALIDATOR_API=3600|' "${cluster_dir}/.env" >"${cluster_dir}/.env~"
+  mv "${cluster_dir}/.env~" "${cluster_dir}/.env"
 fi
 
 if grep -xq "CHARON_PORT_MONITORING=.*" ./.env; then
   echo "CHARON_PORT_MONITORING already set, using the set port instead of the default 3620"
 else
-  sed 's|#CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=3620|' ${cluster_dir}/.env >${cluster_dir}/.env~
-  mv ${cluster_dir}/.env~ ${cluster_dir}/.env
+  sed 's|#CHARON_PORT_MONITORING=|CHARON_PORT_MONITORING=3620|' "${cluster_dir}/.env" >"${cluster_dir}/.env~"
+  mv "${cluster_dir}/.env~" "${cluster_dir}/.env"
 fi
 
 if grep -xq "CHARON_PORT_P2P_TCP=.*" ./.env; then
   echo "CHARON_PORT_P2P_TCP already set, using the set port instead of the default 3610"
 else
-  sed 's|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=3610|' ${cluster_dir}/.env >${cluster_dir}/.env~
-  mv ${cluster_dir}/.env~ ${cluster_dir}/.env
+  sed 's|#CHARON_PORT_P2P_TCP=|CHARON_PORT_P2P_TCP=3610|' "${cluster_dir}/.env" >"${cluster_dir}/.env~"
+  mv "${cluster_dir}/.env~" "${cluster_dir}/.env"
 fi
 
 # Create data dir.
-mkdir ${cluster_dir}/data
+mkdir "${cluster_dir}/data"
 
 # Copy lodestar files.
 owner="$(ls -ld "lodestar" | awk '{print $3}')"
-if [ "x${owner}" = "x${USER}" ]; then
-  cp -r ./lodestar ${cluster_dir}/
+if [ "${owner}" = "${USER}" ]; then
+  cp -r ./lodestar "${cluster_dir}/"
 else
   echo "current user ${USER} is not owner of lodestar/"
   exit 1
@@ -123,8 +127,8 @@ fi
 # Copy lodestar data, if it exists.
 if test -d ./data/lodestar; then
   owner="$(ls -ld "data/lodestar" | awk '{print $3}')"
-  if [ "x${owner}" = "x${USER}" ]; then
-    cp -r ./data/lodestar ${cluster_dir}/data/
+  if [ "${owner}" = "${USER}" ]; then
+    cp -r ./data/lodestar "${cluster_dir}/data/"
   else
     echo "current user ${USER} is not owner of data/lodestar/"
     exit 1
@@ -133,8 +137,8 @@ fi
 
 # Copy prometheus files.
 owner="$(ls -ld "prometheus" | awk '{print $3}')"
-if [ "x${owner}" = "x${USER}" ]; then
-  cp -r ./prometheus ${cluster_dir}/
+if [ "${owner}" = "${USER}" ]; then
+  cp -r ./prometheus "${cluster_dir}/"
 else
   echo "current user ${USER} is not owner of prometheus/"
   exit 1
@@ -143,8 +147,8 @@ fi
 # Copy prometheus data, if it exists.
 if test -d ./data/prometheus; then
   owner="$(ls -ld "data/prometheus" | awk '{print $3}')"
-  if [ "x${owner}" = "x${USER}" ]; then
-    cp -r ./data/prometheus ${cluster_dir}/data/
+  if [ "${owner}" = "${USER}" ]; then
+    cp -r ./data/prometheus "${cluster_dir}/data/"
   else
     echo "current user ${USER} is not owner of data/prometheus/"
     exit 1
@@ -152,12 +156,12 @@ if test -d ./data/prometheus; then
 fi
 
 # Add the base network on which EL + CL + MEV-boost + Grafana run.
-sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml~
-mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
+sed "s|  dvnode:|  dvnode:\n  shared-node:\n      external:\n         name: charon-distributed-validator-node_dvnode|" "${cluster_dir}/docker-compose.yml" >"${cluster_dir}/docker-compose.yml~"
+mv "${cluster_dir}/docker-compose.yml~" "${cluster_dir}/docker-compose.yml"
 
 # Include the base network in the cluster-specific services' network config.
-sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" ${cluster_dir}/docker-compose.yml >${cluster_dir}/docker-compose.yml~
-mv ${cluster_dir}/docker-compose.yml~ ${cluster_dir}/docker-compose.yml
+sed "s|    networks: \[dvnode\]|    networks: [dvnode,shared-node]|" "${cluster_dir}/docker-compose.yml" >"${cluster_dir}/docker-compose.yml~"
+mv "${cluster_dir}/docker-compose.yml~" "${cluster_dir}/docker-compose.yml"
 
 if ! docker info >/dev/null 2>&1; then
   echo "Docker daemon is not running, please start Docker first."
@@ -172,11 +176,11 @@ if [[ $(docker compose ps -aq) ]]; then
   # Start the base containers in the root directory.
   docker compose --profile base up -d
   # Start the cluster-specific containers in cluster-specific directory (i.e.: charon, VC).
-  docker compose --profile cluster -f ${cluster_dir}/docker-compose.yml up -d
+  docker compose --profile cluster -f "${cluster_dir}/docker-compose.yml" up -d
 fi
 
 migrated_readme() {
-  cat >$1 <<EOL
+  cat >"$1" <<EOL
 THIS DIRECTORY HAS BEEN MIGRATED TO $2.
 YOU SHOULD REFER TO CONFIGURATIONS AND DATA IN $2.
 EOL
