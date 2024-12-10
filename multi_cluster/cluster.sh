@@ -117,12 +117,12 @@ add() {
     # Check if TCP port is free, if it is, is_occupied is set to empty, otherwise increment the port by 1 and continue the loop.
     if [ -z ${skip_port_free_check} ]; then
       if [ -x "$(command -v netstat)" ]; then
-        if is_occupied=$(netstat -taln | grep "$port"); then
+        if is_occupied=$(netstat -taln | grep -w "$port"); then
           port=$((port + 1))
           continue
         fi
       elif [ -x "$(command -v ss)" ]; then
-        if is_occupied=$(ss -taln | grep "$port"); then
+        if is_occupied=$(ss -taln | grep -w "$port"); then
           port=$((port + 1))
           continue
         fi
