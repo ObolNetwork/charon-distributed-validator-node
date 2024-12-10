@@ -229,12 +229,12 @@ add() {
   cluster_dir="./clusters/${cluster_name}"
 
   # Copy .env from root dir to cluster's dir (if it exists).
-  if test ./.env; then
+  if test -f ./.env; then
     cp .env "${cluster_dir}/"
   fi
 
   # Copy docker-compose.yml from root dir to cluster's dir (if it exists).
-  if test ./docker-compose.yml; then
+  if test -f ./docker-compose.yml; then
     cp ./docker-compose.yml "$cluster_dir"/
   fi
 

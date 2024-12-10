@@ -69,7 +69,7 @@ if test -d ./.charon; then
 fi
 
 # Copy .env file to clusters directory (if it exists).
-if test ./.env; then
+if test -f ./.env; then
   owner="$(ls -ld ".env" | awk '{print $3}')"
   if [ "${owner}" = "${USER}" ]; then
     cp .env "$cluster_dir"/
@@ -80,7 +80,7 @@ if test ./.env; then
 fi
 
 # Copy docker-compose.yml to clusters directory (if it exists).
-if test ./docker-compose.yml; then
+if test -f ./docker-compose.yml; then
   owner="$(ls -ld "docker-compose.yml" | awk '{print $3}')"
   if [ "${owner}" = "${USER}" ]; then
     cp ./docker-compose.yml "$cluster_dir"/
