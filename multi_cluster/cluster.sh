@@ -84,7 +84,7 @@ check_missing_cluster_name() {
 # Check if ./clusters directory exists.
 check_clusters_dir_does_not_exist() {
   if test ! -d ./clusters; then
-    echo "./clsuters directory does not exist. Run setup.sh first."
+    echo "./clusters directory does not exist. Run setup.sh first."
     exit 1
   fi
 }
@@ -92,7 +92,7 @@ check_clusters_dir_does_not_exist() {
 # Check if cluster with the specified cluster_name already exists.
 check_cluster_already_exists() {
   if test -d "./clusters/${cluster_name}"; then
-    echo "./clsuters/${cluster_name} directory already exists."
+    echo "./clusters/${cluster_name} directory already exists."
     exit 1
   fi
 }
@@ -100,7 +100,7 @@ check_cluster_already_exists() {
 # Check if cluster with the specified cluster_name does not exist.
 check_cluster_does_not_exist() {
   if test ! -d "./clusters/${cluster_name}"; then
-    echo "./clsuters/$cluster_name directory does not exist."
+    echo "./clusters/$cluster_name directory does not exist."
     exit 1
   fi
 }

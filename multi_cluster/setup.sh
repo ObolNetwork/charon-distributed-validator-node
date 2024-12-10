@@ -41,7 +41,7 @@ cluster_dir=./clusters/${cluster_name}
 
 # Check if clusters directory already exists.
 if test -d ./clusters; then
-  echo "./clsuters directory already exists. Cannot setup already set multi cluster CDVN."
+  echo "./clusters directory already exists. Cannot setup already set multi cluster CDVN."
   exit 1
 fi
 
