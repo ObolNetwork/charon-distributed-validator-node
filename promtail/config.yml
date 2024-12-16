@@ -1,0 +1,41 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: $CHARON_LOKI_ADDRESSES
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        replacement: '$1'
+        target_label: 'container'
+      - source_labels: ['container']
+        regex: '.*charon.*'
+        replacement: 'lido-charon'
+        target_label: 'job'
+      - source_labels: ['container']
+        regex: '.*nethermind.*'
+        replacement: 'lido-nethermind'
+        target_label: 'job'
+      - source_labels: ['container']
+        regex: '.*lodestar.*'
+        replacement: 'lido-lodestar'
+        target_label: 'job'
+      - source_labels: ['container']
+        regex: '.*lighthouse.*'
+        replacement: 'lido-lighthouse'
+        target_label: 'job'
+      - target_label: 'cluster_name'
+        replacement: $CLUSTER_NAME
+      - target_label: 'cluster_peer'
+        replacement: $CLUSTER_PEER
+    pipeline_stages:
+      - docker: {}

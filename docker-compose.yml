@@ -183,6 +183,15 @@ services:
       - ./data/loki:/opt/loki
     restart: unless-stopped
 
+  promtail:
+    image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail/config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: [dvnode]
+    restart: unless-stopped
+
   #             _ _     _       _                        _           _
   # __   ____ _| (_) __| | __ _| |_ ___  _ __       ___ (_) ___  ___| |_ ___  _ __
   # \ \ / / _` | | |/ _` |/ _` | __/ _ \| '__|____ / _ \| |/ _ \/ __| __/ _ \| '__|
