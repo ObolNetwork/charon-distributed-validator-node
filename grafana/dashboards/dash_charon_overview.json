@@ -3098,12 +3098,154 @@
       "type": "table"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "A two dimensional view of 90th percentile latencies between peers that report to us and their cluster operators.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "color-background"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "dark-green",
+                "value": 0
+              },
+              {
+                "color": "semi-dark-green",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 50
+              },
+              {
+                "color": "light-green",
+                "value": 80
+              },
+              {
+                "color": "super-light-green",
+                "value": 90
+              },
+              {
+                "color": "super-light-yellow",
+                "value": 100
+              },
+              {
+                "color": "yellow",
+                "value": 125
+              },
+              {
+                "color": "#f2ae13",
+                "value": 150
+              },
+              {
+                "color": "orange",
+                "value": 240
+              },
+              {
+                "color": "dark-orange",
+                "value": 275
+              },
+              {
+                "color": "dark-red",
+                "value": 300
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 7,
+        "x": 0,
+        "y": 36
+      },
+      "id": 246,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.90, sum(rate(p2p_ping_latency_secs_bucket{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\"}[5m])) by (le, cluster_peer, peer)) * 1000",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Peer latencies 2D",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "cluster_peer",
+            "rowField": "peer",
+            "valueField": "Value"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "peer\\cluster_peer"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 42
       },
       "id": 178,
       "panels": [],
@@ -3152,7 +3294,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 37
+        "y": 43
       },
       "id": 92,
       "options": {
@@ -3228,7 +3370,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 37
+        "y": 43
       },
       "id": 81,
       "options": {
@@ -3308,7 +3450,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 43
+        "y": 49
       },
       "id": 91,
       "options": {
@@ -3384,7 +3526,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 43
+        "y": 49
       },
       "id": 185,
       "options": {
@@ -3483,7 +3625,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 49
+        "y": 55
       },
       "id": 180,
       "options": {
@@ -3557,7 +3699,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 49
+        "y": 55
       },
       "id": 186,
       "options": {
@@ -3656,7 +3798,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 55
+        "y": 61
       },
       "id": 222,
       "options": {
@@ -3792,7 +3934,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 61
+        "y": 67
       },
       "id": 242,
       "options": {
@@ -3892,7 +4034,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 67
+        "y": 73
       },
       "id": 203,
       "options": {
@@ -3999,7 +4141,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 73
+        "y": 79
       },
       "id": 184,
       "options": {
@@ -4117,7 +4259,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 79
+        "y": 85
       },
       "id": 218,
       "options": {
@@ -4221,7 +4363,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 85
+        "y": 91
       },
       "id": 208,
       "options": {
@@ -4324,7 +4466,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 91
+        "y": 97
       },
       "id": 182,
       "options": {
@@ -4417,7 +4559,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 97
+        "y": 103
       },
       "id": 189,
       "options": {
@@ -4457,7 +4599,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 103
+        "y": 109
       },
       "id": 123,
       "panels": [
@@ -4523,7 +4665,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 50
+            "y": 58
           },
           "id": 127,
           "options": {
@@ -4629,7 +4771,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 50
+            "y": 58
           },
           "id": 129,
           "links": [],
@@ -4741,7 +4883,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 57
+            "y": 65
           },
           "id": 125,
           "options": {
@@ -4849,7 +4991,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 57
+            "y": 65
           },
           "id": 130,
           "links": [],
@@ -4896,7 +5038,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 104
+        "y": 110
       },
       "id": 141,
       "panels": [],
@@ -4937,7 +5079,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 105
+        "y": 111
       },
       "id": 191,
       "options": {
@@ -5046,7 +5188,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 107
+        "y": 113
       },
       "id": 142,
       "options": {
@@ -5141,7 +5283,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 107
+        "y": 113
       },
       "id": 138,
       "options": {
@@ -5257,7 +5399,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 114
+        "y": 120
       },
       "id": 144,
       "options": {
@@ -5359,7 +5501,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 114
+        "y": 120
       },
       "id": 145,
       "options": {
@@ -5459,7 +5601,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 121
+        "y": 127
       },
       "id": 147,
       "options": {
@@ -5497,7 +5639,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 128
+        "y": 134
       },
       "id": 132,
       "panels": [
@@ -5562,7 +5704,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 137
+            "y": 145
           },
           "id": 136,
           "options": {
@@ -5656,7 +5798,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 137
+            "y": 145
           },
           "id": 143,
           "options": {
@@ -5747,7 +5889,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 144
+            "y": 152
           },
           "id": 139,
           "options": {
@@ -5790,7 +5932,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 129
+        "y": 135
       },
       "id": 149,
       "panels": [],
@@ -5837,7 +5979,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 130
+        "y": 136
       },
       "id": 195,
       "options": {
@@ -5944,7 +6086,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 130
+        "y": 136
       },
       "id": 25,
       "options": {
@@ -6009,7 +6151,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 136
+        "y": 142
       },
       "id": 166,
       "options": {
@@ -6068,7 +6210,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 136
+        "y": 142
       },
       "id": 160,
       "options": {
@@ -6190,7 +6332,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 142
+        "y": 148
       },
       "id": 158,
       "options": {
@@ -6286,7 +6428,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 142
+        "y": 148
       },
       "id": 163,
       "options": {
@@ -6393,7 +6535,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 148
+        "y": 154
       },
       "id": 151,
       "options": {
@@ -6500,7 +6642,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 148
+        "y": 154
       },
       "id": 153,
       "options": {
@@ -6563,7 +6705,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 154
+        "y": 160
       },
       "id": 156,
       "options": {
@@ -6673,7 +6815,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 154
+        "y": 160
       },
       "id": 154,
       "options": {
@@ -6768,7 +6910,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 160
+        "y": 166
       },
       "id": 226,
       "options": {
@@ -7173,6 +7315,6 @@
   "timezone": "",
   "title": "Charon Overview",
   "uid": "d6qujIJVk",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }
