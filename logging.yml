@@ -1,13 +1,4 @@
 services:
-  loki:
-    image: grafana/loki:${LOKI_VERSION:-2.8.2}
-    user: ":"
-    networks: [dvnode]
-    command: -config.file=/etc/loki/loki.yml
-    volumes:
-      - ./loki/loki.yml:/etc/loki/loki.yml
-      - ./data/loki:/opt/loki
-    restart: unless-stopped
 
   promtail:
     image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
@@ -17,7 +8,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks: [dvnode]
     restart: unless-stopped
-
 
 networks:
   dvnode:

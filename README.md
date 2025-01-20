@@ -44,7 +44,7 @@ Finally, to run the cluster run one of the following commands.
 # To start the minimum amount of services
 docker compose up -d
 
-# To also start logging containers which will allow the Obol Core team to help identify cluster issues
+# To also start a promtail container which will stream logs to the Obol Core team to help identify cluster issues
 docker compose -f docker-compose.yml -f logging.yml up -d
 ```
 
