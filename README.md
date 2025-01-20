@@ -38,6 +38,16 @@ To configure this repo for a particular network, follow these instructions. If y
 
 You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo. 
 
+Finally, to run the cluster run one of the following commands.
+
+```sh
+# To start the minimum amount of services
+docker compose up -d
+
+# To also start logging containers which will allow the Obol Core team to help identify cluster issues
+docker compose -f docker-compose.yml -f logging.yml up -d
+```
+
 # FAQs
 
 Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/faq/errors).

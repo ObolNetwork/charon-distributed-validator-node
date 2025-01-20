@@ -1,5 +1,3 @@
-version: "3.8"
-
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
 # ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
@@ -173,24 +171,7 @@ services:
       - ./data/grafana:/var/lib/grafana
     restart: unless-stopped
 
-  loki:
-    image: grafana/loki:${LOKI_VERSION:-2.8.2}
-    user: ":"
-    networks: [dvnode]
-    command: -config.file=/etc/loki/loki.yml
-    volumes:
-      - ./loki/loki.yml:/etc/loki/loki.yml
-      - ./data/loki:/opt/loki
-    restart: unless-stopped
 
-  promtail:
-    image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
-    command: -config.file=/etc/promtail/config.yml
-    volumes:
-      - ./promtail/config.yml:/etc/promtail/config.yml
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks: [dvnode]
-    restart: unless-stopped
 
   #             _ _     _       _                        _           _
   # __   ____ _| (_) __| | __ _| |_ ___  _ __       ___ (_) ___  ___| |_ ___  _ __
