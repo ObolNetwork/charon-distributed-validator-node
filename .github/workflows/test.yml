@@ -10,5 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - run: docker-compose up --no-start
-    - run: docker-compose -f docker-compose.yml -f compose-debug.yml up --no-start
+    - run: docker compose up --no-start
+    - run: docker compose -f docker-compose.yml -f compose-debug.yml -f logging.yml up --no-start
