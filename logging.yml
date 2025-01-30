@@ -2,11 +2,14 @@ services:
 
   promtail:
     image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
+    environment:
+      CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
     command: -config.file=/etc/promtail/config.yml
     volumes:
-      - ./promtail/config.yml:/etc/promtail/config.yml
+      - ./promtail:/etc/promtail
       - /var/run/docker.sock:/var/run/docker.sock
     networks: [dvnode]
+    entrypoint: /etc/promtail/run.sh
     restart: unless-stopped
 
 networks:
