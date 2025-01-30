@@ -152,9 +152,12 @@ services:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.46.0}
     user: ":"
     networks: [dvnode]
+    environment:
+      PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN:-"obol-monitoring-token-needed"}
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
+    entrypoint: /etc/prometheus/run.sh
     restart: unless-stopped
 
   grafana:
