@@ -156,7 +156,6 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
-    entrypoint: /etc/prometheus/run.sh
     restart: unless-stopped
 
   grafana:
