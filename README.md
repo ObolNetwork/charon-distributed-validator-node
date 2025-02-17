@@ -43,3 +43,85 @@ docker compose -f examples/nethermind_teku_lighthouse.yml up
 # FAQs
 
 Check the Obol docs for frequent [errors and resolutions](https://docs.obol.tech/docs/faq/errors)
+
+<!-- TODO: move this guide to the docs -->
+# Multi cluster setup
+
+There is an option to run multiple Charon clusters using the same Execution Layer Client (EL), Consensus Layer Client (CL) and Grafana. This way you can operate multiple clusters for different purposes, without putting much more pressure on your system.
+
+The way this is achieved is by separating the EL, CL and Grafana from the Charon node, Validator Client (VC) and Prometheus. Instead of having `.charon/` folder in the root directory it is moved to `clusters/{CLUSTER_NAME}/.charon`. Moreover, the VC and Prometheus data is now per cluster as well, moved from `data/lodestar` and `data/prometheus` to `clusters/{CLUSTER_NAME}/data/lodestar` and `clusters/{CLUSTER_NAME}/data/prometheus`, respectively. `docker-compose.yml` and `.env` are also used per cluster. There are also supporting scripts for the Charon node and the VC.
+
+## Setup
+
+If you already have running validator node in Docker, the Docker containers will be moved to the new multi cluster setup.
+
+```bash
+./multi_cluster/setup.sh {CLUSTER_NAME}
+```
+
+You can inspect what you have in the `./clusters/` directory. Each subfolder is a cluster with the following structure:
+
+```directory
+clusters
+└───{CLUSTER_NAME}     # cluster name
+│   │   .charon             # folder including secret material used by charon
+│   │   data                # data from the validator client and prometheus
+│   │   lodestar            # scripts used by lodestar
+│   │   prometheus          # scripts and configs used by prometheus
+│   │   .env                # environment variables used by the cluster
+│   │   docker-compose.yml  # docker compose used by the cluster
+│                           # N.B.: only services with profile "cluster" are ran
+└───{CLUSTER_NAME_2}
+└───{CLUSTER_NAME_...}
+└───{CLUSTER_NAME_N}
+```
+
+Note that those folders and files are copied from the root directory. Meaning all configurations and setup you have already done, will be copied to this first cluster of the multi cluster setup.
+
+## Manage cluster
+
+Manage the Charon + Validator Client + Prometheus containers of each cluster found in `./clusters/`.
+
+### Add cluster
+
+```bash
+./multi_cluster/cluster.sh add {CLUSTER_NAME}
+```
+
+Note that only the `.env`, `lodestar/`, `prometheus/` and `docker-compose.yml` files and directories are coiped from the root directory to the new cluster. `.charon/` and `data/` folders are expected to be from a brand new cluster that you will setup in the `./clusters/{CLUSTER_NAME}` directory.
+
+### Start cluster
+
+It is expected that you have already done the regular procedure from cluster setup and you have `./clusters/{CLUSTER_NAME}/.charon/` folder.
+
+```bash
+./multi_cluster/cluster.sh start {CLUSTER_NAME}
+```
+
+### Stop cluster
+
+```bash
+./multi_cluster/cluster.sh stop {CLUSTER_NAME}
+```
+
+### Delete cluster
+
+```bash
+./multi_cluster/cluster.sh delete {CLUSTER_NAME}
+```
+
+## Manage base node
+
+Manage the EL + CL + Grafana containers.
+
+### Start base node
+
+```bash
+./multi_cluster/base.sh start
+```
+
+### Stop base node
+
+```bash
+./multi_cluster/base.sh stop
+```
