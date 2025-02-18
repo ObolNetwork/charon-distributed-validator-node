@@ -93,6 +93,7 @@ services:
       - CHARON_FEATURE_SET_ENABLE=${CHARON_FEATURE_SET_ENABLE:-}
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
+      - CHARON_NICKNAME=${CHARON_NICKNAME:-}
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
