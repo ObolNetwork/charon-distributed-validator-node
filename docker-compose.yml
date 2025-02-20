@@ -16,6 +16,8 @@ services:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/udp # P2P UDP
       - ${NETHERMIND_IP_HTTP:-127.0.0.1}:${NETHERMIND_PORT_HTTP:-8545}:8545 # JSON-RPC
       - ${NETHERMIND_IP_ENGINE:-127.0.0.1}:${NETHERMIND_PORT_ENGINE:-8551}:8551 # ENGINE-API
+    labels:
+      - "promtail-monitored=${NETHERMIND_PROMTAIL_MONITORED:-true}"
     command: |
       --config=${NETWORK}
       --datadir=data
@@ -48,6 +50,8 @@ services:
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
+    labels:
+      - "promtail-monitored=${LIGHTHOUSE_PROMTAIL_MONITORED:-true}"      
     command: |
       lighthouse bn
       --network=${NETWORK}
@@ -98,6 +102,8 @@ services:
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     networks: [dvnode]
+    labels:
+      - "promtail-monitored=${CHARON_PROMTAIL_MONITORED:-true}"
     volumes:
       - .charon:/opt/charon/.charon
     restart: unless-stopped
@@ -120,6 +126,8 @@ services:
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${BUILDER_SELECTION:-builderalways}
+    labels:
+      - "promtail-monitored=${LODESTAR_PROMTAIL_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
@@ -139,6 +147,8 @@ services:
       -addr=0.0.0.0:18550
       -relay-check
       -relays=${MEVBOOST_RELAYS}
+    labels:
+      - "promtail-monitored=${MEV_BOOST_PROMTAIL_MONITORED:-true}"      
     networks: [dvnode]
     restart: unless-stopped
 
@@ -195,6 +205,8 @@ services:
     networks: [dvnode]
     volumes:
       - ./validator-ejector:/exitmessages
+    labels:
+      - "promtail-monitored=${EJECTOR_PROMTAIL_MONITORED:-true}"      
     restart: unless-stopped
     environment:
       - EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://nethermind:8545}
@@ -222,6 +234,8 @@ services:
     volumes:
       - ./validator-ejector:/exitmessages
       - .charon:/charon
+    labels:
+      - "promtail-monitored=${DV_EXIT_PROMTAIL_MONITORED:-true}"      
     environment:
       - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://lighthouse:5052}
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
