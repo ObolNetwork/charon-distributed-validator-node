@@ -21,23 +21,30 @@ Check the Obol [docs](https://docs.obol.tech/docs/start/quickstart_overview) for
 
 A default example configuration of a full validator node is found in the root `docker-compose.yml` file.
 
-The `examples/` directory is under development, you will find a collection of docker compose configuration files that demonstrate various clients and their configurations for running a Distributed Validator Node. These files are with filenames as {EC}-{CC}-{VC}.yml (where EC: Execution Client, CC: Consensus Client, VC: Validator Client). For example, if you wish to run a DV node with Geth EL, Teku CL and Lighthouse VC, you can run `geth_teku_lighthouse.yml`.
+To customize your node configuration, you can create a `docker-compose.override.yml` file. A sample override file is provided as `docker-compose.override.yml.sample` which you can use as a starting point. This allows you to override default settings and choose different client combinations without modifying the base configuration.
 
 ⚠️⚠️⚠️ **Important:**
 The configurations provided are meant for demonstration purposes only and may not be suitable for production environments.
-These examples are primarily intended for advanced users who are familiar with Docker and have a good understanding of execution and consensus clients.
 Please exercise caution when using them and ensure that you thoroughly review and customize the configurations according to your specific requirements.
 
-To run the default example, use the following command:
+To run the default configuration, use the following command:
 
 ```sh
 docker compose up
 ```
 
-To run any of the other examples, found in `examples/` use the following command:
+To use a custom configuration with an override file:
 
+1. Copy the sample override file:
 ```sh
-docker compose -f examples/nethermind_teku_lighthouse.yml up
+cp docker-compose.override.yml.sample docker-compose.override.yml
+```
+
+2. Edit the `docker-compose.override.yml` file to suit your needs
+
+3. Run docker compose (it will automatically use both files):
+```sh
+docker compose up
 ```
 
 # FAQs
