@@ -46,12 +46,12 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0-beta.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0-beta.1}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
     labels:
-      - "promtail-monitored=${LIGHTHOUSE_PROMTAIL_MONITORED:-true}"      
+      - "promtail-monitored=${LIGHTHOUSE_PROMTAIL_MONITORED:-true}"
     command: |
       lighthouse bn
       --network=${NETWORK}
@@ -148,7 +148,7 @@ services:
       -relay-check
       -relays=${MEVBOOST_RELAYS}
     labels:
-      - "promtail-monitored=${MEV_BOOST_PROMTAIL_MONITORED:-true}"      
+      - "promtail-monitored=${MEV_BOOST_PROMTAIL_MONITORED:-true}"
     networks: [dvnode]
     restart: unless-stopped
 
@@ -206,7 +206,7 @@ services:
     volumes:
       - ./validator-ejector:/exitmessages
     labels:
-      - "promtail-monitored=${EJECTOR_PROMTAIL_MONITORED:-true}"      
+      - "promtail-monitored=${EJECTOR_PROMTAIL_MONITORED:-true}"
     restart: unless-stopped
     environment:
       - EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://nethermind:8545}
@@ -235,7 +235,7 @@ services:
       - ./validator-ejector:/exitmessages
       - .charon:/charon
     labels:
-      - "promtail-monitored=${DV_EXIT_PROMTAIL_MONITORED:-true}"      
+      - "promtail-monitored=${DV_EXIT_PROMTAIL_MONITORED:-true}"
     environment:
       - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://lighthouse:5052}
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
