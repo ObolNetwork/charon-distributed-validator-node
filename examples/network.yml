@@ -1,0 +1,6 @@
+# include this file to link various other services together such as your validator client, charon, your eth1 and eth2 clients, prometheus, and grafana
+# if you are using a RocketPool reverse-hybrid configuration include rocketpool_net.yml instead of this file
+
+networks:
+  default:
+    name: dvnode
