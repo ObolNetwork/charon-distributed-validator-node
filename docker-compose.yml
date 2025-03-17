@@ -9,7 +9,7 @@ services:
   # | | | |  __/ |_| | | |  __/ |  | | | | | | | | | | (_| |
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.31.1}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.31.5}
     restart: unless-stopped
     ports:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -46,7 +46,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0-beta.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0-beta.3}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
@@ -82,7 +82,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-77b153e}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.3.0-rc3}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
@@ -117,7 +117,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.27.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.28.0-rc.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
