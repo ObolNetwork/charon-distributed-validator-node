@@ -31,6 +31,9 @@ To configure this repo for a particular network, follow these instructions. If y
 
     # holesky
     cp .env.sample.holesky .env
+
+    # hoodi
+    cp .env.sample.hoodi .env
     ```
 2. Grab your operator ID from the lido [mainnet dashboard](https://operators.lido.fi/) or [testnet dashboard](https://operators-holesky.testnet.fi/).
 3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID.
