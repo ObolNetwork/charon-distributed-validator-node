@@ -117,7 +117,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.28.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.28.1-rc.1}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
