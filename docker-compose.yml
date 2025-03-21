@@ -148,7 +148,7 @@ services:
   # |_| |_| |_|\___/|_| |_|_|\__\___/|_|  |_|_| |_|\__, |
   #                                                |___/
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.50.1}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.2.1}
     user: ":"
     networks: [dvnode]
     environment:
@@ -161,7 +161,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-10.4.2}
+    image: grafana/grafana:${GRAFANA_VERSION:-11.5.2}
     user: ":"
     ports:
       - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
