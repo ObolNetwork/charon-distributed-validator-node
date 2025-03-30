@@ -7,11 +7,13 @@ fi
 
 if [ -z "$PROM_REMOTE_WRITE_TOKEN" ]
 then
-  echo "\$PROM_REMOTE_WRITE_TOKEN variable is empty"
+  echo "\$PROM_REMOTE_WRITE_TOKEN variable is empty" >&2
+  exit 1
 fi
 
-# eval is used instead of envsubst, as prometheus user doesn't have permissions to install envsubst
-eval "echo \"$(cat /etc/prometheus/prometheus.yml.example)\"" > /etc/prometheus/prometheus.yml
+
+sed "s|\$PROM_REMOTE_WRITE_TOKEN|${PROM_REMOTE_WRITE_TOKEN}|g" \
+    /etc/prometheus/prometheus.yml.example > /etc/prometheus/prometheus.yml
 
 /bin/prometheus \
   --config.file=/etc/prometheus/prometheus.yml
