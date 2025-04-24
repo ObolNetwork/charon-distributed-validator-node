@@ -153,7 +153,7 @@ services:
     user: ":"
     networks: [dvnode]
     environment:
-      PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN:-"obol-monitoring-token-needed"}
+      PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN}
       SERVICE_OWNER: ${SERVICE_OWNER:-"obol-cdvn"}
     volumes:
       - ./prometheus:/etc/prometheus
