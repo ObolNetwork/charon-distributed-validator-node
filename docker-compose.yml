@@ -47,6 +47,7 @@ services:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
+      - 5054:5054/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
     command: |
       lighthouse bn
@@ -64,6 +65,7 @@ services:
       --metrics-address=0.0.0.0
       --metrics-port=5054
       --metrics-allow-origin="*"
+      --state-cache-size=128
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
