@@ -69,6 +69,7 @@ services:
       --metrics-port=5054
       --metrics-allow-origin="*"
       --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
+      --state-cache-size=128
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
