@@ -23,18 +23,14 @@ services:
   node-exporter:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
 
-  jaeger:
-    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.46.0}
-    ports:
-      - ${MONITORING_PORT_JAEGER:-16686}:16686
-    environment:
-      - SPAN_STORAGE_TYPE=badger
-      - BADGER_EPHEMERAL=false
-      - BADGER_DIRECTORY_VALUE=/badger/data
-      - BADGER_DIRECTORY_KEY=/badger/key
-      - BADGER_SPAN_STORE_TTL=72h
+  tempo:
+    image: grafana/tempo:${TEMPO_VERSION:-2.7.1}
+    user: ":"
+    command: -config.file=/etc/tempo/tempo.yaml
     volumes:
-      - ./data/jaeger:/badger
+      - ./tempo:/etc/tempo
+      - ./data/tempo:/opt/tempo
+    restart: unless-stopped
 
   loki:
     image: grafana/loki:${LOKI_VERSION:-2.8.2}
@@ -47,8 +43,8 @@ services:
 
   charon:
     environment:
-      - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
-      - CHARON_JAEGER_SERVICE=charon
+      - CHARON_OTLP_ADDRESS=tempo:4317
+      - CHARON_OTLP_SERVICE_NAME=charon
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
 
