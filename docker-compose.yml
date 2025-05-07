@@ -46,7 +46,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.1}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
@@ -69,7 +69,6 @@ services:
       --metrics-port=5054
       --metrics-allow-origin="*"
       --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
-      --state-cache-size=128
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
@@ -83,7 +82,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.3.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.3.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_BEACON_NODE_HEADERS=${CHARON_BEACON_NODE_HEADERS:-}
