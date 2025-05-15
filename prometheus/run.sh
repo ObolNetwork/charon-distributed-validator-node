@@ -2,7 +2,8 @@
 
 if [ -z "$SERVICE_OWNER" ]
 then
-  echo "\$SERVICE_OWNER variable is empty"
+  echo "\$SERVICE_OWNER variable is empty" >&2
+  exit 1
 fi
 
 if [ -z "$PROM_REMOTE_WRITE_TOKEN" ]
@@ -11,8 +12,8 @@ then
   exit 1
 fi
 
-
-sed "s|\$PROM_REMOTE_WRITE_TOKEN|${PROM_REMOTE_WRITE_TOKEN}|g" \
+sed -e "s|\$PROM_REMOTE_WRITE_TOKEN|${PROM_REMOTE_WRITE_TOKEN}|g" \
+    -e "s|\$SERVICE_OWNER|${SERVICE_OWNER}|g" \
     /etc/prometheus/prometheus.yml.example > /etc/prometheus/prometheus.yml
 
 /bin/prometheus \
