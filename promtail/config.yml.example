@@ -37,6 +37,10 @@ scrape_configs:
         regex: '.*lighthouse.*'
         replacement: 'lido-lighthouse'
         target_label: 'job'
+      - source_labels: ['container']
+        regex: '.*mev-boost.*'
+        replacement: 'lido-mev-boost'
+        target_label: 'job'
       - target_label: 'cluster_name'
         replacement: $CLUSTER_NAME
       - target_label: 'cluster_peer'
