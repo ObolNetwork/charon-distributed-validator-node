@@ -144,11 +144,10 @@ services:
   #
   commit-boost:
     image: ghcr.io/commit-boost/pbs:${COMMITBOOST_VERSION:-v0.7.0}
-    command: 
-      [
-        "--listen-address=0.0.0.0:18550",
-        "--builder=https://boost.commitboost.xyz"
-      ]
+    environment:
+      - CB_CONFIG=/etc/commit-boost/config.toml
+    volumes:
+      - ./commit-boost/config.toml:/etc/commit-boost/config.toml:ro
     labels:
       - "promtail-monitored=${COMMIT_BOOST_PROMTAIL_MONITORED:-true}"
     networks: [dvnode]

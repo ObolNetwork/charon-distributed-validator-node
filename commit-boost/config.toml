@@ -1,0 +1,8 @@
+chain = "Mainnet"
+
+[pbs]
+port = 18550
+
+[[relays]]
+id = "titan"
+url = "https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@titanrelay.xyz"
