@@ -143,7 +143,7 @@ services:
   #  \___\___/|_| |_| |_|_| |_| |_|_|\__|    |_.__/ \___/ \___/|___/\__|
   #
   commit-boost:
-    image: ghcr.io/commit-boost/pbs:${COMMITBOOST_VERSION:-v0.7.0}
+    image: ghcr.io/commit-boost/pbs:${COMMITBOOST_VERSION:-v0.8.0-rc.2}
     environment:
       - CB_CONFIG=/etc/commit-boost/config.toml
     volumes:

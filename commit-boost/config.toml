@@ -2,6 +2,11 @@ chain = "Mainnet"
 
 [pbs]
 port = 18550
+host = "0.0.0.0"
+
+[metrics]
+enabled = true
+host = "0.0.0.0"
 
 [[relays]]
 id = "titan"

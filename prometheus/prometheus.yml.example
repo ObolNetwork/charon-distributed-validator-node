@@ -26,6 +26,9 @@ scrape_configs:
   - job_name: "lodestar"
     static_configs:
       - targets: ["lodestar:5064"]
+  - job_name: "commit-boost"
+    static_configs:
+      - targets: ["commit-boost:10000"]
   # Debug
   - job_name: "node-exporter"
     static_configs:
