@@ -1,0 +1,36 @@
+chain = "Hoodi"
+
+[pbs]
+port = 18550
+host = "0.0.0.0"
+#timeout_get_header_ms
+#timeout_get_payload_ms
+#timeout_register_validator_ms
+
+[metrics]
+enabled = true
+host = "0.0.0.0"
+
+[[relays]]
+id = "hoodi.aestus.live"
+url = "https://0x98f0ef62f00780cf8eb06701a7d22725b9437d4768bb19b363e882ae87129945ec206ec2dc16933f31d983f8225772b6@hoodi.aestus.live"
+
+[[relays]]
+id = "hoodi.titanrelay.xyz"
+url = "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@hoodi.titanrelay.xyz"
+
+[[relays]]
+id = "relay-hoodi.ultrasound.money"
+url = "https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-hoodi.ultrasound.money"
+
+[[relays]]
+id = "boost-relay-hoodi.flashbots.net"
+url = "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-hoodi.flashbots.net"
+
+[[relays]]
+id = "hoodi-builder-proxy-alpha.interstate.so"
+url = "https://0x9110847c15a7f5c80a9fdd5db989a614cc01104e53bd8c252b6f46a4842c7fdef6b9593336035b5094878deff386804c@hoodi-builder-proxy-alpha.interstate.so"
+
+[[relays]]
+id = "hoodi-relay.ethgas.com"
+url = "https://0xb20c3fe59db9c3655088839ef3d972878d182eb745afd8abb1dd2abf6c14f93cd5934ed4446a5fe1ba039e2bc0cf1011@hoodi-relay.ethgas.com"
