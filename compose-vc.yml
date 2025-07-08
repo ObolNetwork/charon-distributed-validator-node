@@ -1,0 +1,53 @@
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
+
+services:
+  #  _           _           _
+  # | | ___   __| | ___  ___| |_ __ _ _ __
+  # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
+  # | | (_) | (_| |  __/\__ \ || (_| | |
+  # |_|\___/ \__,_|\___||___/\__\__,_|_|
+
+  vc-lodestar:
+    profiles: [vc-lodestar]
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.31.0}
+    depends_on: [charon]
+    entrypoint: /opt/lodestar/run.sh
+    networks: [dvnode]
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+      BUILDER_SELECTION: ${VC_LODESTAR_BUILDER_SELECTION:-builderalways}
+    labels:
+      - "promtail-monitored=${VC_LODESTAR_PROMTAIL_MONITORED:-true}"
+    volumes:
+      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - .charon/validator_keys:/home/charon/validator_keys
+      - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
+    restart: unless-stopped
+
+  #        _           _
+  #  _ __ (_)_ __ ___ | |__  _   _ ___
+  # | '_ \| | '_ ` _ \| '_ \| | | / __|
+  # | | | | | | | | | | |_) | |_| \__ \
+  # |_| |_|_|_| |_| |_|_.__/ \__,_|___/
+
+  vc-nimbus:
+    profiles: [vc-nimbus]
+    build:
+      context: nimbus
+      args:
+        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v25.6.0}
+    depends_on: [charon]
+    networks: [dvnode]
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+    labels:
+      - "promtail-monitored=${VC_NIMBUS_PROMTAIL_MONITORED:-true}"
+    volumes:
+      - ./nimbus/run.sh:/home/user/data/run.sh
+      - .charon/validator_keys:/home/validator_keys
+      - ./data/vc-nimbus:/home/user/data
+    restart: unless-stopped

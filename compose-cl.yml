@@ -1,0 +1,73 @@
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
+
+services:
+  #                            _ _
+  #   __ _ _ __ __ _ _ __   __| (_)_ __   ___
+  #  / _` | '__/ _` | '_ \ / _` | | '_ \ / _ \
+  # | (_| | | | (_| | | | | (_| | | | | |  __/
+  #  \__, |_|  \__,_|_| |_|\__,_|_|_| |_|\___|
+  #  |___/
+
+  cl-grandine:
+    profiles: [cl-grandine]
+    image: sifrai/grandine:${GRANDINE_VERSION:-1.1.1}
+    restart: unless-stopped
+    labels:
+      - "promtail-monitored=${CL_GRANDINE_PROMTAIL_MONITORED:-true}"
+    command:
+      - --data-dir=/root/.grandine
+      - --eth1-rpc-urls=http://${EL}:8551
+      - --jwt-secret=/jwt/jwt.hex
+      - --http-address=0.0.0.0
+      - --http-port=5052
+      - --network=${NETWORK}
+      - --metrics
+      - --metrics-port=5054
+      - --metrics-address=0.0.0.0
+      - --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      - --builder-url=http://${MEV}:18550
+    ports:
+      - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
+    volumes:
+      - ./data/cl-grandine:/root/.grandine
+      - ./jwt:/jwt:ro
+    networks: [dvnode]
+
+  #  _ _       _     _   _
+  # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
+  # | | |/ _` | '_ \| __| '_ \ / _ \| | | / __|/ _ \
+  # | | | (_| | | | | |_| | | | (_) | |_| \__ \  __/
+  # |_|_|\__, |_| |_|\__|_| |_|\___/ \__,_|___/\___|
+  #      |___/
+
+  cl-lighthouse:
+    profiles: [cl-lighthouse]
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.1}
+    restart: unless-stopped
+    labels:
+      - "promtail-monitored=${CL_LIGHTHOUSE_PROMTAIL_MONITORED:-true}"
+    command: |
+      lighthouse bn
+      --network=${NETWORK}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      --checkpoint-sync-url-timeout=600
+      --execution-endpoint=http://${EL}:8551
+      --execution-jwt=/opt/jwt/jwt.hex
+      --datadir=/opt/app/beacon/
+      --builder=http://${MEV}:18550
+      --http
+      --http-address=0.0.0.0
+      --http-port=5052
+      --metrics
+      --metrics-address=0.0.0.0
+      --metrics-port=5054
+      --metrics-allow-origin="*"
+      --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
+    ports:
+      - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
+    volumes:
+      - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
+      - ./jwt:/opt/jwt
+    networks: [dvnode]
