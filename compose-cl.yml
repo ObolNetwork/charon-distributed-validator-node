@@ -28,6 +28,7 @@ services:
       - --metrics-address=0.0.0.0
       - --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
       - --builder-url=http://${MEV}:18550
+      - --max-empty-slots=4096
     ports:
       - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
     volumes:
