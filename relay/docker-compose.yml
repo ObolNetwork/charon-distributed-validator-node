@@ -1,14 +1,14 @@
 version: "3.8"
 
 services:
-#             _        _  _
-#   _ _  ___ | | __ _ | || |
-#  | '_|/ -_)| |/ _` | \_. |
-#  |_|  \___||_|\__/_| |__/
-#
+  #             _        _  _
+  #   _ _  ___ | | __ _ | || |
+  #  | '_|/ -_)| |/ _` | \_. |
+  #  |_|  \___||_|\__/_| |__/
+  #
   relay:
     # Pegged charon version (update this for each release).
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.0.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.5.2}
     environment:
       CHARON_P2P_TCP_ADDRESS: 0.0.0.0:3610
       CHARON_HTTP_ADDRESS: 0.0.0.0:3640
