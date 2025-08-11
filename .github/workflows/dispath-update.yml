@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extract tag name
         run: echo "TAG_NAME=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV

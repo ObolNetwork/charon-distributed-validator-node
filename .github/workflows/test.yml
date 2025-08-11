@@ -9,6 +9,6 @@ jobs:
     # Ensures default fresh checkout can create containers.
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - run: docker compose up --no-start
     - run: docker compose -f docker-compose.yml -f compose-debug.yml up --no-start
