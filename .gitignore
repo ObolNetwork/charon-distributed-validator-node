@@ -21,11 +21,3 @@ prometheus/prometheus.yml
 **/keystore-*.json
 **/keystore-*.txt
 **/charon-enr-private-key
-
-# Dependencies
-**/node_modules/
-
-# Local test files
-test-*.yaml
-demo-*.yaml
-*.log
