@@ -101,6 +101,7 @@ services:
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
       - CHARON_NICKNAME=${CHARON_NICKNAME:-}
+      - CHARON_EXECUTION_CLIENT_RPC_ENDPOINT=${CHARON_EXECUTION_CLIENT_RPC_ENDPOINT:-http://nethermind:8545}
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     labels:
