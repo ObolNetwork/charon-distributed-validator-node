@@ -12,3 +12,12 @@ data/
 .idea
 .charon
 prometheus/prometheus.yml
+
+# Cluster data and keys
+**/canary-*/
+**/node[0-9]*/
+**/cluster-lock.json
+**/validator_keys/
+**/keystore-*.json
+**/keystore-*.txt
+**/charon-enr-private-key
