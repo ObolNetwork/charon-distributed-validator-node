@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Pre-commit hook to prevent sensitive data leaks
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+echo "🔍 Checking for sensitive files..."
+
+# Critical patterns to block
+blocked_patterns=(
+    "canary-.*/"
+    "node[0-9]+/"
+    "cluster-lock\.json"
+    "validator_keys/"
+    "keystore-.*\.(json|txt)"
+    "charon-enr-private-key"
+    ".*private.*key"
+)
+
+found_issues=0
+for file in $(git diff --cached --name-only); do
+    for pattern in "${blocked_patterns[@]}"; do
+        if echo "$file" | grep -qE "$pattern"; then
+            echo -e "${RED}❌ BLOCKED: $file (matched: $pattern)${NC}"
+            found_issues=1
+        fi
+    done
+done
+
+if [ $found_issues -eq 0 ]; then
+    echo -e "${GREEN}✅ No sensitive files detected${NC}"
+else
+    echo -e "${RED}Remove sensitive files before committing!${NC}"
+    exit 1
+fi
