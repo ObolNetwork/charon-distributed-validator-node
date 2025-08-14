@@ -1,0 +1,63 @@
+version: "3.8"
+
+# Docker-compose file to aid developers in debugging. This is not required for "normal" users. See the "Docker power users" section of the README.md for more info.
+
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# See .env.sample "Debug Config" section
+
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.47.0}
+    command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
+    privileged: true
+    volumes:
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:ro'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+      - '/dev/disk/:/dev/disk:ro'
+    devices:
+      - '/dev/kmsg:/dev/kmsg'
+    restart: unless-stopped
+
+  node-exporter:
+    image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
+
+  jaeger:
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.46.0}
+    ports:
+      - ${MONITORING_PORT_JAEGER:-16686}:16686
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+      - BADGER_SPAN_STORE_TTL=72h
+    volumes:
+      - ./data/jaeger:/badger
+
+  loki:
+    image: grafana/loki:${LOKI_VERSION:-2.8.2}
+    user: ":"
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./data/loki:/opt/loki
+    restart: unless-stopped
+
+  charon:
+    environment:
+      - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
+      - CHARON_JAEGER_SERVICE=charon
+      - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
+      - CHARON_LOKI_SERVICE=charon
+
+  lido-dv-exit:
+    environment:
+      - LIDODVEXIT_LOG_LEVEL=debug
+      - LIDODVEXIT_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
+
+networks:
+  default:
+    name: ${CHARON_DOCKER_NETWORK:-lido-charon-distributed-validator-node_dvnode}
+    external: true
