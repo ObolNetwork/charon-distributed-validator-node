@@ -19,7 +19,7 @@ Check the Obol [docs](https://docs.obol.org/docs/start/quickstart_overview) for 
 
 # Adding Validators
 
-Starting with charon v1.6, you can add validators to your cluster using the `charon alpha add-validators` command. Note that this is an experimental feature and should not be used in production (Mainnet) yet. The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
+Starting with charon v1.6, you can add validators to your cluster using the `charon alpha add-validators` command. Note that this is an experimental feature and should not be used in production (Mainnet). The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
 
 1. Review the `add-validators` command [CLI reference](https://docs.obol.org/next/learn/charon/charon-cli-reference).
 2. Ensure this folder contains a valid `.charon` directory currently used by the running node. Keep the DV node running during the process.
@@ -29,12 +29,12 @@ Starting with charon v1.6, you can add validators to your cluster using the `cha
 # If you prefer running a pre-built charon binary
 charon alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --output-dir=output
 
-# Or, if you prefer running it dockerised
+# Or, if you prefer running it using Docker
 # (replace 'latest' with the most recent version if needed: https://hub.docker.com/r/obolnetwork/charon/tags)
 docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:latest alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --data-dir=/opt/charon/.charon --output-dir=/opt/charon/output
 ```
 
-This command will create a new cluster configuration that includes both existing and new validators. It will also generate the necessary keys for the new validators and deposit-data files. The new configuration will be saved in the `output` directory.
+This command will create a new cluster configuration that includes both existing and new validators. It will also generate the necessary keys for the new validators and deposit-data files. A new configuration will be saved in the `output` directory.
 
 4. To start using the new configuration (with the added validators), stop the current charon and validator client instances:
 
@@ -63,7 +63,7 @@ Steps 4–6 must be performed independently by all node operators, likely at dif
 
 - The new cluster configuration will not be reflected on the Launchpad.
 - The new cluster configuration will have a new cluster hash, so the observability stack will display new cluster data under a different identifier.
-- The `add-validators` command supports the KeyManager API (similar to the `dkg` command), but since it may not have direct access to the original private keys if they're not still in the `.charon` folder you are adding validators to, it cannot produce valid cluster lock signatures. In this case, you must use the `--unverified` flag, which means charon does not hash and sign the new cluster lock file with all the private keys to prove their existence. This requires adding the `--no-verify` flag or `CHARON_NO_VERIFY=true` environment variable to the `charon run` command/container.
+- The `add-validators` command supports the KeyManager API (similar to the `dkg` command). However, it may not have direct access to the original private keys if they're no longer in the `.charon` folder you are adding validators to. In this case, it cannot produce valid cluster lock signatures, so you must use the `--unverified` flag. This means charon does not hash and sign the new cluster lock file with all the private keys to prove their existence. As a result, you need to add the `--no-verify` flag or set the `CHARON_NO_VERIFY=true` environment variable to the `charon run` command/container.
 - If you use different validator clients, review the keys import script. The old keys in `.charon/validator_keys` remain unchanged, so verify that importing the same keys will not disrupt the validator client's state.
 
 # FAQs
