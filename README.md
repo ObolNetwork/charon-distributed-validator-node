@@ -56,9 +56,9 @@ Steps 4–6 must be performed independently by all node operators, likely at dif
 
 ## Current limitations:
 
-- The new cluster configuration will not be reflected in Launchpad.
+- The new cluster configuration will not be reflected on the Launchpad.
 - The new cluster configuration will have a new cluster hash, so the observability stack will display new cluster data under a different identifier.
-- The `add-validators` command supports the KeyManager API (similar to the `dkg` command), but since it does not have direct access to the keys, it cannot produce valid cluster lock signatures. In this case, you must use the `--unverified` flag, which produces empty signatures. This requires adding the `--no-verify` flag to the `charon run` command.
+- The `add-validators` command supports the KeyManager API (similar to the `dkg` command), but since it may not have direct access to the original private keys if they're not still in the `.charon` folder you are adding validators to, it cannot produce valid cluster lock signatures. In this case, you must use the `--unverified` flag, which means charon does not hash and sign the new cluster lock file with all the private keys to prove their existence. This requires adding the `--no-verify` flag or `CHARON_NO_VERIFY=true` environment variable to the `charon run` command/container.
 - If you use different validator clients, review the keys import script. The old keys in `.charon/validator_keys` remain unchanged, so verify that importing the same keys will not disrupt the validator client's state.
 
 # FAQs
