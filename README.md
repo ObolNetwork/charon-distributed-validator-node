@@ -26,10 +26,15 @@ Starting with charon v1.6, you can add validators to your cluster using the `cha
 3. Run the following command to collectively generate and add 10 new validators with other node operators (similar to DKG):
 
 ```sh
-charon alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address>
+# If you prefer running a pre-built charon binary
+charon alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --output-dir=output
+
+# Or, if you prefer running it dockerised
+# (replace 'latest' with the most recent version if needed: https://hub.docker.com/r/obolnetwork/charon/tags)
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:latest alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --data-dir=/opt/charon/.charon --output-dir=/opt/charon/output
 ```
 
-This command will create a new cluster configuration that includes both existing and new validators. It will also generate the necessary keys for the new validators and deposit-data files. The new configuration will be saved in the `.charon-add-validators` directory.
+This command will create a new cluster configuration that includes both existing and new validators. It will also generate the necessary keys for the new validators and deposit-data files. The new configuration will be saved in the `output` directory.
 
 4. To start using the new configuration (with the added validators), stop the current charon and validator client instances:
 
@@ -37,11 +42,11 @@ This command will create a new cluster configuration that includes both existing
 docker compose stop charon lodestar
 ```
 
-5. Back up and remove the existing `.charon` directory, then move the `.charon-add-validators` directory to `.charon`:
+5. Back up and remove the existing `.charon` directory, then move the `output` directory to `.charon`:
 
 ```sh
 mv .charon .charon-backup
-mv .charon-add-validators .charon
+mv output .charon
 ```
 
 6. Restart the charon and validator client instances:
