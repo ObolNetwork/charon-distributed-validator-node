@@ -1,5 +1,3 @@
-version: "3.8"
-
 # Docker-compose file to aid developers in debugging. This is not required for "normal" users. See the "Docker power users" section of the README.md for more info.
 
 # Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
@@ -11,13 +9,13 @@ services:
     command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
     privileged: true
     volumes:
-      - '/:/rootfs:ro'
-      - '/var/run:/var/run:ro'
-      - '/sys:/sys:ro'
-      - '/var/lib/docker/:/var/lib/docker:ro'
-      - '/dev/disk/:/dev/disk:ro'
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/dev/disk/:/dev/disk:ro"
     devices:
-      - '/dev/kmsg:/dev/kmsg'
+      - "/dev/kmsg:/dev/kmsg"
     restart: unless-stopped
 
   node-exporter:
