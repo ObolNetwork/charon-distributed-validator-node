@@ -51,3 +51,56 @@ services:
       - .charon/validator_keys:/home/validator_keys
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
+
+  #  _ __  _ __ _   _ ___ _ __ ___
+  # | '_ \| '__| | | / __| '_ ` _ \
+  # | |_) | |  | |_| \__ \ | | | | |
+  # | .__/|_|   \__, |___/_| |_| |_|
+  # |_|         |___/
+
+  vc-prysm:
+    profiles: [vc-prysm]
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v6.0.4}
+    platform: "linux/amd64"
+    depends_on: [charon]
+    networks: [dvnode]
+    entrypoint: /home/prysm/run.sh
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+    labels:
+      - "promtail-monitored=${VC_PRYSM_PROMTAIL_MONITORED:-true}"
+    volumes:
+      - ./prysm/run.sh:/home/prysm/run.sh
+      - ./data/vc-prysm:/data/vc
+      - .charon/validator_keys:/home/charon/validator_keys
+    restart: unless-stopped
+
+  #  _       _
+  # | |_ ___| | ___   _
+  # | __/ _ \ |/ / | | |
+  # | ||  __/   <| |_| |
+  #  \__\___|_|\_\\__,_|
+
+  vc-teku:
+    profiles: [vc-teku]
+    image: consensys/teku:${VC_TEKU_VERSION:-25.7.1}
+    command: |
+      validator-client
+      --beacon-node-api-endpoint "http://charon:3600"
+      --network="${NETWORK}"
+      --data-base-path=/home/data
+      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
+      --validators-keystore-locking-enabled false
+      --validators-external-signer-slashing-protection-enabled true
+      --validators-builder-registration-default-enabled true
+      --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
+      --Xobol-dvt-integration-enabled true
+    depends_on: [charon]
+    networks: [dvnode]
+    labels:
+      - "promtail-monitored=${VC_TEKU_PROMTAIL_MONITORED:-true}"
+    volumes:
+      - .charon/validator_keys:/opt/charon/validator_keys
+      - ./data/vc-teku:/home/data
+    restart: unless-stopped
