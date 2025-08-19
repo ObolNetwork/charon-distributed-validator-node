@@ -21,14 +21,18 @@ services:
   node-exporter:
     image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
 
-  tempo:
-    image: grafana/tempo:${TEMPO_VERSION:-2.7.1}
-    user: ":"
-    command: -config.file=/etc/tempo/tempo.yaml
+  jaeger:
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.46.0}
+    ports:
+      - ${MONITORING_PORT_JAEGER:-16686}:16686
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+      - BADGER_SPAN_STORE_TTL=72h
     volumes:
-      - ./tempo:/etc/tempo
-      - ./data/tempo:/opt/tempo
-    restart: unless-stopped
+      - ./data/jaeger:/badger
 
   loki:
     image: grafana/loki:${LOKI_VERSION:-2.8.2}
@@ -41,12 +45,17 @@ services:
 
   charon:
     environment:
-      - CHARON_OTLP_ADDRESS=tempo:4317
-      - CHARON_OTLP_SERVICE_NAME=charon
+      - CHARON_JAEGER_ADDRESS=jaeger:6831 # jaeger UDP agent
+      - CHARON_JAEGER_SERVICE=charon
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
 
+  lido-dv-exit:
+    environment:
+      - LIDODVEXIT_LOG_LEVEL=debug
+      - LIDODVEXIT_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
+
 networks:
   default:
-    name: ${CHARON_DOCKER_NETWORK:-charon-distributed-validator-node_dvnode}
+    name: ${CHARON_DOCKER_NETWORK:-lido-charon-distributed-validator-node_dvnode}
     external: true
