@@ -12,3 +12,4 @@ data/
 .idea
 .charon
 prometheus/prometheus.yml
+commit-boost/config.toml

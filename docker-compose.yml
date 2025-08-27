@@ -8,8 +8,10 @@ services:
   # | '_ \ / _ \ __| '_ \ / _ \ '__| '_ ` _ \| | '_ \ / _` |
   # | | | |  __/ |_| | | |  __/ |  | | | | | | | | | | (_| |
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
+
   nethermind:
     image: nethermind/nethermind:${NETHERMIND_VERSION:-1.32.2}
+    profiles: [""]
     restart: unless-stopped
     ports:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -47,6 +49,7 @@ services:
 
   lighthouse:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.1.0}
+    profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - 5054:5054/tcp # P2P TCP
@@ -85,7 +88,7 @@ services:
   charon:
     image: obolnetwork/charon:${CHARON_VERSION:-v1.6.0}
     environment:
-      - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
+      - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
       - CHARON_BEACON_NODE_SUBMIT_TIMEOUT=${CHARON_BEACON_NODE_SUBMIT_TIMEOUT:-4s}
       - CHARON_FALLBACK_BEACON_NODE_ENDPOINTS=${CHARON_FALLBACK_BEACON_NODE_ENDPOINTS:-}
@@ -121,6 +124,7 @@ services:
 
   lodestar:
     image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.33.0}
+    profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -142,8 +146,10 @@ services:
   #  | '_ ` _ \ / _ \ \ / /____| '_ \ / _ \ / _ \/ __| __|
   #  | | | | | |  __/\ V /_____| |_) | (_) | (_) \__ \ |_
   #  |_| |_| |_|\___| \_/      |_.__/ \___/ \___/|___/\__|
+
   mev-boost:
     image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.9}
+    profiles: [""]
     command: |
       -${NETWORK}
       -loglevel=debug
@@ -161,6 +167,7 @@ services:
   # | | | | | | (_) | | | | | || (_) | |  | | | | | (_| |
   # |_| |_| |_|\___/|_| |_|_|\__\___/|_|  |_|_| |_|\__, |
   #                                                |___/
+
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v3.2.1}
     user: ":"
