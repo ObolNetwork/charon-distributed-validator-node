@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.1.0}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -86,7 +86,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.5.2}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.6.0}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
@@ -123,7 +123,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.31.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.33.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
