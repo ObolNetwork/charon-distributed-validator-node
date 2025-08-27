@@ -25,7 +25,8 @@ Check the Obol [docs](https://docs.obol.tech/docs/start/quickstart_group) for de
 To configure this repo for a particular network, follow these instructions. If you do not, your node will fail to start. 
 
 1. Copy `.env.sample.<network-name>` to `.env`:
-    ```sh
+
+```sh
     # mainnet
     cp .env.sample.mainnet .env
 
@@ -34,12 +35,26 @@ To configure this repo for a particular network, follow these instructions. If y
 
     # hoodi
     cp .env.sample.hoodi .env
-    ```
+```
+
+> **_NOTE:_** If you are using commit-boost, instead of mev-boost, do the same for commit-boost's config:
+
+```sh
+    # mainnet
+    cp commit-boost/.config.toml.sample.mainnet commit-boost/config.toml
+
+    # holesky
+    cp commit-boost/.config.toml.sample.holesky commit-boost/config.toml
+
+    # hoodi
+    cp commit-boost/.config.toml.sample.hoodi commit-boost/config.toml
+```
+
 2. Grab your operator ID from the lido [mainnet dashboard](https://operators.lido.fi/) or [testnet dashboard](https://operators-holesky.testnet.fi/).
 3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID.
 4. Save and close `.env`.
 
-You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo. 
+You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo.
 
 Finally, to run the cluster run one of the following commands.
 
