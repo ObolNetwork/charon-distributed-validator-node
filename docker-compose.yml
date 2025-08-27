@@ -46,7 +46,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.0.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v7.1.0}
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - 5054:5054/tcp # P2P TCP
@@ -120,7 +120,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.31.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.33.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
