@@ -212,7 +212,7 @@ services:
   #                                                   |__/
 
   validator-ejector:
-    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-1.7.0}
+    image: lidofinance/validator-ejector:${VALIDATOR_EJECTOR_VERSION:-1.8.0}
     user: ":"
     networks: [dvnode]
     volumes:
@@ -239,7 +239,7 @@ services:
   # |_|_|\__,_|\___/       \__,_| \_/       \___/_/\_\_|\__|
 
   lido-dv-exit:
-    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-v0.3.0}
+    image: obolnetwork/lido-dv-exit:${LIDO_DV_EXIT_VERSION:-v0.4.0}
     user: ":"
     networks: [dvnode]
     volumes:
