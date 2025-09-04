@@ -89,6 +89,7 @@ services:
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
       --ee-endpoint=http://${EL}:8551
       --ee-jwt-secret-file=/jwt/jwt.hex
+      --data-base-path=/opt/teku/data
       --builder-endpoint=http://${MEV}:18550
       --rest-api-enabled=true
       --rest-api-interface=0.0.0.0
