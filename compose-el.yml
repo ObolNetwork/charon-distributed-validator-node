@@ -39,3 +39,35 @@ services:
     volumes:
       - ./data/nethermind:/nethermind/data
       - ./jwt:/root/jwt
+
+  #           _   _     
+  #  _ __ ___| |_| |__  
+  # | '__/ _ \ __| '_ \ 
+  # | | |  __/ |_| | | |
+  # |_|  \___|\__|_| |_|
+
+  el-reth:
+    profiles: [el-reth]
+    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v1.6.0}
+    restart: unless-stopped
+    ports:
+      - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
+      - ${EL_PORT_P2P:-30303}:30303/udp # P2P UDP
+      - ${EL_IP_HTTP:-127.0.0.1}:${EL_PORT_HTTP:-8545}:8545 # JSON-RPC
+      - ${EL_IP_ENGINE:-127.0.0.1}:${EL_PORT_ENGINE:-8551}:8551 # ENGINE-API
+    labels:
+      - "promtail-monitored=${EL_RETH_PROMTAIL_MONITORED:-true}"
+    command: |
+      node
+      --chain=${NETWORK}
+      --datadir=data
+      --authrpc.jwtsecret="/root/jwt/jwt.hex"
+      --authrpc.addr=0.0.0.0
+      --authrpc.port=8551
+      --http
+      --http.addr=0.0.0.0
+      --http.port=8545
+      --metrics=0.0.0.0:8008
+    networks: [dvnode]
+    volumes:
+      - ./jwt:/root/jwt
