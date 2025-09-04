@@ -65,7 +65,6 @@ services:
       --metrics-address=0.0.0.0
       --metrics-port=5054
       --metrics-allow-origin="*"
-      --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
     ports:
       - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
     volumes:
@@ -99,7 +98,6 @@ services:
       --metrics-interface=0.0.0.0
       --metrics-port=5054
       --metrics-host-allowlist="*"
-      --validators-proposer-default-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
     volumes:
       - ./data/teku:/opt/teku/data
       - ./jwt:/jwt:ro
@@ -132,7 +130,6 @@ services:
       --metrics
       --metrics.address=0.0.0.0
       --metrics.port=5054
-      --suggestedFeeRecipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
     volumes:
       - ./data/lodestar:/opt/lodestar/data
       - ./jwt:/jwt:ro
