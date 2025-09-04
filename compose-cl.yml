@@ -100,7 +100,7 @@ services:
       --metrics-port=5054
       --metrics-host-allowlist="*"
     volumes:
-      - ./data/teku:/opt/teku/data
+      - ./data/cl-teku:/opt/teku/data
       - ./jwt:/jwt:ro
     networks: [dvnode]
 
@@ -132,6 +132,6 @@ services:
       --metrics.address=0.0.0.0
       --metrics.port=5054
     volumes:
-      - ./data/lodestar:/opt/lodestar/data
+      - ./data/cl-lodestar:/opt/lodestar/data
       - ./jwt:/jwt:ro
     networks: [dvnode]

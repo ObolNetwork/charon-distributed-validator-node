@@ -22,7 +22,7 @@ services:
       - "promtail-monitored=${EL_NETHERMIND_PROMTAIL_MONITORED:-true}"
     command: |
       --config=${NETWORK}
-      --datadir=data
+      --data-dir=/nethermind/data
       --HealthChecks.Enabled=true
       --JsonRpc.Enabled=true
       --JsonRpc.JwtSecretFile="/root/jwt/jwt.hex"
@@ -60,7 +60,7 @@ services:
     command: |
       node
       --chain=${NETWORK}
-      --datadir=data
+      --datadir=/reth/data
       --authrpc.jwtsecret="/root/jwt/jwt.hex"
       --authrpc.addr=0.0.0.0
       --authrpc.port=8551
@@ -70,4 +70,5 @@ services:
       --metrics=0.0.0.0:8008
     networks: [dvnode]
     volumes:
+      - ./data/reth:/reth/data
       - ./jwt:/root/jwt
