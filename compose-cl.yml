@@ -65,10 +65,73 @@ services:
       --metrics-address=0.0.0.0
       --metrics-port=5054
       --metrics-allow-origin="*"
-      --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
     ports:
       - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
     volumes:
       - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
       - ./jwt:/opt/jwt
+    networks: [dvnode]
+
+  #  _       _          
+  # | |_ ___| | ___   _ 
+  # | __/ _ \ |/ / | | |
+  # | ||  __/   <| |_| |
+  #  \__\___|_|\_\\__,_|
+
+  cl-teku:
+    profiles: [cl-teku]
+    image: consensys/teku:${VC_VERSION:-25.7.1}
+    restart: unless-stopped
+    labels:
+      - "promtail-monitored=${CL_TEKU_PROMTAIL_MONITORED:-true}"
+    command: |
+      --network=${NETWORK}
+      --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      --ee-endpoint=http://${EL}:8551
+      --ee-jwt-secret-file=/jwt/jwt.hex
+      --data-base-path=/opt/teku/data
+      --builder-endpoint=http://${MEV}:18550
+      --rest-api-enabled=true
+      --rest-api-interface=0.0.0.0
+      --rest-api-port=5052
+      --rest-api-host-allowlist="*"
+      --metrics-enabled=true
+      --metrics-interface=0.0.0.0
+      --metrics-port=5054
+      --metrics-host-allowlist="*"
+    volumes:
+      - ./data/cl-teku:/opt/teku/data
+      - ./jwt:/jwt:ro
+    networks: [dvnode]
+
+  #  _           _           _             
+  # | | ___   __| | ___  ___| |_ __ _ _ __ 
+  # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
+  # | | (_) | (_| |  __/\__ \ || (_| | |   
+  # |_|\___/ \__,_|\___||___/\__\__,_|_|
+
+  cl-lodestar:
+    profiles: [cl-lodestar]
+    image: chainsafe/lodestar:${VC_VERSION:-v1.33.0}
+    restart: unless-stopped
+    labels:
+      - "promtail-monitored=${CL_LODESTAR_PROMTAIL_MONITORED:-true}"
+    command: |
+      beacon
+      --network=${NETWORK}
+      --checkpointSyncUrl=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
+      --execution.urls=http://${EL}:8551
+      --jwt-secret=/jwt/jwt.hex
+      --dataDir=/opt/lodestar/data
+      --builder
+      --builder.url=http://${MEV}:18550
+      --rest
+      --rest.address=0.0.0.0
+      --rest.port=5052
+      --metrics
+      --metrics.address=0.0.0.0
+      --metrics.port=5054
+    volumes:
+      - ./data/cl-lodestar:/opt/lodestar/data
+      - ./jwt:/jwt:ro
     networks: [dvnode]

@@ -72,7 +72,6 @@ services:
       --metrics-address=0.0.0.0
       --metrics-port=5054
       --metrics-allow-origin="*"
-      --state-cache-size=128
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
