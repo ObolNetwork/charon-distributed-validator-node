@@ -52,7 +52,8 @@ To configure this repo for a particular network, follow these instructions. If y
 
 2. Grab your operator ID from the lido [mainnet dashboard](https://operators.lido.fi/) or [testnet dashboard](https://operators-holesky.testnet.fi/).
 3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID.
-4. Save and close `.env`.
+4. Find `VE_EASY_TRACK_MOTION_CREATOR_ADDRESSES_ALLOWLIST=["0xYourNodeOperatorRewardAddress"]`, uncomment it, and change `0xYourNodeOperatorRewardAddress` to your Lido Operator SAFE manager address for your cluster.
+5. Save and close `.env`.
 
 You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo.
 
