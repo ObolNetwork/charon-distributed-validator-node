@@ -3680,8 +3680,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Charon Overview",
-  "uid": "d6qujIJVk",
+  "title": "Single Charon Client Overview",
+  "uid": "charonoverview",
   "version": 66,
   "weekStart": ""
 }
