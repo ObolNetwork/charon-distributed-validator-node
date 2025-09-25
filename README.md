@@ -19,7 +19,7 @@ Check the Obol [docs](https://docs.obol.org/docs/start/quickstart_overview) for 
 
 # Versioning
 
-It is recommended to use a stable version of the codebase. Major and minor versions follow those of Charon itself (i.e.: latest `v1.6.X` of CDVN will reflect latest `v1.6.Y` Charon), but patch versions in CDVN might be higher (i.e.: `v1.6.2` of CDVN has (latest) `v1.6.1` of Charon running).
+It is recommended to use a stable version of the codebase. Major and minor versions follow those of Charon itself (i.e.: latest `v1.6.X` of CDVN will reflect latest `v1.6.Y` Charon), but patch versions in CDVN might be higher (i.e.: `v1.6.2` of CDVN has (latest) `v1.6.1` of Charon).
 This is done with mind, that small improvements on CDVN can be made without being tied to a Charon release.
 
 # Adding Validators
