@@ -11,7 +11,7 @@ services:
 
   mev-commitboost:
     profiles: [mev-commitboost]
-    image: ghcr.io/commit-boost/pbs:${MEV_COMMITBOOST_VERSION:-v0.8.1-rc.2}
+    image: ghcr.io/commit-boost/pbs:${MEV_COMMITBOOST_VERSION:-v0.8.0}
     environment:
       - CB_CONFIG=/etc/commit-boost/config.toml
     volumes:
@@ -29,7 +29,7 @@ services:
 
   mev-mevboost:
     profiles: [mev-mevboost]
-    image: flashbots/mev-boost:${MEV_MEVBOOST_VERSION:-1.10a3}
+    image: flashbots/mev-boost:${MEV_MEVBOOST_VERSION:-1.9}
     command: |
       -${NETWORK}
       -loglevel=debug
