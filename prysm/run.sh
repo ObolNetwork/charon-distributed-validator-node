@@ -6,7 +6,7 @@ WALLET_DIR="/prysm-wallet"
 rm -rf $WALLET_DIR
 mkdir $WALLET_DIR
 
-# Refer: https://docs.prylabs.network/docs/install/install-with-script#step-5-run-a-validator-using-prysm
+# Refer: https://prysm.offchainlabs.com/docs/install-prysm/install-with-script/#step-5-run-a-validator-using-prysm
 # Running a prysm VC involves two steps which need to run in order:
 # 1. Import validator keys in a prysm wallet account.
 # 2. Run the validator client.
