@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   node-exporter:
-    image: bitnami/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
+    image: bitnamilegacy/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
 
   jaeger:
     image: jaegertracing/all-in-one:${JAEGER_VERSION:-1.46.0}
