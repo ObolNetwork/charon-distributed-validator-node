@@ -38,9 +38,9 @@ echo "Imported all keys"
 # Now run nimbus VC
 exec /home/user/nimbus_validator_client \
   --data-dir=/home/user/data \
-  --beacon-node="http://charon:3600" \
+  --beacon-node="${BEACON_NODE_ADDRESS}" \
   --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder=true \
+  --payload-builder=${BUILDER_API_ENABLED} \
   --distributed

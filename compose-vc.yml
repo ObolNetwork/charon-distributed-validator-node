@@ -44,6 +44,7 @@ services:
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "promtail-monitored=${VC_NIMBUS_PROMTAIL_MONITORED:-true}"
     volumes:
@@ -93,7 +94,7 @@ services:
       --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
       --validators-keystore-locking-enabled false
       --validators-external-signer-slashing-protection-enabled true
-      --validators-builder-registration-default-enabled true
+      --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
     depends_on: [charon]
