@@ -112,7 +112,7 @@ services:
 
   cl-lodestar:
     profiles: [cl-lodestar]
-    image: chainsafe/lodestar:${VC_VERSION:-v1.35.0-rc.0}
+    image: chainsafe/lodestar:${VC_VERSION:-v1.35.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_LODESTAR_PROMTAIL_MONITORED:-true}"
