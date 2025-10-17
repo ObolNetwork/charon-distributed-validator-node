@@ -155,7 +155,7 @@ services:
       -loglevel=debug
       -addr=0.0.0.0:18550
       -relay-check
-      -relays=${MEVBOOST_RELAYS}
+      -relays=${MEV_RELAYS:-${MEVBOOST_RELAYS}}
       -request-timeout-getheader=${MEVBOOST_TIMEOUT_GETHEADER:-600}
       -request-timeout-getpayload=${MEVBOOST_TIMEOUT_GETPAYLOAD:-4000}
       -request-timeout-regval=${MEVBOOST_TIMEOUT_REGVAL:-3000}
@@ -221,8 +221,8 @@ services:
       - "promtail-monitored=${EJECTOR_PROMTAIL_MONITORED:-true}"
     restart: unless-stopped
     environment:
-      - EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://nethermind:8545}
-      - CONSENSUS_NODE=${VE_BEACON_NODE_URL:-http://lighthouse:5052}
+      - EXECUTION_NODE=${VE_EXECUTION_NODE_URL:-http://${EL:-nethermind}:8545}
+      - CONSENSUS_NODE=${VE_BEACON_NODE_URL:-http://${CL:-lighthouse}:5052}
       - LOCATOR_ADDRESS=${VE_LOCATOR_ADDRESS}
       - STAKING_MODULE_ID=${VE_STAKING_MODULE_ID:-2}
       - OPERATOR_ID=${VE_OPERATOR_ID}
@@ -250,7 +250,7 @@ services:
     labels:
       - "promtail-monitored=${DV_EXIT_PROMTAIL_MONITORED:-true}"
     environment:
-      - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://lighthouse:5052}
+      - LIDODVEXIT_BEACON_NODE_URL=${LIDO_DV_EXIT_BEACON_NODE_URL:-http://${CL:-lighthouse}:5052}
       - LIDODVEXIT_CHARON_RUNTIME_DIR=/charon
       - LIDODVEXIT_EJECTOR_EXIT_PATH=/exitmessages
       - LIDODVEXIT_EXIT_EPOCH=${LIDODVEXIT_EXIT_EPOCH}
