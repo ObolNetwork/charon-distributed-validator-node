@@ -4,7 +4,7 @@
 
 services:
   prometheus:
-    profiles: [monitoring-standard]
+    profiles: [monitoring-metrics]
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.53.5}
     user: ":"
     networks: [dvnode]
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    profiles: [monitoring-standard]
+    profiles: [monitoring-visualization]
     image: grafana/grafana:${GRAFANA_VERSION:-10.4.0}
     user: ":"
     ports:
@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
 
   loki:
-    profiles: [monitoring-standard]
+    profiles: [monitoring-log-aggregator]
     image: grafana/loki:${LOKI_VERSION:-2.9.15}
     user: ":"
     networks: [dvnode]
