@@ -1,0 +1,58 @@
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
+# ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
+
+services:
+  prometheus:
+    profiles: [monitoring-standard]
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.53.5}
+    user: ":"
+    networks: [dvnode]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    restart: unless-stopped
+
+  grafana:
+    profiles: [monitoring-standard]
+    image: grafana/grafana:${GRAFANA_VERSION:-10.4.0}
+    user: ":"
+    ports:
+      - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
+    networks: [dvnode]
+    volumes:
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./grafana/dashboards:/etc/dashboards
+      - ./data/grafana:/var/lib/grafana
+    restart: unless-stopped
+
+  loki:
+    profiles: [monitoring-standard]
+    image: grafana/loki:${LOKI_VERSION:-2.9.15}
+    user: ":"
+    networks: [dvnode]
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./data/loki:/opt/loki
+    restart: unless-stopped
+
+  promtail:
+    profiles: [monitoring-log-collector]
+    image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
+    environment:
+      CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
+      CLUSTER_NAME: ${CLUSTER_NAME}
+      CLUSTER_PEER: ${CLUSTER_PEER}
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail:/etc/promtail
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: [dvnode]
+    entrypoint: /etc/promtail/run.sh
+    restart: unless-stopped
+
+networks:
+  dvnode:

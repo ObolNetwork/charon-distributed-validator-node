@@ -173,6 +173,7 @@ services:
 
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v2.53.5}
+    profiles: [""]
     user: ":"
     networks: [dvnode]
     volumes:
@@ -182,6 +183,7 @@ services:
 
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-10.4.0}
+    profiles: [""]
     user: ":"
     ports:
       - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
@@ -196,12 +198,28 @@ services:
 
   loki:
     image: grafana/loki:${LOKI_VERSION:-2.9.15}
+    profiles: [""]
     user: ":"
     networks: [dvnode]
     command: -config.file=/etc/loki/loki.yml
     volumes:
       - ./loki/loki.yml:/etc/loki/loki.yml
       - ./data/loki:/opt/loki
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
+    profiles: [""]
+    environment:
+      CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
+      CLUSTER_NAME: ${CLUSTER_NAME}
+      CLUSTER_PEER: ${CLUSTER_PEER}
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail:/etc/promtail
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: [dvnode]
+    entrypoint: /etc/promtail/run.sh
     restart: unless-stopped
 
   #             _ _     _       _                        _           _
