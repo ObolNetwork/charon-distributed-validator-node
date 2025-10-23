@@ -54,13 +54,31 @@ To configure this repo for a particular network, follow these instructions. If y
 3. Find `VE_OPERATOR_ID` in `.env` and set it to your operator ID.
 4. Find `VE_EASY_TRACK_MOTION_CREATOR_ADDRESSES_ALLOWLIST=["0xYourNodeOperatorRewardAddress"]`, uncomment it, and change `0xYourNodeOperatorRewardAddress` to your Lido Operator SAFE manager address for your cluster.
 5. To enable log collection with promtail which will stream logs to the Obol Core team to help identify cluster issues find `MONITORING=${MONITORING:-monitoring},monitoring-log-collector` and uncomment it.
-6. Save and close `.env`.
+6. Consult with the others in your cluster, and choose a set of execution layer (EL), consensus layer (CL), validator client (VC) and mev clients (MEV) for your setup that maximises the client diversity of your cluster; by commenting and uncommenting one of each in the opening lines of your `.env` file.
+7. Save and close the `.env` file.
 
-You will need a `.charon/` folder from a completed DKG present to complete the setup of this repo.
+> [!IMPORTANT]  
+> You will need a `.charon/` folder from a completed DKG ceremony present in this repo to complete the remaining setup of the node.
 
-Finally, to run the cluster run one of the following commands.
+Finally, to run the node run the following command.
 
 ```sh
+docker compose up -d
+```
+
+To update your node to a new release, run the following commands;
+
+```sh
+# Stop the node
+docker compose down
+# Save any local changes
+git stash
+git pull
+# Check out the latest version of the repo (replace `v.0.*.* with e.g. `v0.2.0`)
+git checkout v0.*.*
+# Re-apply the local changes
+git stash apply
+# Restart the node
 docker compose up -d
 ```
 
