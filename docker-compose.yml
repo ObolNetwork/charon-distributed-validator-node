@@ -10,7 +10,7 @@ services:
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
 
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.34.1}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.35.0}
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0-rc.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0-rc.2}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -85,7 +85,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_HEADERS=${CHARON_BEACON_NODE_HEADERS:-}
@@ -148,7 +148,7 @@ services:
   #  |_| |_| |_|\___| \_/      |_.__/ \___/ \___/|___/\__|
 
   mev-boost:
-    image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.10a5}
+    image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.10a6}
     profiles: [""]
     command: |
       -${NETWORK}
@@ -205,21 +205,6 @@ services:
     volumes:
       - ./loki/loki.yml:/etc/loki/loki.yml
       - ./data/loki:/opt/loki
-    restart: unless-stopped
-
-  promtail:
-    image: grafana/promtail:${PROMTAIL_VERSION:-2.8.2}
-    profiles: [""]
-    environment:
-      CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
-      CLUSTER_NAME: ${CLUSTER_NAME}
-      CLUSTER_PEER: ${CLUSTER_PEER}
-    command: -config.file=/etc/promtail/config.yml
-    volumes:
-      - ./promtail:/etc/promtail
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks: [dvnode]
-    entrypoint: /etc/promtail/run.sh
     restart: unless-stopped
 
   #             _ _     _       _                        _           _
