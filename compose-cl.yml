@@ -45,7 +45,7 @@ services:
 
   cl-lighthouse:
     profiles: [cl-lighthouse]
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0-rc.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0-rc.2}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_LIGHTHOUSE_PROMTAIL_MONITORED:-true}"
@@ -80,7 +80,7 @@ services:
 
   cl-teku:
     profiles: [cl-teku]
-    image: consensys/teku:${VC_VERSION:-25.9.3}
+    image: consensys/teku:${VC_VERSION:-25.10.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_TEKU_PROMTAIL_MONITORED:-true}"
