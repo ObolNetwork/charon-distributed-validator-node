@@ -29,7 +29,7 @@ services:
 
   mev-mevboost:
     profiles: [mev-mevboost]
-    image: flashbots/mev-boost:${MEV_MEVBOOST_VERSION:-1.10a7}
+    image: flashbots/mev-boost:${MEV_MEVBOOST_VERSION:-1.10}
     command: |
       -${NETWORK}
       -loglevel=debug
