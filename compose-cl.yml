@@ -12,7 +12,7 @@ services:
 
   cl-grandine:
     profiles: [cl-grandine]
-    image: sifrai/grandine:${GRANDINE_VERSION:-v2.0.0.rc1}
+    image: sifrai/grandine:${GRANDINE_VERSION:-v2.0.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_GRANDINE_PROMTAIL_MONITORED:-true}"
