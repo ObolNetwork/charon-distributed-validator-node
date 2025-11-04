@@ -100,7 +100,7 @@ services:
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
       - CHARON_MONITORING_ADDRESS=0.0.0.0:3620
       - CHARON_BUILDER_API=${BUILDER_API_ENABLED:-true}
-      - CHARON_FEATURE_SET_ENABLE=${CHARON_FEATURE_SET_ENABLE:-}
+      - CHARON_FEATURE_SET_ENABLE=${CHARON_FEATURE_SET_ENABLE:-proposal_timeout}
       - CHARON_LOKI_ADDRESSES=${CHARON_LOKI_ADDRESSES:-http://loki:3100/loki/api/v1/push}
       - CHARON_LOKI_SERVICE=charon
       - CHARON_NICKNAME=${CHARON_NICKNAME:-}
@@ -123,7 +123,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.35.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.36.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
