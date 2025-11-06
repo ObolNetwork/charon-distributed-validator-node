@@ -33,8 +33,9 @@ services:
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
-      --Sync.AncientBodiesBarrier=4367322
-      --Sync.AncientReceiptsBarrier=4367322
+      --Sync.AncientBodiesBarrier=${NETHERMIND_ANCIENT_BODIES_BARRIER:-0}
+      --Sync.AncientReceiptsBarrier=${NETHERMIND_ANCIENT_RECEIPTS_BARRIER:-0}
+      --TxPool.BlobsSupport=Disabled
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
@@ -68,6 +69,7 @@ services:
       --http.addr=0.0.0.0
       --http.port=8545
       --metrics=0.0.0.0:8008
+      --txpool.blobpool-max-count=0
     networks: [dvnode]
     volumes:
       - ./data/reth:/reth/data
