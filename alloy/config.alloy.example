@@ -1,0 +1,87 @@
+discovery.docker "docker" {
+	host = "unix:///var/run/docker.sock"
+}
+
+loki.process "docker" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.docker { }
+}
+
+discovery.relabel "docker" {
+	targets = discovery.docker.docker.targets
+
+	rule {
+		source_labels = ["__meta_docker_container_label_promtail_monitored"]
+		regex         = "true"
+		action        = "keep"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container"
+	}
+
+	rule {
+		source_labels = ["container"]
+		regex         = ".*charon.*"
+		target_label  = "job"
+		replacement   = "charon"
+	}
+
+	rule {
+		source_labels = ["container"]
+		regex         = ".*nethermind.*"
+		target_label  = "job"
+		replacement   = "nethermind"
+	}
+
+	rule {
+		source_labels = ["container"]
+		regex         = ".*lodestar.*"
+		target_label  = "job"
+		replacement   = "lodestar"
+	}
+
+	rule {
+		source_labels = ["container"]
+		regex         = ".*lighthouse.*"
+		target_label  = "job"
+		replacement   = "lighthouse"
+	}
+
+	rule {
+		source_labels = ["container"]
+		regex         = ".*mev-boost.*"
+		target_label  = "job"
+		replacement   = "mev-boost"
+	}
+
+	rule {
+		target_label = "cluster_name"
+		replacement  = "$CLUSTER_NAME"
+	}
+
+	rule {
+		target_label = "cluster_peer"
+		replacement  = "$CLUSTER_PEER"
+	}
+}
+
+loki.source.docker "docker" {
+	host          = "unix:///var/run/docker.sock"
+	targets       = discovery.docker.docker.targets
+	forward_to    = [loki.process.docker.receiver]
+	relabel_rules = discovery.relabel.docker.rules
+}
+
+loki.write "default" {
+	endpoint {
+		url = "$CHARON_LOKI_ADDRESSES"
+	}
+	external_labels = {
+		cluster_name = "$CLUSTER_NAME",
+		cluster_peer = "$CLUSTER_PEER",
+	}
+}
