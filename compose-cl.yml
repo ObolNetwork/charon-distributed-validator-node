@@ -12,7 +12,7 @@ services:
 
   cl-grandine:
     profiles: [cl-grandine]
-    image: sifrai/grandine:${GRANDINE_VERSION:-v2.0.0}
+    image: sifrai/grandine:${GRANDINE_VERSION:-2.0.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_GRANDINE_PROMTAIL_MONITORED:-true}"
@@ -45,7 +45,7 @@ services:
 
   cl-lighthouse:
     profiles: [cl-lighthouse]
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.1}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_LIGHTHOUSE_PROMTAIL_MONITORED:-true}"
@@ -67,7 +67,8 @@ services:
       --metrics-allow-origin="*"
       --suggested-fee-recipient=${LIDO_EXECUTION_LAYER_REWARDS_ADDRESS:-0x388C818CA8B9251b393131C08a736A67ccB19297}
     ports:
-      - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
+      - ${CL_PORT_P2P:-9000}:9000/tcp # P2P TCP
+      - ${CL_PORT_P2P:-9000}:9000/udp # P2P UDP
     volumes:
       - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
       - ./jwt:/opt/jwt
@@ -81,7 +82,7 @@ services:
 
   cl-teku:
     profiles: [cl-teku]
-    image: consensys/teku:${VC_VERSION:-25.11.0}
+    image: consensys/teku:${VC_VERSION:-25.11.1}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_TEKU_PROMTAIL_MONITORED:-true}"
