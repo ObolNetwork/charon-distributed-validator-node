@@ -84,7 +84,7 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-25.11.0}
+    image: consensys/teku:${VC_TEKU_VERSION:-25.11.1}
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
