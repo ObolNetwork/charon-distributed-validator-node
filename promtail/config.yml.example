@@ -42,8 +42,8 @@ scrape_configs:
         replacement: 'lido-mev-boost'
         target_label: 'job'
       - target_label: 'cluster_name'
-        replacement: $CLUSTER_NAME
+        replacement: '$CLUSTER_NAME'
       - target_label: 'cluster_peer'
-        replacement: $CLUSTER_PEER
+        replacement: '$CLUSTER_PEER'
     pipeline_stages:
       - docker: {}
