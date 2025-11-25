@@ -61,7 +61,7 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v6.1.4}
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.0.0}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
@@ -85,7 +85,7 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-25.11.0}
+    image: consensys/teku:${VC_TEKU_VERSION:-25.11.1}
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
