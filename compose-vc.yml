@@ -36,6 +36,7 @@ services:
 
   vc-nimbus:
     profiles: [vc-nimbus]
+    image: "lido-nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v25.11.0}"
     build:
       context: nimbus
       args:
