@@ -39,7 +39,7 @@ services:
     build:
       context: nimbus
       args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v25.11.0}
+        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v25.11.1}
     depends_on: [charon]
     networks: [dvnode]
     environment:
