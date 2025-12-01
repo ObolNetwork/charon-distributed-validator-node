@@ -85,7 +85,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.2-rc0}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.1}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_BEACON_NODE_HEADERS=${CHARON_BEACON_NODE_HEADERS:-}
@@ -123,7 +123,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.37.0-rc.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.37.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
