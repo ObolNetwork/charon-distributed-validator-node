@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.0.1}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -122,7 +122,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.36.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.37.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
@@ -147,7 +147,7 @@ services:
   #  |_| |_| |_|\___| \_/      |_.__/ \___/ \___/|___/\__|
 
   mev-boost:
-    image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.10}
+    image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.10.1}
     profiles: [""]
     command: |
       -${NETWORK}
