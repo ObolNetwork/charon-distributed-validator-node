@@ -155,6 +155,21 @@ rm -rf ./data/lighthouse
 
 ## Switch validator client
 
+> [!WARNING]
+> There are incompatibilities on requesting beacon committee selections between validator clients. The different clients are being divised in the following two groups:
+>
+> 1. Validator client requests beacon committee selections of the current slot, beginning of each slot:
+>    1. Lodestar
+>    2. Lighthouse
+>    3. Nimbus
+> 2. Validator client requests beacon committee selections of the current epoch, beginning of each epoch:
+>    1. Teku
+>    2. Prysm
+>
+> Not having threshold nodes using validator client from one or the other group will result in beacon committee aggregation duties failing.
+>
+> **Lodestar validator client has a behaviour to skip the next slot if it fails attestation or aggregation. This means that clusters should not run Lodestar if they cannot reach threshold of validator clients from group 1, otherwise their attestation success will drop by half.**
+
 1. Stop the existing validator client container.
 
 ```sh
