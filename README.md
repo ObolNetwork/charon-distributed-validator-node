@@ -155,6 +155,12 @@ rm -rf ./data/lighthouse
 
 ## Switch validator client
 
+> [!NOTE]
+> There is currently an incompatibility between validator clients that may cause attestation aggregation duties to fail. Aggregation duties are not economically rewarded nor punished for their completion.
+>
+> To ensure aggregations succeed; have at least threshold of nodes in the cluster running one of Lodestar, Lighthouse, and Nimbus, or alternatively; have a threshold of nodes in the cluster running one of Teku and Prysm. This incompatibility will be remediated in upcoming client releases.
+>
+
 1. Stop the existing validator client container.
 
 ```sh
