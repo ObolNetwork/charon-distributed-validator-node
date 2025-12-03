@@ -155,20 +155,16 @@ rm -rf ./data/lighthouse
 
 ## Switch validator client
 
+> [!NOTE]
+> There is currently an incompatibility between validator clients that may cause attestation aggregation duties to fail. Aggregation duties are not economically rewarded nor punished for their completion.
+>
+> To ensure aggregations succeed; have at least threshold of nodes in the cluster running one of Lodestar, Lighthouse, and Nimbus, or alternatively; have a threshold of nodes in the cluster running one of Teku and Prysm. This incompatibility will be remediated in upcoming client releases.
+>
+
 > [!WARNING]
-> There are incompatibilities on requesting beacon committee selections between validator clients. The different clients are being divised in the following two groups:
+> **Lodestar's validator** client's default behaviour is to skip the next slot if it fails an attestation or aggregation. This can impact your cluster's performance, particularly if you have more than the fault tolerance threshold of your cluster running Lodestar's validator client, and many validators running in the cluster.
 >
-> 1. Validator client requests beacon committee selections of the current slot, beginning of each slot:
->    1. Lodestar
->    2. Lighthouse
->    3. Nimbus
-> 2. Validator client requests beacon committee selections of the current epoch, beginning of each epoch:
->    1. Teku
->    2. Prysm
->
-> Not having threshold nodes using validator client from one or the other group will result in beacon committee aggregation duties failing.
->
-> **Lodestar validator client has a behaviour to skip the next slot if it fails attestation or aggregation. This means that clusters should not run Lodestar if they cannot reach threshold of validator clients from group 1, otherwise their attestation success will drop by half.**
+> If your cluster is not successfully aggregating, you should ideally swap to a set of compatible validator clients listed above, along with ensuring your clients have the appropriate [`--distributed` flag](../troubleshooting/client_configurations.md) set to enable distributed aggregation mode. Failing that, you can add the flag `--slotSkip false` to your `lodestar vc` process, (requires lodestar to be version `v1.37.0` and newer) or set `VC_LODESTAR_DISABLE_SLOT_SKIP=true` in your `.env` file if you're using (L)[CDVN](https://github.com/ObolNetwork/charon-distributed-validator-node). This disables the slot skipping feature.
 
 1. Stop the existing validator client container.
 
