@@ -32,9 +32,8 @@ services:
       --JsonRpc.Port=8545
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
-      --Sync.AncientBodiesBarrier=${NETHERMIND_ANCIENT_BODIES_BARRIER:-0}
-      --Sync.AncientReceiptsBarrier=${NETHERMIND_ANCIENT_RECEIPTS_BARRIER:-0}
       --Sync.SnapSync=true
+      --History.Pruning=Rolling
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data

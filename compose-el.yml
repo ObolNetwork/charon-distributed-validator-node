@@ -33,8 +33,7 @@ services:
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
-      --Sync.AncientBodiesBarrier=4367322
-      --Sync.AncientReceiptsBarrier=4367322
+      --History.Pruning=Rolling
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
@@ -59,6 +58,7 @@ services:
       - "promtail-monitored=${EL_RETH_PROMTAIL_MONITORED:-true}"
     command: |
       node
+      --full
       --chain=${NETWORK}
       --datadir=/reth/data
       --authrpc.jwtsecret="/root/jwt/jwt.hex"
