@@ -71,7 +71,6 @@ services:
       --http.addr=0.0.0.0
       --http.port=8545
       --metrics=0.0.0.0:8008
-      --txpool.blobpool-max-count=0
     networks: [dvnode]
     volumes:
       - ./data/reth:/reth/data
