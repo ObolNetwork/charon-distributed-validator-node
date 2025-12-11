@@ -61,6 +61,7 @@ services:
       - "promtail-monitored=${EL_RETH_PROMTAIL_MONITORED:-true}"
     command: |
       node
+      --full
       --chain=${NETWORK}
       --datadir=/reth/data
       --authrpc.jwtsecret="/root/jwt/jwt.hex"
