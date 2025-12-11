@@ -33,8 +33,11 @@ services:
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
-      --Sync.AncientBodiesBarrier=4367322
-      --Sync.AncientReceiptsBarrier=4367322
+      --Sync.AncientBodiesBarrier=${NETHERMIND_ANCIENT_BODIES_BARRIER:-20000000}
+      --Sync.AncientReceiptsBarrier=${NETHERMIND_ANCIENT_RECEIPTS_BARRIER:-20000000}
+      --History.Pruning=${NETHERMIND_HISTORY_PRUNING:-Rolling}
+      --History.RetentionEpochs=${NETHERMIND_HISTORY_RETENTION_EPOCHS:-82125}
+    
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
@@ -59,6 +62,7 @@ services:
       - "promtail-monitored=${EL_RETH_PROMTAIL_MONITORED:-true}"
     command: |
       node
+      --full
       --chain=${NETWORK}
       --datadir=/reth/data
       --authrpc.jwtsecret="/root/jwt/jwt.hex"
