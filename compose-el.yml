@@ -37,7 +37,6 @@ services:
       --Sync.AncientReceiptsBarrier=${NETHERMIND_ANCIENT_RECEIPTS_BARRIER:-0}
       --History.Pruning=${NETHERMIND_HISTORY_PRUNING:-Disabled}
       --History.RetentionEpochs=${NETHERMIND_HISTORY_RETENTION_EPOCHS:-82125}
-      --TxPool.BlobsSupport=Disabled
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
