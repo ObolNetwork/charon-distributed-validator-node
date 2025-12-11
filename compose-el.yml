@@ -33,10 +33,7 @@ services:
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
-      --Sync.AncientBodiesBarrier=${NETHERMIND_ANCIENT_BODIES_BARRIER:-20000000}
-      --Sync.AncientReceiptsBarrier=${NETHERMIND_ANCIENT_RECEIPTS_BARRIER:-20000000}
-      --History.Pruning=${NETHERMIND_HISTORY_PRUNING:-Rolling}
-      --History.RetentionEpochs=${NETHERMIND_HISTORY_RETENTION_EPOCHS:-82125}
+      --History.Pruning=Rolling
     
     networks: [dvnode]
     volumes:
