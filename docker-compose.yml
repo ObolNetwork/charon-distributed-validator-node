@@ -10,7 +10,7 @@ services:
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
 
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.35.2}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.35.6}
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -84,7 +84,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.2}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.7.3}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://lighthouse:5052}
       - CHARON_BEACON_NODE_HEADERS=${CHARON_BEACON_NODE_HEADERS:-}

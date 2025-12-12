@@ -61,7 +61,7 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.0.0}
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.1.0}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
