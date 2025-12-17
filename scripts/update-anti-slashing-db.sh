@@ -50,9 +50,25 @@ if [ ! -f "$TARGET_LOCK" ]; then
     exit 1
 fi
 
-# Create a temporary file for the updated EIP-3076 data
+# Validate all files contain valid JSON
+if ! jq empty "$EIP3076_FILE" 2>/dev/null; then
+    echo "Error: EIP-3076 file contains invalid JSON: $EIP3076_FILE" >&2
+    exit 1
+fi
+
+if ! jq empty "$SOURCE_LOCK" 2>/dev/null; then
+    echo "Error: Source cluster-lock file contains invalid JSON: $SOURCE_LOCK" >&2
+    exit 1
+fi
+
+if ! jq empty "$TARGET_LOCK" 2>/dev/null; then
+    echo "Error: Target cluster-lock file contains invalid JSON: $TARGET_LOCK" >&2
+    exit 1
+fi
+
+# Create temporary files for processing
 TEMP_FILE=$(mktemp)
-trap 'rm -f "$TEMP_FILE"' EXIT
+trap 'rm -f "$TEMP_FILE" "${TEMP_FILE}.tmp"' EXIT
 
 # Function to find pubkey in cluster-lock and return validator_index,share_index
 # Returns empty string if not found
@@ -122,19 +138,21 @@ fi
 
 echo ""
 
-# Read the EIP-3076 file
-eip3076_data=$(cat "$EIP3076_FILE")
-
-# Get all pubkeys from the data array
-pubkeys=$(echo "$eip3076_data" | jq -r '.data[].pubkey')
+# Get all unique pubkeys from the data array
+# Note: The same pubkey may appear multiple times, so we deduplicate with sort -u
+pubkeys=$(jq -r '.data[].pubkey' "$EIP3076_FILE" | sort -u)
 
 if [ -z "$pubkeys" ]; then
     echo "Warning: No pubkeys found in EIP-3076 file" >&2
     exit 0
 fi
 
-# Start with the original data
-updated_data="$eip3076_data"
+pubkey_count=$(echo "$pubkeys" | wc -l | tr -d ' ')
+echo "Found $pubkey_count unique pubkey(s) to process"
+echo ""
+
+# Copy original file to temp file, we'll modify it in place
+cp "$EIP3076_FILE" "$TEMP_FILE"
 
 # Process each pubkey
 while IFS= read -r old_pubkey; do
@@ -182,17 +200,16 @@ while IFS= read -r old_pubkey; do
     echo "  Replacing with: $new_pubkey"
 
     # Replace the pubkey in the JSON data
-    # We need to be careful to only replace the pubkey in the data array, not in other places
-    updated_data=$(echo "$updated_data" | jq --arg old "$old_pubkey" --arg new "$new_pubkey" '
+    # Note: The same pubkey may appear multiple times in the data array (one per validator).
+    # This filter will update ALL occurrences of the old pubkey with the new one.
+    # We modify the temp file in place using jq's output redirection
+    jq --arg old "$old_pubkey" --arg new "$new_pubkey" '
         (.data[] | select(.pubkey == $old) | .pubkey) |= $new
-    ')
+    ' "$TEMP_FILE" > "${TEMP_FILE}.tmp" && mv "${TEMP_FILE}.tmp" "$TEMP_FILE"
 
     echo "  Done"
     echo ""
 done <<< "$pubkeys"
-
-# Write the updated data to temp file
-echo "$updated_data" | jq '.' > "$TEMP_FILE"
 
 # Validate the output is valid JSON
 if ! jq empty "$TEMP_FILE" 2>/dev/null; then
