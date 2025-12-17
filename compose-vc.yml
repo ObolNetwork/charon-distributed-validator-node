@@ -11,7 +11,7 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.37.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -62,7 +62,7 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.0.0}
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.1.0}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
@@ -86,7 +86,7 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-25.11.1}
+    image: consensys/teku:${VC_TEKU_VERSION:-25.12.0}
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
