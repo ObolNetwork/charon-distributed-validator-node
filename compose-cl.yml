@@ -82,7 +82,7 @@ services:
 
   cl-teku:
     profiles: [cl-teku]
-    image: consensys/teku:${VC_VERSION:-25.11.1}
+    image: consensys/teku:${VC_VERSION:-25.12.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_TEKU_PROMTAIL_MONITORED:-true}"
@@ -115,7 +115,7 @@ services:
 
   cl-lodestar:
     profiles: [cl-lodestar]
-    image: chainsafe/lodestar:${VC_VERSION:-v1.37.0}
+    image: chainsafe/lodestar:${VC_VERSION:-v1.38.0}
     restart: unless-stopped
     labels:
       - "promtail-monitored=${CL_LODESTAR_PROMTAIL_MONITORED:-true}"
