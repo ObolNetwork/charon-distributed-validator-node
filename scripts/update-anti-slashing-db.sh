@@ -68,7 +68,7 @@ fi
 
 # Create temporary files for processing
 TEMP_FILE=$(mktemp)
-trap 'rm -f "$TEMP_FILE" "${TEMP_FILE}.tmp"' EXIT
+trap 'rm -f "$TEMP_FILE" "${TEMP_FILE}.tmp"' EXIT INT TERM
 
 # Function to find pubkey in cluster-lock and return validator_index,share_index
 # Returns empty string if not found
@@ -116,6 +116,17 @@ echo ""
 source_validators=$(jq '.distributed_validators | length' "$SOURCE_LOCK")
 target_validators=$(jq '.distributed_validators | length' "$TARGET_LOCK")
 
+# Validate that we got valid numeric values
+if [ -z "$source_validators" ] || [ "$source_validators" = "null" ]; then
+    echo "Error: Source cluster-lock missing 'distributed_validators' field" >&2
+    exit 1
+fi
+
+if [ -z "$target_validators" ] || [ "$target_validators" = "null" ]; then
+    echo "Error: Target cluster-lock missing 'distributed_validators' field" >&2
+    exit 1
+fi
+
 echo "Source cluster-lock has $source_validators validators"
 echo "Target cluster-lock has $target_validators validators"
 
@@ -147,7 +158,7 @@ if [ -z "$pubkeys" ]; then
     exit 0
 fi
 
-pubkey_count=$(echo "$pubkeys" | wc -l | tr -d ' ')
+pubkey_count=$(echo "$pubkeys" | wc -l | xargs)
 echo "Found $pubkey_count unique pubkey(s) to process"
 echo ""
 
@@ -174,10 +185,9 @@ while IFS= read -r old_pubkey; do
     echo "  Found at distributed_validators[$validator_idx].public_shares[$share_idx]"
 
     # Verify target has sufficient validators
-    target_validator_count=$(jq '.distributed_validators | length' "$TARGET_LOCK")
-    if [ "$validator_idx" -ge "$target_validator_count" ]; then
+    if [ "$validator_idx" -ge "$target_validators" ]; then
         echo "  Error: Target cluster-lock.json doesn't have validator at index $validator_idx" >&2
-        echo "         Target has only $target_validator_count validators" >&2
+        echo "         Target has only $target_validators validators" >&2
         exit 1
     fi
 
