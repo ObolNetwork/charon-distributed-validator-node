@@ -21,7 +21,7 @@ services:
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${VC_LODESTAR_BUILDER_SELECTION:-builderalways}
     labels:
-      - "promtail-monitored=${VC_LODESTAR_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
@@ -46,7 +46,7 @@ services:
       BEACON_NODE_ADDRESS: http://charon:3600
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
-      - "promtail-monitored=${VC_NIMBUS_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
       - ./nimbus/run.sh:/home/user/data/run.sh
       - .charon/validator_keys:/home/validator_keys
@@ -70,7 +70,7 @@ services:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
     labels:
-      - "promtail-monitored=${VC_PRYSM_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
@@ -100,7 +100,7 @@ services:
     depends_on: [charon]
     networks: [dvnode]
     labels:
-      - "promtail-monitored=${VC_TEKU_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
       - .charon/validator_keys:/opt/charon/validator_keys
       - ./data/vc-teku:/home/data

@@ -19,7 +19,7 @@ services:
       - ${NETHERMIND_IP_HTTP:-127.0.0.1}:${NETHERMIND_PORT_HTTP:-8545}:8545 # JSON-RPC
       - ${NETHERMIND_IP_ENGINE:-127.0.0.1}:${NETHERMIND_PORT_ENGINE:-8551}:8551 # ENGINE-API
     labels:
-      - "promtail-monitored=${NETHERMIND_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${NETHERMIND_ALLOY_MONITORED:-true}"
     command: |
       --config=${NETWORK}
       --datadir=data
@@ -55,7 +55,7 @@ services:
       - 5054:5054/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
     labels:
-      - "promtail-monitored=${LIGHTHOUSE_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${LIGHTHOUSE_ALLOY_MONITORED:-true}"
     command: |
       lighthouse bn
       --network=${NETWORK}
@@ -107,7 +107,7 @@ services:
     ports:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     labels:
-      - "promtail-monitored=${CHARON_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${CHARON_ALLOY_MONITORED:-true}"
     networks: [dvnode]
     volumes:
       - .charon:/opt/charon/.charon
@@ -133,7 +133,7 @@ services:
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${BUILDER_SELECTION:-builderalways}
     labels:
-      - "promtail-monitored=${LODESTAR_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
@@ -156,7 +156,7 @@ services:
       -relay-check
       -relays=${MEVBOOST_RELAYS}
     labels:
-      - "promtail-monitored=${MEV_BOOST_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${MEV_BOOST_ALLOY_MONITORED:-true}"
     networks: [dvnode]
     restart: unless-stopped
 

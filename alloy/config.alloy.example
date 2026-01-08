@@ -12,7 +12,7 @@ discovery.relabel "docker" {
 	targets = discovery.docker.docker.targets
 
 	rule {
-		source_labels = ["__meta_docker_container_label_promtail_monitored"]
+		source_labels = ["__meta_docker_container_label_alloy_monitored"]
 		regex         = "true"
 		action        = "keep"
 	}
