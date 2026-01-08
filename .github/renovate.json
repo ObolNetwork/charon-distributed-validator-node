@@ -4,7 +4,22 @@
     "config:recommended"
   ],
   "enabledManagers": [
-    "github-actions"
+    "github-actions",
+    "regex"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^docker-compose\\.yml$",
+        "^relay/docker-compose\\.yml$"
+      ],
+      "matchStrings": [
+        "image:\\s*obolnetwork/charon:\\$\\{CHARON_VERSION:-v?(?<currentValue>[\\w.-]+)}"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "ObolNetwork/charon",
+      "versioningTemplate": "semver"
+    }
   ],
   "packageRules": [
     {
@@ -24,6 +39,18 @@
         "renovate/github-actions"
       ],
       "groupName": "GitHub Actions updates"
+    },
+    {
+      "matchManagers": [
+        "regex"
+      ],
+      "matchDepNames": [
+        "ObolNetwork/charon"
+      ],
+      "labels": [
+        "renovate/charon"
+      ],
+      "groupName": "Charon image updates"
     }
   ]
 }
