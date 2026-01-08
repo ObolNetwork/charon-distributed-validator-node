@@ -17,7 +17,7 @@ services:
     volumes:
       - ./commit-boost/config.toml:/etc/commit-boost/config.toml:ro
     labels:
-      - "promtail-monitored=${MEV_COMMIT_BOOST_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${MEV_COMMIT_BOOST_ALLOY_MONITORED:-true}"
     networks: [dvnode]
     restart: unless-stopped
 
@@ -40,6 +40,6 @@ services:
       -request-timeout-getpayload=${MEV_TIMEOUT_GETPAYLOAD:-4000}
       -request-timeout-regval=${MEV_TIMEOUT_REGVAL:-3000}
     labels:
-      - "promtail-monitored=${MEV_MEV_BOOST_PROMTAIL_MONITORED:-true}"
+      - "alloy-monitored=${MEV_MEV_BOOST_ALLOY_MONITORED:-true}"
     networks: [dvnode]
     restart: unless-stopped
