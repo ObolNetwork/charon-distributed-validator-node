@@ -109,6 +109,8 @@ services:
     labels:
       - "alloy-monitored=${CHARON_ALLOY_MONITORED:-true}"
     networks: [dvnode]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - .charon:/opt/charon/.charon
     restart: unless-stopped
