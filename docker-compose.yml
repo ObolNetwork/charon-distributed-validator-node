@@ -53,6 +53,7 @@ services:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - 5054:5054/tcp # P2P TCP
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
+      - ${LIGHTHOUSE_IP_HTTP:-127.0.0.1}:${LIGHTHOUSE_PORT_HTTP:-5052}:5052
     labels:
       - "alloy-monitored=${LIGHTHOUSE_ALLOY_MONITORED:-true}"
     command: |
