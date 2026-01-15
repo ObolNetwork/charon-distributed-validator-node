@@ -120,7 +120,7 @@ services:
 
   cl-lodestar:
     profiles: [cl-lodestar]
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.38.0}
+    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.38.0}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
