@@ -30,7 +30,9 @@ services:
       - --builder-url=http://${MEV}:18550
       - --max-empty-slots=4096
     ports:
-      - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
+      - ${CL_PORT_P2P:-9000}:9000/tcp
+      - ${CL_PORT_P2P:-9000}:9000/udp
+      - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-grandine:/root/.grandine
       - ./jwt:/jwt:ro
@@ -66,7 +68,9 @@ services:
       --metrics-port=5054
       --metrics-allow-origin="*"
     ports:
-      - ${CL_PORT_P2P:-9000}:9000 # P2P TCP+UDP
+      - ${CL_PORT_P2P:-9000}:9000/tcp
+      - ${CL_PORT_P2P:-9000}:9000/udp
+      - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
       - ./jwt:/opt/jwt
@@ -80,7 +84,7 @@ services:
 
   cl-teku:
     profiles: [cl-teku]
-    image: consensys/teku:${VC_VERSION:-25.12.0}
+    image: consensys/teku:${CL_TEKU_VERSION:-25.12.0}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
@@ -99,6 +103,10 @@ services:
       --metrics-interface=0.0.0.0
       --metrics-port=5054
       --metrics-host-allowlist="*"
+    ports:
+      - ${CL_PORT_P2P:-9000}:9000/tcp
+      - ${CL_PORT_P2P:-9000}:9000/udp
+      - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-teku:/opt/teku/data
       - ./jwt:/jwt:ro
@@ -112,7 +120,7 @@ services:
 
   cl-lodestar:
     profiles: [cl-lodestar]
-    image: chainsafe/lodestar:${VC_VERSION:-v1.38.0}
+    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.38.0}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
@@ -131,6 +139,10 @@ services:
       --metrics
       --metrics.address=0.0.0.0
       --metrics.port=5054
+    ports:
+      - ${CL_PORT_P2P:-9000}:9000/tcp
+      - ${CL_PORT_P2P:-9000}:9000/udp
+      - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-lodestar:/opt/lodestar/data
       - ./jwt:/jwt:ro
