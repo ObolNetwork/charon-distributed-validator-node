@@ -3,12 +3,17 @@
 # Script to update EIP-3076 anti-slashing DB by replacing pubkey values
 # based on lookup in source and target cluster-lock.json files.
 #
+# This script is invoked by replace_operator.sh for continuing operators only,
+# after the ceremony completes successfully. It translates validator pubkeys in
+# the exported anti-slashing database from old operator keys to new operator keys
+# using the source (original) and target (new) cluster-lock.json files.
+#
 # Usage: update-anti-slashing-db.sh <eip3076-file> <source-cluster-lock> <target-cluster-lock>
 #
 # Arguments:
 #   eip3076-file          - Path to EIP-3076 JSON file to update in place
-#   source-cluster-lock   - Path to source cluster-lock.json
-#   target-cluster-lock   - Path to target cluster-lock.json
+#   source-cluster-lock   - Path to source cluster-lock.json (original)
+#   target-cluster-lock   - Path to target cluster-lock.json (new, from output/)
 #
 # The script traverses the EIP-3076 JSON file and finds all "pubkey" values in the
 # data array. For each pubkey, it looks up the value in the source cluster-lock.json's
@@ -158,7 +163,7 @@ if [ -z "$pubkeys" ]; then
     exit 0
 fi
 
-pubkey_count=$(echo "$pubkeys" | wc -l | xargs)
+pubkey_count=$(grep -c '^' <<< "$pubkeys")
 echo "Found $pubkey_count unique pubkey(s) to process"
 echo ""
 
