@@ -60,8 +60,7 @@
       ],
       "labels": [
         "renovate/docker"
-      ],
-      "groupName": "Docker image updates"
+      ]
     }
   ]
 }
