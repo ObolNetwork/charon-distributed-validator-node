@@ -7,8 +7,9 @@
     "github-actions",
     "regex"
   ],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": [
         "^docker-compose\\.yml$",
         "^relay/docker-compose\\.yml$"
@@ -19,21 +20,23 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "ObolNetwork/charon",
       "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "(^|/)docker-compose\\.ya?ml$",
+        "(^|/)compose[^/]*\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "image:\\s*(?<depName>[^:\\s]+):\\$\\{[A-Z_]+:-(?<currentValue>[^}]+)\\}"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
     {
       "matchManagers": [
         "github-actions"
-      ],
-      "matchDepTypes": [
-        "github-actions"
-      ],
-      "matchFileNames": [
-        ".github/workflows/**"
-      ],
-      "schedule": [
-        "every weekend"
       ],
       "labels": [
         "renovate/github-actions"
@@ -49,8 +52,16 @@
       ],
       "labels": [
         "renovate/charon"
+      ]
+    },
+    {
+      "matchManagers": [
+        "regex"
       ],
-      "groupName": "Charon image updates"
+      "labels": [
+        "renovate/docker"
+      ],
+      "groupName": "Docker image updates"
     }
   ]
 }
