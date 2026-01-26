@@ -11,7 +11,7 @@ services:
 
   el-nethermind:
     profiles: [el-nethermind]
-    image: nethermind/nethermind:${EL_NETHERMIND_VERSION:-1.35.2}
+    image: nethermind/nethermind:${EL_NETHERMIND_VERSION:-1.36.0}
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
