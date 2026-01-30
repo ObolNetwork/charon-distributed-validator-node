@@ -39,6 +39,9 @@ services:
       -request-timeout-getheader=${MEV_TIMEOUT_GETHEADER:-950}
       -request-timeout-getpayload=${MEV_TIMEOUT_GETPAYLOAD:-4000}
       -request-timeout-regval=${MEV_TIMEOUT_REGVAL:-3000}
+      -metrics
+      -metrics-addr 0.0.0.0:18551
+
     labels:
       - "alloy-monitored=${MEV_MEV_BOOST_ALLOY_MONITORED:-true}"
     networks: [dvnode]
