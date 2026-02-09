@@ -70,6 +70,7 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
+      VC_EXTRAS: ${VC_EXTRAS}
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
