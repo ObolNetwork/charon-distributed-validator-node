@@ -5,7 +5,7 @@
 
 services:
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.47.0}
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.55.1}
     command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
     privileged: true
     volumes:
