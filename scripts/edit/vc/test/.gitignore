@@ -2,8 +2,3 @@
 output/
 data/
 *.tmp
-
-# Keep fixtures (override root .gitignore rules)
-!fixtures/
-!fixtures/validator_keys/
-!fixtures/validator_keys/*

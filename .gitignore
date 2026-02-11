@@ -11,7 +11,5 @@ cluster-lock.json
 data/
 .idea
 .charon
-!scripts/edit/replace-operator/test/fixtures/.charon/
-!scripts/edit/replace-operator/test/fixtures/.charon/*
 prometheus/prometheus.yml
 commit-boost/config.toml
