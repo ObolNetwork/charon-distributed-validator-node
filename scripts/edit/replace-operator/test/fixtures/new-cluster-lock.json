@@ -1,0 +1,55 @@
+{
+  "cluster_definition": {
+    "name": "TestCluster",
+    "num_validators": 1,
+    "threshold": 3,
+    "operators": [
+      {
+        "address": "0x5555555555555555555555555555555555555555",
+        "enr": "enr:-HW4QNewReplacement...newoperator0"
+      },
+      {
+        "address": "0x2222222222222222222222222222222222222222",
+        "enr": "enr:-HW4QNewOper...operator1"
+      },
+      {
+        "address": "0x3333333333333333333333333333333333333333",
+        "enr": "enr:-HW4QThird...operator2"
+      },
+      {
+        "address": "0x4444444444444444444444444444444444444444",
+        "enr": "enr:-HW4QFourth...operator3"
+      }
+    ]
+  },
+  "distributed_validators": [
+    {
+      "distributed_public_key": "0xa9fb2be415318eb77709f7c378ab26025371c0b11213d93fd662ffdb06e77a05c7b04573a478e9d5c0c0fd98078965ef",
+      "public_shares": [
+        "0xb11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        "0x8afba316fdcf51e25a89e05e17377b8c72fd465c95346df4ed5694f295faa2ce061e14e579c5bc01a468dbbb191c58e8",
+        "0xa1aeebe0980509f5f8d8d424beb89004a967da8d8093248f64eb27c4ee5d22ba9c0f157025f551f47b31833f8bc585f8",
+        "0xa6c283c82cd0b65436861a149fb840849d06ded1dd8d2f900afb358c6a4232004309120f00a553cdccd8a43f6b743c82"
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "address": "0x5555555555555555555555555555555555555555",
+      "enr": "enr:-HW4QNewReplacement...newoperator0"
+    },
+    {
+      "address": "0x2222222222222222222222222222222222222222",
+      "enr": "enr:-HW4QNewOper...operator1"
+    },
+    {
+      "address": "0x3333333333333333333333333333333333333333",
+      "enr": "enr:-HW4QThird...operator2"
+    },
+    {
+      "address": "0x4444444444444444444444444444444444444444",
+      "enr": "enr:-HW4QFourth...operator3"
+    }
+  ],
+  "lock_hash": "0xf0000000000000000000000000000000000000000000000000000000000000000"
+}
