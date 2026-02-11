@@ -1,0 +1,40 @@
+# Test override for validator client services
+# Removes charon dependency and keeps container alive for testing
+# Mounts test fixtures instead of .charon/validator_keys
+# Uses dedicated test data directory to avoid conflicts
+
+services:
+  vc-lodestar:
+    depends_on: []
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes:
+      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - ./scripts/edit/vc/test/fixtures/validator_keys:/home/charon/validator_keys
+      - ./scripts/edit/vc/test/data/lodestar:/opt/data
+
+  vc-nimbus:
+    depends_on: []
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes:
+      # Mount run.sh from INSIDE the test data directory to avoid conflicts
+      # with the base compose's run.sh mount (volumes are merged, not replaced)
+      - ./scripts/edit/vc/test/data/nimbus/run.sh:/home/user/data/run.sh
+      - ./scripts/edit/vc/test/fixtures/validator_keys:/home/validator_keys
+      - ./scripts/edit/vc/test/data/nimbus:/home/user/data
+
+  vc-prysm:
+    depends_on: []
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes:
+      # Mount run.sh from INSIDE the test data directory to avoid conflicts
+      - ./scripts/edit/vc/test/data/prysm/run.sh:/home/prysm/run.sh
+      - ./scripts/edit/vc/test/fixtures/validator_keys:/home/charon/validator_keys
+      - ./scripts/edit/vc/test/data/prysm:/data/vc
+
+  vc-teku:
+    depends_on: []
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes:
+      # Mount test fixtures validator keys and test data directory
+      - ./scripts/edit/vc/test/fixtures/validator_keys:/opt/charon/validator_keys
+      - ./scripts/edit/vc/test/data/teku:/home/data
