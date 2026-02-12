@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-2.8.2}
+    image: grafana/loki:${LOKI_VERSION:-2.9.17}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:
