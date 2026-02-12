@@ -170,7 +170,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.7.3}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.9.1}
     user: ":"
     networks: [dvnode]
     environment:
