@@ -22,7 +22,6 @@ Automates the complete workflow for operators staying in the cluster:
 - `--new-enr <enr>` - ENR of the new operator (required)
 - `--operator-index <N>` - Index of operator being replaced (required)
 - `--skip-export` - Skip ASDB export if already done
-- `--skip-ceremony` - Skip ceremony if cluster-lock already generated
 - `--dry-run` - Preview without executing
 
 ## For New Operators
