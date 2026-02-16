@@ -375,8 +375,7 @@ test_remaining_help() {
     assert_output_contains "Usage:" "$output" "test_remaining_help" && \
     assert_output_contains "--new-enr" "$output" "test_remaining_help" && \
     assert_output_contains "--operator-index" "$output" "test_remaining_help" && \
-    assert_output_contains "--skip-export" "$output" "test_remaining_help" && \
-    assert_output_contains "--skip-ceremony" "$output" "test_remaining_help"
+    assert_output_contains "--skip-export" "$output" "test_remaining_help"
 }
 
 test_remaining_missing_new_enr() {
@@ -463,16 +462,16 @@ test_remaining_dry_run_full_workflow() {
     local output
     local exit_code=0
     
-    # Use --skip-export and --skip-ceremony to avoid Docker dependencies
+    # Use --skip-export to avoid Docker dependencies
     output=$("$REMAINING_OPERATOR_SCRIPT" \
         --new-enr "enr:-HW4QTestNewOperator123456789" \
         --operator-index 0 \
         --skip-export \
-        --skip-ceremony \
         --dry-run 2>&1) || exit_code=$?
     
     assert_exit_code 0 "$exit_code" "test_remaining_dry_run_full_workflow" && \
     assert_output_contains "DRY-RUN MODE" "$output" "test_remaining_dry_run_full_workflow" && \
+    assert_output_contains "charon edit replace-operator" "$output" "test_remaining_dry_run_full_workflow" && \
     assert_output_contains "Updating anti-slashing database pubkeys" "$output" "test_remaining_dry_run_full_workflow" && \
     assert_output_contains "Stopping" "$output" "test_remaining_dry_run_full_workflow" && \
     assert_output_contains "Backing up" "$output" "test_remaining_dry_run_full_workflow" && \
@@ -497,25 +496,6 @@ test_remaining_skip_export_missing_asdb() {
     
     assert_exit_code 1 "$exit_code" "test_remaining_skip_export_missing_asdb" && \
     assert_output_contains "Cannot skip export" "$output" "test_remaining_skip_export_missing_asdb"
-}
-
-test_remaining_skip_ceremony_missing_output() {
-    local output
-    local exit_code=0
-    
-    rm -f "$REPO_ROOT/output/cluster-lock.json"
-    
-    output=$("$REMAINING_OPERATOR_SCRIPT" \
-        --new-enr "enr:-test" \
-        --operator-index 0 \
-        --skip-ceremony \
-        --dry-run 2>&1) || exit_code=$?
-    
-    # Restore output cluster-lock
-    cp "$TEST_FIXTURES_DIR/new-cluster-lock.json" "$REPO_ROOT/output/cluster-lock.json"
-    
-    assert_exit_code 1 "$exit_code" "test_remaining_skip_ceremony_missing_output" && \
-    assert_output_contains "Cannot skip ceremony" "$output" "test_remaining_skip_ceremony_missing_output"
 }
 
 test_remaining_unknown_argument() {
@@ -575,7 +555,6 @@ main() {
     run_test "remaining-operator: error when ENR key missing" test_remaining_missing_enr_key
     run_test "remaining-operator: dry-run full workflow" test_remaining_dry_run_full_workflow
     run_test "remaining-operator: skip-export needs existing ASDB" test_remaining_skip_export_missing_asdb
-    run_test "remaining-operator: skip-ceremony needs existing output" test_remaining_skip_ceremony_missing_output
     run_test "remaining-operator: error for unknown argument" test_remaining_unknown_argument
     
     echo ""

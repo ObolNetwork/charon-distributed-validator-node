@@ -27,7 +27,6 @@
 #   --new-enr <url_or_path>   ENR of the new operator (required)
 #   --operator-index <N>      Index of the operator being replaced (required)
 #   --skip-export             Skip ASDB export (if already exported)
-#   --skip-ceremony           Skip ceremony (if cluster-lock already generated)
 #   --dry-run                 Show what would be done without executing
 #   -h, --help                Show this help message
 #
@@ -46,7 +45,6 @@ cd "$REPO_ROOT"
 NEW_ENR=""
 OPERATOR_INDEX=""
 SKIP_EXPORT=false
-SKIP_CEREMONY=false
 DRY_RUN=false
 
 # Output directories
@@ -77,7 +75,6 @@ Options:
   --new-enr <enr>         ENR of the new operator (required)
   --operator-index <N>    Index of the operator being replaced (required)
   --skip-export           Skip ASDB export (if already exported)
-  --skip-ceremony         Skip ceremony (if cluster-lock already generated)
   --dry-run               Show what would be done without executing
   -h, --help              Show this help message
 
@@ -110,10 +107,6 @@ while [[ $# -gt 0 ]]; do
             SKIP_EXPORT=true
             shift
             ;;
-        --skip-ceremony)
-            SKIP_CEREMONY=true
-            shift
-            ;;
         --dry-run)
             DRY_RUN=true
             shift
@@ -130,17 +123,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate required arguments
-if [ "$SKIP_CEREMONY" = false ]; then
-    if [ -z "$NEW_ENR" ]; then
-        log_error "Missing required argument: --new-enr"
-        echo "Use --help for usage information"
-        exit 1
-    fi
-    if [ -z "$OPERATOR_INDEX" ]; then
-        log_error "Missing required argument: --operator-index"
-        echo "Use --help for usage information"
-        exit 1
-    fi
+if [ -z "$NEW_ENR" ]; then
+    log_error "Missing required argument: --new-enr"
+    echo "Use --help for usage information"
+    exit 1
+fi
+if [ -z "$OPERATOR_INDEX" ]; then
+    log_error "Missing required argument: --operator-index"
+    echo "Use --help for usage information"
+    exit 1
 fi
 
 run_cmd() {
@@ -241,35 +232,27 @@ echo ""
 # Step 2: Run replace-operator ceremony
 log_step "Step 2: Running replace-operator ceremony..."
 
-if [ "$SKIP_CEREMONY" = true ]; then
-    log_warn "Skipping ceremony (--skip-ceremony specified)"
-    if [ ! -f "$OUTPUT_DIR/cluster-lock.json" ]; then
-        log_error "Cannot skip ceremony: $OUTPUT_DIR/cluster-lock.json not found"
-        exit 1
-    fi
+mkdir -p "$OUTPUT_DIR"
+
+log_info "Running: charon edit replace-operator"
+log_info "  Replacing operator index: $OPERATOR_INDEX"
+log_info "  New ENR: ${NEW_ENR:0:50}..."
+
+if [ "$DRY_RUN" = false ]; then
+    docker run --rm \
+        -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
+        -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+        edit replace-operator \
+        --lock-file=/opt/charon/.charon/cluster-lock.json \
+        --output-dir=/opt/charon/output \
+        --operator-index="$OPERATOR_INDEX" \
+        --new-enr="$NEW_ENR"
 else
-    mkdir -p "$OUTPUT_DIR"
-    
-    log_info "Running: charon edit replace-operator"
-    log_info "  Replacing operator index: $OPERATOR_INDEX"
-    log_info "  New ENR: ${NEW_ENR:0:50}..."
-    
-    if [ "$DRY_RUN" = false ]; then
-        docker run --rm \
-            -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-            -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-            "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
-            edit replace-operator \
-            --lock-file=/opt/charon/.charon/cluster-lock.json \
-            --output-dir=/opt/charon/output \
-            --operator-index="$OPERATOR_INDEX" \
-            --new-enr="$NEW_ENR"
-    else
-        echo "  [DRY-RUN] docker run --rm ... charon edit replace-operator ..."
-    fi
-    
-    log_info "New cluster-lock generated at $OUTPUT_DIR/cluster-lock.json"
+    echo "  [DRY-RUN] docker run --rm ... charon edit replace-operator ..."
 fi
+
+log_info "New cluster-lock generated at $OUTPUT_DIR/cluster-lock.json"
 
 echo ""
 
