@@ -22,3 +22,7 @@ commit-boost/config.toml
 **/keystore-*.json
 **/keystore-*.txt
 **/charon-enr-private-key
+
+# Allow test fixtures
+!scripts/edit/**/test/fixtures/.charon/
+!scripts/edit/**/test/fixtures/.charon/**
