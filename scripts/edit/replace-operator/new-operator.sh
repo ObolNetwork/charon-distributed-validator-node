@@ -48,6 +48,9 @@ CLUSTER_LOCK_PATH=""
 GENERATE_ENR=false
 DRY_RUN=false
 
+# Output directories
+BACKUP_DIR="./backups"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -128,10 +131,11 @@ echo "║     Replace-Operator Workflow - NEW OPERATOR                   ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 
-# Check for .env file
+# Step 0: Check prerequisites
+log_step "Step 0: Checking prerequisites..."
+
 if [ ! -f .env ]; then
     log_error ".env file not found. Please create one with NETWORK and VC variables."
-    log_info "Copy from a sample: cp .env.sample.hoodi .env"
     exit 1
 fi
 
@@ -152,7 +156,7 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-log_info "Configuration:"
+log_info "Prerequisites OK"
 log_info "  Network: $NETWORK"
 log_info "  Validator Client: $VC"
 
@@ -187,9 +191,9 @@ if [ "$GENERATE_ENR" = true ]; then
     
     if [ -f .charon/charon-enr-private-key ]; then
         echo ""
-        echo "╔════════════════════════════════════════════════════════════════╗"
-        echo "║  SHARE YOUR ENR WITH THE REMAINING OPERATORS                   ║"
-        echo "╚════════════════════════════════════════════════════════════════╝"
+        log_warn "╔════════════════════════════════════════════════════════════════╗"
+        log_warn "║  SHARE YOUR ENR WITH THE REMAINING OPERATORS                   ║"
+        log_warn "╚════════════════════════════════════════════════════════════════╝"
         echo ""
         
         # Extract and display the ENR
@@ -217,7 +221,7 @@ if [ "$GENERATE_ENR" = true ]; then
     exit 0
 fi
 
-# Step 2: Check prerequisites
+# Step 1: Check prerequisites
 log_step "Step 1: Checking prerequisites..."
 
 if [ "$DRY_RUN" = false ]; then
@@ -263,7 +267,7 @@ log_info "Prerequisites OK"
 
 echo ""
 
-# Step 3: Stop any running containers
+# Step 2: Stop any running containers
 log_step "Step 2: Stopping any running containers..."
 
 # Stop containers if running (ignore errors if not running)
@@ -273,15 +277,15 @@ log_info "Containers stopped"
 
 echo ""
 
-# Step 4: Install cluster-lock if provided
+# Step 3: Install cluster-lock if provided
 if [ -n "$CLUSTER_LOCK_PATH" ]; then
     log_step "Step 3: Installing new cluster-lock..."
     
     if [ -f .charon/cluster-lock.json ]; then
         TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        mkdir -p ./backups
-        run_cmd cp .charon/cluster-lock.json "./backups/cluster-lock.json.$TIMESTAMP"
-        log_info "Old cluster-lock backed up to ./backups/cluster-lock.json.$TIMESTAMP"
+        mkdir -p "$BACKUP_DIR"
+        run_cmd cp .charon/cluster-lock.json "$BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
+        log_info "Old cluster-lock backed up to $BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
     fi
     
     run_cmd cp "$CLUSTER_LOCK_PATH" .charon/cluster-lock.json
@@ -293,7 +297,7 @@ fi
 
 echo ""
 
-# Step 5: Verify cluster-lock matches our ENR
+# Step 4: Verify cluster-lock matches our ENR
 log_step "Step 4: Verifying cluster-lock configuration..."
 
 if [ "$DRY_RUN" = false ] && [ -f .charon/cluster-lock.json ]; then
@@ -321,7 +325,7 @@ fi
 
 echo ""
 
-# Step 6: Start containers
+# Step 5: Start containers
 log_step "Step 5: Starting containers..."
 
 run_cmd docker compose up -d charon "$VC"
