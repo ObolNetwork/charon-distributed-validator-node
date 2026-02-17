@@ -38,6 +38,7 @@ CHARON_VERSION=v1.8.2 ./scripts/edit/test/e2e_test.sh
 3. Interposes a **mock docker wrapper** (`test/bin/docker`) on `PATH`
    - Real `docker run` is used for charon ceremony commands (P2P relay)
    - `docker compose` commands are mocked (container lifecycle, ASDB export/import)
+   - `edit replace-operator` is mocked locally (the command does not yet exist in charon v1.8.2)
 4. Runs each edit script through its happy path
 5. Verifies outputs (validator count, operator count, key changes) at each step
 

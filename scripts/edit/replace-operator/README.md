@@ -10,6 +10,8 @@ These scripts help operators replace a single operator in an existing distribute
 - **Infrastructure migration**: Moving an operator to new infrastructure
 - **Recovery**: Replacing an operator whose keys may have been compromised
 
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
+
 There are two scripts for the two roles involved:
 
 - **`remaining-operator.sh`** - For operators staying in the cluster (runs the ceremony)
@@ -80,12 +82,14 @@ Two-step workflow for the new operator joining the cluster.
 ## Current Limitations
 
 - The new cluster configuration will not be reflected on the Obol Launchpad
-- The new cluster will have a new cluster hash (different observability identifier)
+- The cluster will have a new cluster hash (different observability identifier)
 - Only one operator can be replaced at a time
 
 ## Related
 
 - [Add-Validators Workflow](../add-validators/README.md)
+- [Add-Operators Workflow](../add-operators/README.md)
+- [Remove-Operators Workflow](../remove-operators/README.md)
 - [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)
 - [Anti-Slashing DB Scripts](../vc/README.md)
 - [Obol Documentation](https://docs.obol.org/next/advanced-and-troubleshooting/advanced/replace-operator)

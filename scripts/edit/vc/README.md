@@ -4,7 +4,7 @@ Scripts to export, import, and update validator anti-slashing databases (ASDB) i
 
 ## Overview
 
-When performing cluster edit operations (replace-operator, recreate-private-keys), the anti-slashing database must be exported, updated with new pubkeys, and re-imported to prevent slashing violations. These scripts automate that process across all supported validator clients.
+When performing cluster edit operations (replace-operator, recreate-private-keys, add-operators, remove-operators), the anti-slashing database must be exported, updated with new pubkeys, and re-imported to prevent slashing violations. These scripts automate that process across all supported validator clients.
 
 ## Prerequisites
 
@@ -56,6 +56,8 @@ See [test/README.md](test/README.md) for integration tests.
 
 ## Related
 
-- [Replace-Operator Workflow](../replace-operator/README.md)
-- [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)
 - [Add-Validators Workflow](../add-validators/README.md)
+- [Add-Operators Workflow](../add-operators/README.md)
+- [Remove-Operators Workflow](../remove-operators/README.md)
+- [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)
+- [Replace-Operator Workflow](../replace-operator/README.md)

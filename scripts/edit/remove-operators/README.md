@@ -12,7 +12,7 @@ These scripts help operators remove specific operators from an existing distribu
 
 **Important**: This is a coordinated ceremony. All participating operators must run their respective scripts simultaneously to complete the process.
 
-> Warning: This is an alpha feature in Charon and is not yet recommended for production use.
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
 
 There are two scripts for the two roles involved:
 
@@ -92,8 +92,9 @@ If the removal is within fault tolerance, removed operators do **not** need to r
 
 ## Related
 
+- [Add-Validators Workflow](../add-validators/README.md)
 - [Add-Operators Workflow](../add-operators/README.md)
-- [Replace-Operator Workflow](../replace-operator/README.md)
 - [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)
+- [Replace-Operator Workflow](../replace-operator/README.md)
 - [Anti-Slashing DB Scripts](../vc/README.md)
 - [Obol Documentation](https://docs.obol.org/next/advanced-and-troubleshooting/advanced/remove-operators)
