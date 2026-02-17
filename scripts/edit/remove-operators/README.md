@@ -90,10 +90,6 @@ If the removal is within fault tolerance, removed operators do **not** need to r
 - All remaining operators must have valid validator keys to participate
 - The old cluster must be completely stopped before the new cluster can operate
 
-## Testing
-
-See [test/README.md](test/README.md) for integration tests.
-
 ## Related
 
 - [Add-Operators Workflow](../add-operators/README.md)

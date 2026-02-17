@@ -89,10 +89,6 @@ Two-step workflow for new operators joining the cluster.
 - All operators (existing and new) must participate; no partial participation option
 - Cluster threshold remains unchanged
 
-## Testing
-
-See [test/README.md](test/README.md) for integration tests.
-
 ## Related
 
 - [Add-Validators Workflow](../add-validators/README.md)

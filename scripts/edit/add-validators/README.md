@@ -96,10 +96,6 @@ If your validator keys are stored remotely (e.g., in a KeyManager) and Charon ca
 - The new cluster will have a new cluster hash (different observability identifier)
 - All operators must participate; no partial participation option
 
-## Testing
-
-See [test/README.md](test/README.md) for integration tests.
-
 ## Related
 
 - [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)

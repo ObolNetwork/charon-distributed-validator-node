@@ -83,10 +83,6 @@ Two-step workflow for the new operator joining the cluster.
 - The new cluster will have a new cluster hash (different observability identifier)
 - Only one operator can be replaced at a time
 
-## Testing
-
-See [test/README.md](test/README.md) for integration tests.
-
 ## Related
 
 - [Add-Validators Workflow](../add-validators/README.md)

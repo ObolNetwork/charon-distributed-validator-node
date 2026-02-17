@@ -112,72 +112,14 @@ docker compose -f docker-compose.yml -f compose-debug.yml up --no-start
 
 ## Cluster Edit Scripts
 
-Located in `scripts/edit/`, these automate complex cluster modification operations:
+Located in `scripts/edit/`, these automate complex cluster modification operations. Each has its own README with full usage details:
 
-### Replace Operator (`scripts/edit/replace-operator/`)
-
-Automates the workflow when one operator in a distributed validator cluster needs to be replaced.
-
-**For remaining operators:**
-```bash
-./scripts/edit/replace-operator/remaining-operator.sh \
-    --new-enr "enr:-..." \
-    --operator-index 2
-```
-
-**For new operators:**
-```bash
-# Step 1: Generate and share ENR
-./scripts/edit/replace-operator/new-operator.sh --generate-enr
-
-# Step 2: Apply received cluster-lock
-./scripts/edit/replace-operator/new-operator.sh --cluster-lock ./received-cluster-lock.json
-```
-
-### Anti-Slashing Database Management (`scripts/edit/vc/`)
-
-When switching validator clients or replacing operators, the anti-slashing database (ASDB) must be exported and imported to prevent slashing violations (EIP-3076 format).
-
-```bash
-# Export from current VC
-./scripts/edit/vc/export_asdb.sh
-
-# Import to new VC (after switching VC in .env)
-./scripts/edit/vc/import_asdb.sh
-```
-
-Client-specific scripts are in subdirectories: `lodestar/`, `nimbus/`, `prysm/`, `teku/`.
-
-### Recreate Private Keys (`scripts/edit/recreate-private-keys/`)
-
-Recreates validator private keys from cluster-lock.json when they are lost but the cluster-lock file is still available.
-
-```bash
-./scripts/edit/recreate-private-keys/recreate-private-keys.sh
-```
-
-## Adding Validators
-
-Starting with Charon v1.6, you can add validators to an existing cluster using `charon alpha add-validators`:
-
-```bash
-# Using Docker (recommended)
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:latest \
-  alpha add-validators \
-  --num-validators 10 \
-  --withdrawal-addresses=0x<address> \
-  --fee-recipient-addresses=0x<address> \
-  --data-dir=/opt/charon/.charon \
-  --output-dir=/opt/charon/output
-
-# Apply the new configuration (backup first!)
-docker compose stop charon <vc-service>
-mv .charon .charon-backup
-mv output .charon
-docker compose up -d charon <vc-service>
-```
-
-**Note**: All operators must independently perform the upgrade. The cluster continues operating once threshold operators have upgraded.
+- **[Add Validators](scripts/edit/add-validators/README.md)** - Add new validators to an existing cluster
+- **[Add Operators](scripts/edit/add-operators/README.md)** - Expand the cluster by adding new operators
+- **[Remove Operators](scripts/edit/remove-operators/README.md)** - Remove operators from the cluster
+- **[Replace Operator](scripts/edit/replace-operator/README.md)** - Replace a single operator in the cluster
+- **[Recreate Private Keys](scripts/edit/recreate-private-keys/README.md)** - Refresh private key shares while keeping the same validator public keys
+- **[Anti-Slashing DB (vc/)](scripts/edit/vc/README.md)** - Export/import/update anti-slashing databases (EIP-3076)
 
 ## Monitoring Stack
 
