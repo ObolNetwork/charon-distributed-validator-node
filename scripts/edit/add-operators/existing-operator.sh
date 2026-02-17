@@ -39,7 +39,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="${WORK_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
 cd "$REPO_ROOT"
 
 # Default values
@@ -212,7 +212,7 @@ fi
 
 mkdir -p "$ASDB_EXPORT_DIR"
 
-run_cmd VC="$VC" "$SCRIPT_DIR/../vc/export_asdb.sh" \
+VC="$VC" run_cmd "$SCRIPT_DIR/../vc/export_asdb.sh" \
     --output-file "$ASDB_EXPORT_DIR/slashing-protection.json"
 
 log_info "Anti-slashing database exported to $ASDB_EXPORT_DIR/slashing-protection.json"
@@ -301,7 +301,7 @@ echo ""
 # Step 6: Import updated ASDB
 log_step "Step 6: Importing updated anti-slashing database..."
 
-run_cmd VC="$VC" "$SCRIPT_DIR/../vc/import_asdb.sh" \
+VC="$VC" run_cmd "$SCRIPT_DIR/../vc/import_asdb.sh" \
     --input-file "$ASDB_EXPORT_DIR/slashing-protection.json"
 
 log_info "Anti-slashing database imported"
