@@ -11,13 +11,14 @@ This script helps operators add new validators to an existing distributed valida
 
 **Important**: This is a coordinated ceremony. All operators must run this script simultaneously to complete the process.
 
-> ⚠️ This is an alpha feature in Charon and is not yet recommended for production use.
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
 
 ## Prerequisites
 
 - `.env` file with `NETWORK` and `VC` variables set
 - `.charon` directory with `cluster-lock.json`
 - Docker running
+- `jq` installed
 - **Charon and VC must be RUNNING** during the ceremony
 - **All operators must participate in the ceremony**
 
@@ -93,11 +94,14 @@ If your validator keys are stored remotely (e.g., in a KeyManager) and Charon ca
 ## Current Limitations
 
 - The new cluster configuration will not be reflected on the Obol Launchpad
-- The new cluster will have a new cluster hash (different observability identifier)
+- The cluster will have a new cluster hash (different observability identifier)
 - All operators must participate; no partial participation option
 
 ## Related
 
+- [Add-Operators Workflow](../add-operators/README.md)
+- [Remove-Operators Workflow](../remove-operators/README.md)
 - [Recreate-Private-Keys Workflow](../recreate-private-keys/README.md)
 - [Replace-Operator Workflow](../replace-operator/README.md)
+- [Anti-Slashing DB Scripts](../vc/README.md)
 - [Obol Documentation](https://docs.obol.org/next/advanced-and-troubleshooting/advanced/add-validators)

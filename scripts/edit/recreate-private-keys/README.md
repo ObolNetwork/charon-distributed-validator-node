@@ -12,11 +12,14 @@ This script helps operators recreate validator private key shares while keeping 
 
 **Important**: This operation maintains the same validator public keys, so validators remain registered on the beacon chain without any changes. Only the underlying private key shares held by operators are refreshed.
 
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
+
 ## Prerequisites
 
 - `.env` file with `NETWORK` and `VC` variables set
 - `.charon` directory with `cluster-lock.json` and `validator_keys`
 - Docker running
+- `jq` installed
 - **All operators must participate in the ceremony**
 
 ## Usage
@@ -46,13 +49,16 @@ The script will:
 
 ## Current Limitations
 
-- The new cluster configuration will not be reflected on the Launchpad
-- The new cluster will have a new cluster hash (different observability identifier)
+- The new cluster configuration will not be reflected on the Obol Launchpad
+- The cluster will have a new cluster hash (different observability identifier)
 - All operators must participate; no partial participation option
 - All operators must have their current validator private key shares
 
 ## Related
 
+- [Add-Validators Workflow](../add-validators/README.md)
+- [Add-Operators Workflow](../add-operators/README.md)
+- [Remove-Operators Workflow](../remove-operators/README.md)
 - [Replace-Operator Workflow](../replace-operator/README.md)
 - [Anti-Slashing DB Scripts](../vc/README.md)
 - [Obol Documentation](https://docs.obol.org/next/advanced-and-troubleshooting/advanced/recreate-private-keys)
