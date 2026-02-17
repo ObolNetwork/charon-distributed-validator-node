@@ -14,6 +14,3 @@ data/
 prometheus/prometheus.yml
 commit-boost/config.toml
 
-# Allow test fixtures
-!scripts/edit/**/test/fixtures/.charon/
-!scripts/edit/**/test/fixtures/.charon/**
