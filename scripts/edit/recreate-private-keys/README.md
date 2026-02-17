@@ -51,10 +51,6 @@ The script will:
 - All operators must participate; no partial participation option
 - All operators must have their current validator private key shares
 
-## Testing
-
-See [test/README.md](test/README.md) for integration tests.
-
 ## Related
 
 - [Replace-Operator Workflow](../replace-operator/README.md)
