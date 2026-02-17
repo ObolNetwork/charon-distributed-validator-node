@@ -302,7 +302,7 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
 else
-    echo "  [DRY-RUN] docker ${DOCKER_ARGS[*]}"
+    echo "  [DRY-RUN] docker run --rm -it ... charon alpha edit add-validators --num-validators=$NUM_VALIDATORS --output-dir=$OUTPUT_DIR"
 fi
 
 echo ""

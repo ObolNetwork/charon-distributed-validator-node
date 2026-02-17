@@ -31,7 +31,7 @@
 #   -h, --help                Show this help message
 #
 # Example:
-#   ./scripts/edit/remaining-operator.sh \
+#   ./scripts/edit/replace-operator/remaining-operator.sh \
 #       --new-enr "enr:-..." \
 #       --operator-index 2
 
@@ -79,7 +79,7 @@ Options:
   -h, --help              Show this help message
 
 Example:
-  ./scripts/edit/remaining-operator.sh \
+  ./scripts/edit/replace-operator/remaining-operator.sh \
       --new-enr "enr:-..." \
       --operator-index 2
 
@@ -323,4 +323,6 @@ log_info "Next steps:"
 log_info "  1. Verify charon is syncing with peers: docker compose logs -f charon"
 log_info "  2. Verify VC is running: docker compose logs -f $VC"
 log_info "  3. Share the new cluster-lock.json with the NEW operator"
+echo ""
+log_warn "Keep the backup until you've verified normal operation for several epochs."
 echo ""

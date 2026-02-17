@@ -39,7 +39,10 @@ The script will:
 
 ## Options
 
-- `--dry-run` - Preview without executing
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--dry-run` | No | Preview without executing |
+| `-h, --help` | No | Show help message |
 
 ## Current Limitations
 
