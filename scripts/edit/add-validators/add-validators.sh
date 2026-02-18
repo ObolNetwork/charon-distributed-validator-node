@@ -1,44 +1,6 @@
 #!/usr/bin/env bash
 
-# Add-Validators Script
-#
-# This script automates the add-validators ceremony for Charon distributed
-# validators. This is used to add new validators to an existing cluster.
-#
-# Reference: https://docs.obol.org/next/advanced-and-troubleshooting/advanced/add-validators
-#
-# IMPORTANT: This is a CEREMONY - ALL operators in the cluster must run this
-# script simultaneously. The ceremony coordinates between all operators to
-# generate new validator key shares.
-#
-# Use cases:
-# - Adding more validators to an existing distributed validator cluster
-# - Expanding staking capacity without creating a new cluster
-#
-# The workflow:
-# 1. Check prerequisites (cluster running, cluster-lock exists)
-# 2. Run the add-validators ceremony (all operators simultaneously)
-# 3. Stop containers
-# 4. Backup and replace .charon directory
-# 5. Restart containers
-#
-# Prerequisites:
-# - .env file with NETWORK and VC variables set
-# - .charon directory with cluster-lock.json
-# - Docker and docker compose installed and running
-# - Charon and VC must be RUNNING during ceremony
-# - All operators must participate in the ceremony
-#
-# Usage:
-#   ./scripts/edit/add-validators/add-validators.sh [OPTIONS]
-#
-# Options:
-#   --num-validators <N>           Number of validators to add (required)
-#   --withdrawal-addresses <addr>  Withdrawal address(es), comma-separated for multiple
-#   --fee-recipient-addresses <addr> Fee recipient address(es), comma-separated
-#   --unverified                   Skip key verification (when keys not accessible)
-#   --dry-run                      Show what would be done without executing
-#   -h, --help                     Show this help message
+# Add-Validators Script - See README.md for documentation
 
 set -euo pipefail
 
@@ -73,40 +35,17 @@ usage() {
     cat << 'EOF'
 Usage: ./scripts/edit/add-validators/add-validators.sh [OPTIONS]
 
-Adds new validators to an existing distributed validator cluster. This is a
-CEREMONY that ALL operators must run simultaneously.
+Adds new validators to an existing distributed validator cluster.
 
 Options:
   --num-validators <N>             Number of validators to add (required)
-  --withdrawal-addresses <addr>    Withdrawal address(es), comma-separated for multiple
-  --fee-recipient-addresses <addr> Fee recipient address(es), comma-separated
+  --withdrawal-addresses <addr>    Withdrawal address(es), comma-separated (required)
+  --fee-recipient-addresses <addr> Fee recipient address(es), comma-separated (required)
   --unverified                     Skip key verification (when keys not accessible)
   --dry-run                        Show what would be done without executing
   -h, --help                       Show this help message
 
-Example:
-  # Add 10 validators with same withdrawal address
-  ./scripts/edit/add-validators/add-validators.sh \
-      --num-validators 10 \
-      --withdrawal-addresses 0x123...abc \
-      --fee-recipient-addresses 0x456...def
-
-  # Add validators without key verification (remote KeyManager)
-  ./scripts/edit/add-validators/add-validators.sh \
-      --num-validators 5 \
-      --withdrawal-addresses 0x123...abc \
-      --fee-recipient-addresses 0x456...def \
-      --unverified
-
-Prerequisites:
-  - .env file with NETWORK and VC variables set
-  - .charon directory with cluster-lock.json and validator_keys
-  - Charon and VC containers RUNNING during ceremony
-  - All operators must participate in the ceremony
-
-Note:
-  If using --unverified flag, you must start charon with --no-verify flag
-  or set CHARON_NO_VERIFY=true environment variable.
+See README.md for detailed documentation.
 EOF
     exit 0
 }
@@ -148,6 +87,18 @@ done
 # Validate required arguments
 if [ -z "$NUM_VALIDATORS" ]; then
     log_error "Missing required argument: --num-validators"
+    echo "Use --help for usage information"
+    exit 1
+fi
+
+if [ -z "$WITHDRAWAL_ADDRESSES" ]; then
+    log_error "Missing required argument: --withdrawal-addresses"
+    echo "Use --help for usage information"
+    exit 1
+fi
+
+if [ -z "$FEE_RECIPIENT_ADDRESSES" ]; then
+    log_error "Missing required argument: --fee-recipient-addresses"
     echo "Use --help for usage information"
     exit 1
 fi
@@ -207,16 +158,14 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Check if charon is running (required for ceremony)
-if [ "$DRY_RUN" = false ]; then
-    if ! docker compose ps charon 2>/dev/null | grep -q Up; then
-        log_error "Charon container is not running."
-        log_error "The DV node should be running during the add-validators ceremony."
-        log_error "Start it with: docker compose up -d charon $VC"
-        exit 1
-    fi
-else
-    log_warn "Would check that charon container is running"
+# Check if containers are currently running
+CHARON_WAS_RUNNING=false
+VC_WAS_RUNNING=false
+if docker compose ps charon 2>/dev/null | grep -q Up; then
+    CHARON_WAS_RUNNING=true
+fi
+if docker compose ps "$VC" 2>/dev/null | grep -q Up; then
+    VC_WAS_RUNNING=true
 fi
 
 log_info "Prerequisites OK"
@@ -236,6 +185,13 @@ fi
 
 if [ "$DRY_RUN" = true ]; then
     log_warn "DRY-RUN MODE: No changes will be made"
+fi
+
+# Check if output directory already exists
+if [ -d "$OUTPUT_DIR" ]; then
+    log_error "Output directory '$OUTPUT_DIR' already exists."
+    log_error "Please remove it first: rm -rf $OUTPUT_DIR"
+    exit 1
 fi
 
 # Show current cluster info
@@ -307,12 +263,15 @@ fi
 
 echo ""
 
-# Step 2: Stop containers
+# Step 2: Stop containers (if they were running)
 log_step "Step 2: Stopping containers..."
 
-run_cmd docker compose stop "$VC" charon
-
-log_info "Containers stopped"
+if [ "$CHARON_WAS_RUNNING" = true ] || [ "$VC_WAS_RUNNING" = true ]; then
+    run_cmd docker compose stop "$VC" charon
+    log_info "Containers stopped"
+else
+    log_info "Containers were not running, skipping stop"
+fi
 
 echo ""
 
@@ -330,18 +289,19 @@ log_info "New cluster configuration installed to .charon/"
 
 echo ""
 
-# Step 4: Restart containers
+# Step 4: Restart containers (if they were running before)
 log_step "Step 4: Restarting containers..."
 
-# Build up command with potential --no-verify flag
-if [ "$UNVERIFIED" = true ]; then
-    log_warn "Starting charon with CHARON_NO_VERIFY=true (required for --unverified mode)"
+if [ "$CHARON_WAS_RUNNING" = true ] || [ "$VC_WAS_RUNNING" = true ]; then
+    if [ "$UNVERIFIED" = true ]; then
+        log_warn "Starting charon with CHARON_NO_VERIFY=true (required for --unverified mode)"
+    fi
     run_cmd docker compose up -d charon "$VC"
+    log_info "Containers restarted"
 else
-    run_cmd docker compose up -d charon "$VC"
+    log_info "Containers were not running before, skipping restart"
+    log_info "Start manually with: docker compose up -d charon $VC"
 fi
-
-log_info "Containers restarted"
 
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
@@ -352,7 +312,11 @@ log_info "Summary:"
 log_info "  - Old .charon backed up to: $BACKUP_DIR/.charon-backup.$TIMESTAMP"
 log_info "  - New cluster configuration installed in: .charon/"
 log_info "  - $NUM_VALIDATORS new validator(s) added"
-log_info "  - Containers restarted: charon, $VC"
+if [ "$CHARON_WAS_RUNNING" = true ] || [ "$VC_WAS_RUNNING" = true ]; then
+    log_info "  - Containers restarted: charon, $VC"
+else
+    log_info "  - Containers not restarted (were not running)"
+fi
 
 if [ "$UNVERIFIED" = true ]; then
     echo ""
@@ -370,7 +334,4 @@ log_info "  5. Activate new validators on the beacon chain"
 echo ""
 log_warn "Keep the backup until you've verified normal operation for several epochs."
 echo ""
-log_info "Current limitations:"
-log_info "  - The new configuration will not be reflected on the Obol Launchpad"
-log_info "  - The cluster will have a new cluster hash (different observability ID)"
-echo ""
+
