@@ -34,6 +34,7 @@ services:
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
       --History.Pruning=Rolling
+      --Blocks.BlockProductionBlobLimit=0
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
