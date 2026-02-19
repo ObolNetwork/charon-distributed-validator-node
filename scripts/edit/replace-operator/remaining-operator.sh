@@ -1,39 +1,6 @@
 #!/usr/bin/env bash
 
-# Replace-Operator Workflow Script for REMAINING Operators
-#
-# This script automates the complete replace-operator workflow for operators
-# who are staying in the cluster (continuing operators).
-#
-# The workflow:
-# 1. Export the current anti-slashing database
-# 2. Run the replace-operator ceremony (charon edit replace-operator)
-# 3. Update the exported ASDB with new pubkeys
-# 4. Stop charon and VC containers
-# 5. Backup and replace the cluster-lock
-# 6. Import the updated ASDB
-# 7. Restart all containers
-#
-# Prerequisites:
-# - .env file with NETWORK and VC variables set
-# - .charon directory with cluster-lock.json and charon-enr-private-key
-# - Docker and docker compose installed and running
-# - VC container running (for initial export)
-#
-# Usage:
-#   ./scripts/edit/replace-operator/remaining-operator.sh [OPTIONS]
-#
-# Options:
-#   --new-enr <url_or_path>   ENR of the new operator (required)
-#   --operator-index <N>      Index of the operator being replaced (required)
-#   --skip-export             Skip ASDB export (if already exported)
-#   --dry-run                 Show what would be done without executing
-#   -h, --help                Show this help message
-#
-# Example:
-#   ./scripts/edit/replace-operator/remaining-operator.sh \
-#       --new-enr "enr:-..." \
-#       --operator-index 2
+# Replace-Operator Script for REMAINING Operators - See README.md for documentation
 
 set -euo pipefail
 
@@ -286,6 +253,8 @@ mkdir -p "$BACKUP_DIR"
 run_cmd cp .charon/cluster-lock.json "$BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
 log_info "Old cluster-lock backed up to $BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
 
+# Remove existing file first (may be read-only from Charon)
+rm -f .charon/cluster-lock.json
 run_cmd cp "$OUTPUT_DIR/cluster-lock.json" .charon/cluster-lock.json
 log_info "New cluster-lock installed"
 
@@ -301,13 +270,6 @@ log_info "Anti-slashing database imported"
 
 echo ""
 
-# Step 7: Restart containers
-log_step "Step 7: Restarting containers..."
-
-run_cmd docker compose up -d charon "$VC"
-
-log_info "Containers restarted"
-
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║     Replace-Operator Workflow COMPLETED                        ║"
@@ -317,10 +279,17 @@ log_info "Summary:"
 log_info "  - Old cluster-lock backed up to: $BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
 log_info "  - New cluster-lock installed in: .charon/cluster-lock.json"
 log_info "  - Anti-slashing database updated and imported"
-log_info "  - Containers restarted: charon, $VC"
 echo ""
-log_info "Next steps:"
-log_info "  1. Verify charon is syncing with peers: docker compose logs -f charon"
+log_warn "╔════════════════════════════════════════════════════════════════╗"
+log_warn "║  IMPORTANT: Wait at least 2 epochs (~13 min) before starting  ║"
+log_warn "║  containers to avoid slashing risk from duplicate attestations║"
+log_warn "╚════════════════════════════════════════════════════════════════╝"
+echo ""
+log_info "When ready, start containers with:"
+echo "  docker compose up -d charon $VC"
+echo ""
+log_info "After starting, verify:"
+log_info "  1. Check charon logs: docker compose logs -f charon"
 log_info "  2. Verify VC is running: docker compose logs -f $VC"
 log_info "  3. Share the new cluster-lock.json with the NEW operator"
 echo ""

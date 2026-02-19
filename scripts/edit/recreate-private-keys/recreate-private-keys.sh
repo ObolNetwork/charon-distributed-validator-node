@@ -1,43 +1,6 @@
 #!/usr/bin/env bash
 
-# Recreate-Private-Keys Script
-#
-# This script automates the recreate-private-keys ceremony for Charon
-# distributed validators. This is used to regenerate validator private key
-# shares while keeping the same validator public keys.
-#
-# Reference: https://docs.obol.org/next/advanced-and-troubleshooting/advanced/recreate-private-keys
-#
-# IMPORTANT: This is a CEREMONY - ALL operators in the cluster must run this
-# script simultaneously. The ceremony coordinates between all operators to
-# generate new private key shares.
-#
-# Use cases:
-# - Security concerns: If private key shares may have been compromised
-# - Key rotation: As part of regular security practices
-# - Recovery: After a security incident to refresh key material
-#
-# The workflow:
-# 1. Export the current anti-slashing database
-# 2. Run the recreate-private-keys ceremony (all operators simultaneously)
-# 3. Update the exported ASDB with new pubkeys
-# 4. Stop containers
-# 5. Backup and replace .charon directory
-# 6. Import the updated ASDB
-# 7. Restart containers
-#
-# Prerequisites:
-# - .env file with NETWORK and VC variables set
-# - .charon directory with cluster-lock.json and validator_keys
-# - Docker and docker compose installed and running
-# - All operators must participate in the ceremony
-#
-# Usage:
-#   ./scripts/edit/recreate-private-keys/recreate-private-keys.sh [OPTIONS]
-#
-# Options:
-#   --dry-run         Show what would be done without executing
-#   -h, --help        Show this help message
+# Recreate-Private-Keys Script - See README.md for documentation
 
 set -euo pipefail
 
@@ -287,13 +250,6 @@ log_info "Anti-slashing database imported"
 
 echo ""
 
-# Step 7: Restart containers
-log_step "Step 7: Restarting containers..."
-
-run_cmd docker compose up -d charon "$VC"
-
-log_info "Containers restarted"
-
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║     Recreate Private Keys Workflow COMPLETED                   ║"
@@ -303,9 +259,16 @@ log_info "Summary:"
 log_info "  - Old .charon backed up to: $BACKUP_DIR/.charon-backup.$TIMESTAMP"
 log_info "  - New keys installed in: .charon/"
 log_info "  - Anti-slashing database updated and imported"
-log_info "  - Containers restarted: charon, $VC"
 echo ""
-log_info "Next steps:"
+log_warn "╔════════════════════════════════════════════════════════════════╗"
+log_warn "║  IMPORTANT: Wait at least 2 epochs (~13 min) before starting  ║"
+log_warn "║  containers to avoid slashing risk from duplicate attestations║"
+log_warn "╚════════════════════════════════════════════════════════════════╝"
+echo ""
+log_info "When ready, start containers with:"
+echo "  docker compose up -d charon $VC"
+echo ""
+log_info "After starting, verify:"
 log_info "  1. Check charon logs: docker compose logs -f charon"
 log_info "  2. Verify all nodes connected and healthy"
 log_info "  3. Verify cluster is producing attestations"

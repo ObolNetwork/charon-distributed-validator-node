@@ -126,6 +126,7 @@ create_cluster() {
     mkdir -p "$cluster_dir"
 
     docker run --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$cluster_dir:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         create cluster \
@@ -315,6 +316,7 @@ test_add_operators() {
     # Generate ENR for new operator
     log_info "  Generating ENR for new operator..."
     "$REAL_DOCKER" run --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         create enr
@@ -322,6 +324,7 @@ test_add_operators() {
     # Extract ENR
     local new_enr
     new_enr=$("$REAL_DOCKER" run --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         enr 2>/dev/null)
@@ -494,12 +497,14 @@ test_replace_operator() {
     # Generate ENR for replacement operator
     log_info "  Generating ENR for replacement operator..."
     "$REAL_DOCKER" run --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         create enr
 
     local new_enr
     new_enr=$("$REAL_DOCKER" run --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         enr 2>/dev/null)

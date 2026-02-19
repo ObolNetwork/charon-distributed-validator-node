@@ -279,7 +279,7 @@ case "${1:-}" in
             fi
         fi
 
-        exec "${REAL_DOCKER}" run "${cleaned_args[@]}"
+        exec "${REAL_DOCKER}" run --user "$(id -u):$(id -g)" "${cleaned_args[@]}"
         ;;
     *)
         # Pass through everything else

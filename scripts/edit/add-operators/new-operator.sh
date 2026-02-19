@@ -1,43 +1,6 @@
 #!/usr/bin/env bash
 
-# Add-Operators Script for NEW Operators
-#
-# This script helps new operators join an existing cluster during the
-# add-operators ceremony.
-#
-# Reference: https://docs.obol.org/next/advanced-and-troubleshooting/advanced/add-operators
-#
-# IMPORTANT: This is a CEREMONY - ALL operators (existing AND new) must run
-# their respective scripts simultaneously.
-#
-# Two-step workflow:
-# 1. Generate your ENR and share it with existing operators
-# 2. Run the ceremony with the cluster-lock received from existing operators
-#
-# Prerequisites:
-# - .env file with NETWORK and VC variables set
-# - For --generate-enr: Docker installed
-# - For ceremony: .charon/charon-enr-private-key must exist
-# - For ceremony: Cluster-lock.json received from existing operators
-#
-# Usage:
-#   ./scripts/edit/add-operators/new-operator.sh [OPTIONS]
-#
-# Options:
-#   --new-operator-enrs <enrs>  Comma-separated ENRs of ALL new operators (required for ceremony)
-#   --cluster-lock <path>       Path to existing cluster-lock.json (required for ceremony)
-#   --generate-enr              Generate a new ENR private key if not present
-#   --dry-run                   Show what would be done without executing
-#   -h, --help                  Show this help message
-#
-# Examples:
-#   # Step 1: Generate ENR and share with existing operators
-#   ./scripts/edit/add-operators/new-operator.sh --generate-enr
-#
-#   # Step 2: Run ceremony with all new operator ENRs
-#   ./scripts/edit/add-operators/new-operator.sh \
-#       --new-operator-enrs "enr:-...,enr:-..." \
-#       --cluster-lock ./received-cluster-lock.json
+# Add-Operators Script for NEW Operators - See README.md for documentation
 
 set -euo pipefail
 

@@ -1,41 +1,6 @@
 #!/usr/bin/env bash
 
-# Replace-Operator Workflow Script for NEW Operator
-#
-# This script helps a new operator join an existing cluster after a
-# replace-operator ceremony has been completed by the remaining operators.
-#
-# Prerequisites (before running this script):
-# 1. Generate your ENR private key:
-#    docker run --rm -v "$(pwd)/.charon:/opt/charon/.charon" obolnetwork/charon:latest create enr
-#
-# 2. Share your ENR (found in .charon/charon-enr-private-key.pub or printed by the command)
-#    with the remaining operators so they can run the ceremony.
-#
-# 3. Receive the new cluster-lock.json from the remaining operators after
-#    they complete the ceremony.
-#
-# The workflow:
-# 1. Verify prerequisites (.charon folder, private key, cluster-lock)
-# 2. Stop any running containers
-# 3. Place the new cluster-lock.json (if not already in place)
-# 4. Start charon and VC containers
-#
-# Usage:
-#   ./scripts/edit/replace-operator/new-operator.sh [OPTIONS]
-#
-# Options:
-#   --cluster-lock <path>     Path to the new cluster-lock.json file (optional if already in .charon)
-#   --generate-enr            Generate a new ENR private key if not present
-#   --dry-run                 Show what would be done without executing
-#   -h, --help                Show this help message
-#
-# Examples:
-#   # Generate ENR first (share the output with remaining operators)
-#   ./scripts/edit/replace-operator/new-operator.sh --generate-enr
-#
-#   # After receiving cluster-lock, join the cluster
-#   ./scripts/edit/replace-operator/new-operator.sh --cluster-lock ./received-cluster-lock.json
+# Replace-Operator Script for NEW Operator - See README.md for documentation
 
 set -euo pipefail
 

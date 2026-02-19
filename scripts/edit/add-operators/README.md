@@ -52,7 +52,7 @@ Automates the complete workflow for operators already in the cluster:
 4. **Stop containers** - Stop charon and VC
 5. **Backup and replace** - Backup current `.charon/` to `./backups/`, install new configuration
 6. **Import ASDB** - Import updated anti-slashing database
-7. **Restart containers** - Start charon and VC with new configuration
+7. **Print restart commands** - Display commands to start containers after waiting ~2 epochs
 
 ## For New Operators
 
@@ -64,12 +64,18 @@ Two-step workflow for new operators joining the cluster.
 ./scripts/edit/add-operators/new-operator.sh --generate-enr
 ```
 
-**Step 2:** After receiving the existing cluster-lock, run the ceremony:
+**Step 2:** Download the existing cluster-lock from one of the existing operators:
+
+```bash
+curl -o .charon/cluster-lock.json https://example.com/cluster-lock.json
+```
+
+**Step 3:** Run the ceremony with the cluster-lock:
 
 ```bash
 ./scripts/edit/add-operators/new-operator.sh \
     --new-operator-enrs "enr:-...,enr:-..." \
-    --cluster-lock ./received-cluster-lock.json
+    --cluster-lock .charon/cluster-lock.json
 ```
 
 ### Options
@@ -81,13 +87,6 @@ Two-step workflow for new operators joining the cluster.
 | `--generate-enr` | No | Generate new ENR private key |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
-
-## Current Limitations
-
-- The new cluster configuration will not be reflected on the Obol Launchpad
-- The cluster will have a new cluster hash (different observability identifier)
-- All operators (existing and new) must participate; no partial participation option
-- Cluster threshold remains unchanged
 
 ## Related
 

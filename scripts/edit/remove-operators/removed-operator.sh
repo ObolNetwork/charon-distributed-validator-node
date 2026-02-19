@@ -1,34 +1,6 @@
 #!/usr/bin/env bash
 
-# Remove-Operators Script for REMOVED Operators
-#
-# This script helps operators who are being removed from the cluster to
-# participate in the remove-operators ceremony. This is only required when
-# the removal exceeds the cluster's fault tolerance.
-#
-# Reference: https://docs.obol.org/next/advanced-and-troubleshooting/advanced/remove-operators
-#
-# IMPORTANT: This script is only needed when removing more operators than the
-# cluster's fault tolerance (f = operators - threshold) allows. In that case,
-# removed operators must participate in the ceremony to provide their key shares.
-#
-# If the removal is within fault tolerance, removed operators do NOT need to
-# run this script - they simply stop their nodes after the ceremony.
-#
-# Prerequisites:
-# - .env file with NETWORK and VC variables set
-# - .charon directory with cluster-lock.json, charon-enr-private-key, and validator_keys
-# - Docker and docker compose installed and running
-#
-# Usage:
-#   ./scripts/edit/remove-operators/removed-operator.sh [OPTIONS]
-#
-# Options:
-#   --operator-enrs-to-remove <enrs>      Comma-separated ENRs of operators to remove (required)
-#   --participating-operator-enrs <enrs>  Comma-separated ENRs of ALL participating operators (required)
-#   --new-threshold <N>                   Override default threshold (defaults to ceil(n * 2/3))
-#   --dry-run                             Show what would be done without executing
-#   -h, --help                            Show this help message
+# Remove-Operators Script for REMOVED Operators - See README.md for documentation
 
 set -euo pipefail
 
