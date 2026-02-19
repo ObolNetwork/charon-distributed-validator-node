@@ -34,6 +34,7 @@ services:
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
       --History.Pruning=Rolling
+      --Blocks.BlockProductionBlobLimit=0
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
@@ -47,7 +48,7 @@ services:
 
   el-reth:
     profiles: [el-reth]
-    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v1.10.2}
+    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v1.11.0}
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
