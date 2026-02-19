@@ -38,7 +38,7 @@ The script will:
 5. Backup current `.charon` directory to `./backups/`
 6. Move new keys from `./output/` to `.charon/`
 7. Import the updated anti-slashing database
-8. Restart containers
+8. Print restart commands (wait ~2 epochs before starting)
 
 ## Options
 
@@ -46,13 +46,6 @@ The script will:
 |--------|----------|-------------|
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
-
-## Current Limitations
-
-- The new cluster configuration will not be reflected on the Obol Launchpad
-- The cluster will have a new cluster hash (different observability identifier)
-- All operators must participate; no partial participation option
-- All operators must have their current validator private key shares
 
 ## Related
 

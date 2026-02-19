@@ -59,7 +59,7 @@ Automates the complete workflow for operators staying in the cluster:
 4. **Stop containers** - Stop charon and VC
 5. **Backup and replace** - Backup current `.charon/` to `./backups/`, install new configuration
 6. **Import ASDB** - Import updated anti-slashing database
-7. **Restart containers** - Start charon and VC with new configuration
+7. **Print restart commands** - Display commands to start containers after waiting ~2 epochs
 
 ## For Removed Operators
 
@@ -82,13 +82,6 @@ If the removal is within fault tolerance, removed operators do **not** need to r
 | `--new-threshold <N>` | No | Override default threshold (defaults to ceil(n * 2/3)) |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
-
-## Current Limitations
-
-- The new cluster configuration will not be reflected on the Obol Launchpad
-- The cluster will have a new cluster hash (different observability identifier)
-- All remaining operators must have valid validator keys to participate
-- The old cluster must be completely stopped before the new cluster can operate
 
 ## Related
 
