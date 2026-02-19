@@ -11,7 +11,7 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.40.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
