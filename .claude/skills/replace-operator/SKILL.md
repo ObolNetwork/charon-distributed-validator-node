@@ -43,7 +43,7 @@ Ask the user: **"Are you a remaining operator (performing the replacement) or th
     [--dry-run]
 ```
 
-After completion, the script will output the new `cluster-lock.json`. Remind the user to **share the new cluster-lock.json with the new operator** and to **wait ~2 epochs before restarting** containers.
+After completion, the script will print commands to start containers manually. Remind the user to **share the new cluster-lock.json with the new operator** and to **wait ~2 epochs before starting** containers.
 
 ### If New Operator
 
@@ -73,4 +73,4 @@ After receiving the new `cluster-lock.json` from remaining operators:
     [--dry-run]
 ```
 
-The script will verify the ENR is present in the cluster-lock, install the configuration, and start charon and VC containers. Note: the new operator does NOT have slashing protection history (fresh start).
+The script will verify the ENR is present in the cluster-lock, install the configuration, and print commands to start containers manually. Note: the new operator does NOT have slashing protection history (fresh start).

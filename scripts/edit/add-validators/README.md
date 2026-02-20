@@ -51,7 +51,7 @@ The script performs the following steps:
 2. **Run ceremony** - P2P coordinated add-validators ceremony with all operators
 3. **Stop containers** - Stop charon and VC (only if they were running)
 4. **Backup and replace** - Backup current `.charon/` to `./backups/`, install new configuration
-5. **Restart containers** - Start charon and VC (only if they were running before)
+5. **Print start commands** - Display commands to start containers manually
 
 ## Related
 

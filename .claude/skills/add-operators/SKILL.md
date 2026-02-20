@@ -39,7 +39,7 @@ Ask the user: **"Are you an existing operator in the cluster, or a new operator 
     [--dry-run]
 ```
 
-The script will export the anti-slashing database, run the P2P ceremony, update keys, and provide restart instructions. After completion, remind the user to **wait ~2 epochs before restarting** containers.
+The script will export the anti-slashing database, run the P2P ceremony, update keys, and print commands to start containers manually. After completion, remind the user to **wait ~2 epochs before starting** containers.
 
 ### If New Operator
 
@@ -71,4 +71,4 @@ After the existing operators have the ENR, gather:
     [--dry-run]
 ```
 
-Remind the user that **all operators (existing AND new) must participate simultaneously** in the P2P ceremony.
+Remind the user that **all operators (existing AND new) must participate simultaneously** in the P2P ceremony. After completion, the script will print commands to start containers manually. The new operator does NOT have slashing protection history (fresh start).
