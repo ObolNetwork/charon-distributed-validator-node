@@ -764,7 +764,7 @@ EOF
         COMPOSE_FILE="$new_op_dir/docker-compose.e2e.yml" \
         COMPOSE_PROJECT_NAME="e2e-op-replace-new" \
             "$REPO_ROOT/scripts/edit/replace-operator/new-operator.sh" \
-            --cluster-lock "$new_lock"
+            --install-lock "$new_lock"
     ) < /dev/null > "$logs_dir/new-operator-setup.log" 2>&1
     if [ $? -ne 0 ]; then
         log_error "New operator post-ceremony setup failed. Log:"
