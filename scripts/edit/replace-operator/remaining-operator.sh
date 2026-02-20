@@ -209,6 +209,8 @@ echo ""
 
 # Step 2: Run replace-operator ceremony
 log_step "Step 2: Running replace-operator ceremony..."
+log_warn "Ensure the new operator has received the current cluster-lock.json BEFORE starting."
+log_warn "All operators (remaining + new) must run the ceremony together."
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -308,7 +310,6 @@ echo ""
 log_info "After starting, verify:"
 log_info "  1. Check charon logs: docker compose logs -f charon"
 log_info "  2. Verify VC is running: docker compose logs -f $VC"
-log_info "  3. Share the new cluster-lock.json with the NEW operator"
 echo ""
 log_warn "Keep the backup until you've verified normal operation for several epochs."
 echo ""

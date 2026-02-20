@@ -14,8 +14,10 @@ These scripts help operators replace a single operator in an existing distribute
 
 There are two scripts for the two roles involved:
 
-- **`remaining-operator.sh`** - For operators staying in the cluster (runs the ceremony)
+- **`remaining-operator.sh`** - For operators staying in the cluster
 - **`new-operator.sh`** - For the new operator joining the cluster
+
+**Important**: All participating operators (remaining + new) run the `charon alpha edit replace-operator` ceremony together. The new operator must receive the current `cluster-lock.json` BEFORE the ceremony begins.
 
 ## Prerequisites
 
@@ -33,6 +35,8 @@ Automates the complete workflow for operators staying in the cluster:
     --new-enr "enr:-..." \
     --old-enr "enr:-..."
 ```
+
+**Before running**: Share your current `cluster-lock.json` with the new operator so they can participate in the ceremony.
 
 ### Options
 
@@ -56,7 +60,7 @@ Automates the complete workflow for operators staying in the cluster:
 
 ## For New Operators
 
-Two-step workflow for the new operator joining the cluster.
+Three-step workflow for the new operator joining the cluster.
 
 **Step 1:** Generate ENR and share with remaining operators:
 
@@ -64,17 +68,27 @@ Two-step workflow for the new operator joining the cluster.
 ./scripts/edit/replace-operator/new-operator.sh --generate-enr
 ```
 
-**Step 2:** After receiving cluster-lock from remaining operators:
+**Step 2:** After receiving `cluster-lock.json` from remaining operators (BEFORE the ceremony), run the ceremony together with all other operators:
 
 ```bash
-./scripts/edit/replace-operator/new-operator.sh --cluster-lock ./received-cluster-lock.json
+./scripts/edit/replace-operator/new-operator.sh \
+    --cluster-lock ./received-cluster-lock.json \
+    --old-enr "enr:-..."
+```
+
+**Step 3:** After the ceremony completes, install the new cluster-lock:
+
+```bash
+./scripts/edit/replace-operator/new-operator.sh --install-lock ./output/cluster-lock.json
 ```
 
 ### Options
 
 | Option | Required | Description |
 |--------|----------|-------------|
-| `--cluster-lock <path>` | No | Path to new cluster-lock.json |
+| `--cluster-lock <path>` | No | Path to cluster-lock.json (for ceremony) |
+| `--old-enr <enr>` | No | ENR of the operator being replaced (for ceremony) |
+| `--install-lock <path>` | No | Install the new cluster-lock after ceremony |
 | `--generate-enr` | No | Generate new ENR private key |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
