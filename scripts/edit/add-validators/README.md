@@ -16,7 +16,7 @@ This script helps operators add new validators to an existing distributed valida
 ## Prerequisites
 
 - `.env` file with `NETWORK` and `VC` variables set
-- `.charon` directory with `cluster-lock.json`
+- `.charon` directory with `cluster-lock.json` and `deposit-data*.json` files
 - Docker running
 - `jq` installed
 - **All operators must participate in the ceremony**

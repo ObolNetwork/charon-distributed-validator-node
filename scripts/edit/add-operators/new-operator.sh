@@ -279,7 +279,7 @@ log_step "Step 2: Running add-operators ceremony..."
 
 echo ""
 log_warn "╔════════════════════════════════════════════════════════════════╗"
-log_warn "║  IMPORTANT: ALL operators must run this ceremony simultaneously ║"
+log_warn "║  IMPORTANT: ALL operators must run this ceremony simultaneously║"
 log_warn "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 
