@@ -12,7 +12,7 @@ Add new validators to an existing Charon distributed validator cluster. All oper
 
 Before running, verify:
 1. `.env` file exists with `NETWORK` and `VC` variables set
-2. `.charon/cluster-lock.json` exists
+2. `.charon/cluster-lock.json` and `.charon/deposit-data*.json` exist
 3. Docker is running
 4. `jq` is installed
 

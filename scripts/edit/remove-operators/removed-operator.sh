@@ -209,7 +209,7 @@ log_step "Step 1: Running remove-operators ceremony..."
 
 echo ""
 log_warn "╔════════════════════════════════════════════════════════════════╗"
-log_warn "║  IMPORTANT: ALL participating operators must run simultaneously ║"
+log_warn "║  IMPORTANT: ALL participating operators must run simultaneously║"
 log_warn "╚════════════════════════════════════════════════════════════════╝"
 echo ""
 

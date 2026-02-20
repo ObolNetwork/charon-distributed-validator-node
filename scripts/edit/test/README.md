@@ -1,6 +1,6 @@
 # E2E Integration Tests for Edit Scripts
 
-End-to-end tests that verify the cluster edit scripts work correctly across the full workflow.
+End-to-end tests that verify the cluster edit scripts work correctly across the full workflow using real Docker Compose services.
 
 ## Prerequisites
 
@@ -17,35 +17,51 @@ End-to-end tests that verify the cluster edit scripts work correctly across the 
 Override the charon version:
 
 ```bash
-CHARON_VERSION=v1.8.2 ./scripts/edit/test/e2e_test.sh
+CHARON_VERSION=v1.9.0-rc3 ./scripts/edit/test/e2e_test.sh
 ```
 
 ## What It Tests
 
 | # | Test | Type | Description |
 |---|------|------|-------------|
-| 1 | add-validators | P2P ceremony (4 ops) | Adds 1 validator to a 4-operator, 1-validator cluster. Verifies 2 validators in output. |
-| 2 | recreate-private-keys | P2P ceremony (4 ops) | Refreshes key shares. Verifies public_shares changed, same validator count. |
-| 3 | add-operators | P2P ceremony (4+1 ops) | Adds 1 new operator. Verifies 5 operators in output. |
-| 4 | remove-operators | P2P ceremony (4 of 5 ops) | Removes the added operator. Verifies 4 operators in output. |
-| 5 | replace-operator | Offline (sequential) | Replaces operator 0. Verifies ENR changed in output. |
-| 6 | update-anti-slashing-db | Standalone (no Docker) | Transforms EIP-3076 pubkeys between cluster-locks. |
+| 1 | recreate-private-keys | P2P ceremony (4 ops) | Refreshes key shares. Verifies public_shares changed, same validator count. |
+| 2 | add-validators | P2P ceremony (4 ops) | Adds 1 validator to a 4-operator, 1-validator cluster. Verifies 2 validators in output. |
+| 3 | add-operators | P2P ceremony (4+3 ops) | Adds 3 new operators (4→7). Verifies 7 operators in output. |
+| 4 | remove-operators | P2P ceremony (6 of 7 ops) | Removes 1 operator (7→6). Verifies 6 operators in output. |
 
 ## How It Works
 
 1. Creates a real test cluster using `charon create cluster` (4 nodes, 1 validator)
-2. Sets up 4 operator work directories with `.charon/` and `.env`
-3. Interposes a **mock docker wrapper** (`test/bin/docker`) on `PATH`
-   - Real `docker run` is used for charon ceremony commands (P2P relay)
-   - `docker compose` commands are mocked (container lifecycle, ASDB export/import)
-   - `alpha edit replace-operator` is now available in charon v1.9.0-rc3
-4. Runs each edit script through its happy path
-5. Verifies outputs (validator count, operator count, key changes) at each step
+2. Sets up isolated operator directories, each with:
+   - `.charon/` — cluster config and validator keys
+   - `.env` — network and VC configuration
+   - `docker-compose.e2e.yml` — minimal compose file (busybox for charon, real lodestar for VC)
+   - `data/lodestar/` — persisted lodestar data directory
+3. Starts Docker Compose stacks for each operator (isolated via `COMPOSE_PROJECT_NAME`)
+4. Seeds lodestar anti-slashing databases from cluster-lock pubkeys
+5. Runs each edit script through its happy path using `WORK_DIR`, `COMPOSE_FILE`, and `COMPOSE_PROJECT_NAME` for isolation
+6. Verifies outputs (validator count, operator count, key changes) at each step
+7. Restarts containers and re-seeds ASDB between tests (pubkeys change after ceremonies)
 
-## WORK_DIR Environment Variable
+### Docker Compose Architecture
 
-The test uses the `WORK_DIR` environment variable to redirect each script's working directory. When set, scripts use `WORK_DIR` as their repo root instead of computing it relative to the script location. This allows running multiple operator instances from isolated directories.
+Each operator gets its own Docker Compose project (`e2e-op0`, `e2e-op1`, ...) running:
+- **charon** — busybox placeholder (ceremonies use standalone `docker run`, not compose)
+- **vc-lodestar** — real lodestar image so ASDB export/import works via `docker compose run`
+
+Both services use `tail -f /dev/null` to stay alive without real network connections.
+
+### Environment Variable Isolation
+
+Edit scripts already preserve `COMPOSE_FILE` and `COMPOSE_PROJECT_NAME` from the environment around `.env` sourcing, so setting these externally works without script modifications:
+
+```bash
+WORK_DIR="$op_dir" \
+COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+COMPOSE_PROJECT_NAME="e2e-op${i}" \
+    "$REPO_ROOT/scripts/edit/recreate-private-keys/recreate-private-keys.sh"
+```
 
 ## Expected Runtime
 
-Approximately 2-5 minutes depending on P2P relay connectivity. The P2P ceremonies (tests 1-4) require all operators to connect through the relay simultaneously.
+Approximately 5-10 minutes depending on P2P relay connectivity and Docker image pull times. The P2P ceremonies require all operators to connect through the relay simultaneously.

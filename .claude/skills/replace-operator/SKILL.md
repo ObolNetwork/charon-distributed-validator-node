@@ -6,7 +6,7 @@ user-invokable: true
 
 # Replace Operator
 
-Replace a single operator in a Charon cluster with a new one. This is a non-P2P local operation (no coordinated ceremony required).
+Replace a single operator in a Charon cluster with a new one. Remaining operators run a `charon alpha edit replace-operator` ceremony (P2P via relay), then share the new cluster-lock with the new operator.
 
 ## Prerequisites
 

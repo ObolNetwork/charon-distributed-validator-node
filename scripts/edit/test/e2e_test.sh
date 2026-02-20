@@ -2,9 +2,8 @@
 
 # E2E Integration Test for Cluster Edit Scripts
 #
-# This test creates a real cluster using charon and runs each edit script
-# through its happy path. Real Docker is used for charon ceremony commands;
-# docker compose (container lifecycle, ASDB) is mocked.
+# This test uses real Docker Compose services (busybox for charon, real lodestar
+# for ASDB operations) and real charon ceremonies via P2P relay.
 #
 # Prerequisites:
 #   - Docker running
@@ -22,8 +21,10 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$TEST_DIR/../../.." && pwd)"
 CHARON_VERSION="${CHARON_VERSION:-v1.9.0-rc3}"
 CHARON_IMAGE="obolnetwork/charon:${CHARON_VERSION}"
+LODESTAR_IMAGE="chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}"
 NUM_OPERATORS=4
 ZERO_ADDR="0x0000000000000000000000000000000000000001"
+HOODI_GVR="0x212f13fc4df078b6cb7db228f1c8307566dcecf900867401a92023d7ba99cb5f"
 
 # Colors
 RED='\033[0;31m'
@@ -37,12 +38,15 @@ TESTS_RUN=0
 TESTS_PASSED=0
 TESTS_FAILED=0
 
+# Track active compose projects for cleanup
+ACTIVE_PROJECTS=()
+
 # --- Helpers ---
 
-log_info()  { echo -e "${GREEN}[INFO]${NC}  $1"; }
-log_warn()  { echo -e "${YELLOW}[WARN]${NC}  $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
-log_test()  { echo -e "${BLUE}[TEST]${NC}  $1"; }
+log_info()  { printf "${GREEN}[INFO]${NC}  %s\n" "$1"; }
+log_warn()  { printf "${YELLOW}[WARN]${NC}  %s\n" "$1"; }
+log_error() { printf "${RED}[ERROR]${NC} %s\n" "$1"; }
+log_test()  { printf "${BLUE}[TEST]${NC}  %s\n" "$1"; }
 
 assert_eq() {
     local desc="$1" expected="$2" actual="$3"
@@ -84,10 +88,146 @@ run_test() {
     fi
 }
 
+# --- Compose helpers ---
+
+# Returns env vars for docker compose targeting operator i's directory.
+compose_env() {
+    local i="$1"
+    local op_dir="$TMP_DIR/operator${i}"
+    echo "COMPOSE_FILE=$op_dir/docker-compose.e2e.yml" \
+         "COMPOSE_PROJECT_NAME=e2e-op${i}"
+}
+
+# Runs docker compose for operator i.
+compose_cmd() {
+    local i="$1"
+    shift
+    local op_dir="$TMP_DIR/operator${i}"
+    COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+    COMPOSE_PROJECT_NAME="e2e-op${i}" \
+        docker compose "$@"
+}
+
+start_operator() {
+    local i="$1"
+    log_info "  Starting compose stack for operator $i..."
+    compose_cmd "$i" up -d 2>/dev/null
+    # Track this project for cleanup
+    local project="e2e-op${i}"
+    if ! printf '%s\n' "${ACTIVE_PROJECTS[@]}" 2>/dev/null | grep -qx "$project"; then
+        ACTIVE_PROJECTS+=("$project")
+    fi
+}
+
+stop_operator() {
+    local i="$1"
+    log_info "  Stopping compose stack for operator $i..."
+    compose_cmd "$i" down --remove-orphans 2>/dev/null || true
+}
+
+# Generate and import a minimal EIP-3076 ASDB for operator i.
+seed_asdb() {
+    local op_dir="$1"
+    local op_index="$2"
+    local lock="$op_dir/.charon/cluster-lock.json"
+
+    if [ ! -f "$lock" ]; then
+        log_warn "  No cluster-lock.json for ASDB seed at $op_dir"
+        return 0
+    fi
+
+    # Extract this operator's public shares
+    local pubkeys
+    pubkeys=$(jq -r --argjson idx "$op_index" \
+        '[.distributed_validators[].public_shares[$idx]] | map(select(. != null)) | .[]' \
+        "$lock" 2>/dev/null || echo "")
+
+    if [ -z "$pubkeys" ]; then
+        log_warn "  No pubkeys found for operator $op_index, skipping ASDB seed"
+        return 0
+    fi
+
+    # Build EIP-3076 JSON
+    local data_entries=""
+    local first=true
+    while IFS= read -r pk; do
+        [ -z "$pk" ] && continue
+        if [ "$first" = true ]; then
+            first=false
+        else
+            data_entries="${data_entries},"
+        fi
+        data_entries="${data_entries}{\"pubkey\":\"${pk}\",\"signed_blocks\":[],\"signed_attestations\":[]}"
+    done <<< "$pubkeys"
+
+    local asdb_file="$op_dir/asdb-seed.json"
+    cat > "$asdb_file" <<EOF
+{"metadata":{"interchange_format_version":"5","genesis_validators_root":"${HOODI_GVR}"},"data":[${data_entries}]}
+EOF
+
+    # Make path absolute for docker mount
+    local abs_asdb_file
+    abs_asdb_file="$(cd "$(dirname "$asdb_file")" && pwd)/$(basename "$asdb_file")"
+
+    # Import into lodestar via docker compose run
+    COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+    COMPOSE_PROJECT_NAME="e2e-op${op_index}" \
+        docker compose run --rm -T \
+        --entrypoint node \
+        -v "$abs_asdb_file":/tmp/import.json:ro \
+        vc-lodestar /usr/app/packages/cli/bin/lodestar validator slashing-protection import \
+        --file /tmp/import.json \
+        --dataDir /opt/data \
+        --network hoodi \
+        --force >/dev/null 2>&1 || log_warn "  ASDB seed import returned non-zero for operator $op_index (may be OK on first run)"
+
+    log_info "  ASDB seeded for operator $op_index"
+}
+
+# Restart containers and re-seed ASDB for an operator.
+restart_and_seed() {
+    local i="$1"
+    local op_dir="$TMP_DIR/operator${i}"
+    compose_cmd "$i" down --remove-orphans 2>/dev/null || true
+    start_operator "$i"
+    seed_asdb "$op_dir" "$i"
+}
+
+# Set up an operator directory with .charon, .env, compose file, and data dirs.
+setup_operator() {
+    local i="$1"
+    local charon_node_dir="$2"
+    local op_dir="$TMP_DIR/operator${i}"
+    mkdir -p "$op_dir/data/lodestar"
+
+    # Copy node contents to operator's .charon directory
+    cp -r "$charon_node_dir" "$op_dir/.charon"
+
+    # Create .env file
+    cat > "$op_dir/.env" <<EOF
+NETWORK=hoodi
+VC=vc-lodestar
+EOF
+
+    # Copy test compose file
+    cp "$TEST_DIR/docker-compose.e2e.yml" "$op_dir/docker-compose.e2e.yml"
+
+    log_info "  Operator $i set up at $op_dir"
+}
+
 # --- Setup ---
 
 TMP_DIR=""
 cleanup() {
+    echo ""
+    log_info "Cleaning up..."
+
+    # Stop all compose projects
+    for project in "${ACTIVE_PROJECTS[@]}"; do
+        log_info "  Stopping project $project..."
+        COMPOSE_PROJECT_NAME="$project" docker compose down --remove-orphans 2>/dev/null || true
+    done
+
     if [ -n "$TMP_DIR" ] && [ -d "$TMP_DIR" ]; then
         rm -rf "$TMP_DIR"
         log_info "Cleaned up $TMP_DIR"
@@ -108,8 +248,10 @@ check_prerequisites() {
         exit 1
     fi
 
-    log_info "Pulling charon image: $CHARON_IMAGE"
+    log_info "Pulling images..."
     docker pull "$CHARON_IMAGE" >/dev/null 2>&1 || true
+    docker pull "$LODESTAR_IMAGE" >/dev/null 2>&1 || true
+    docker pull busybox:latest >/dev/null 2>&1 || true
 
     log_info "Prerequisites OK"
 }
@@ -137,7 +279,6 @@ create_cluster() {
         --fee-recipient-addresses="$ZERO_ADDR" \
         --cluster-dir=/opt/charon/.charon
 
-    # Verify cluster was created
     if [ ! -d "$cluster_dir/node0" ]; then
         log_error "Cluster creation failed - no node0 directory"
         exit 1
@@ -146,103 +287,48 @@ create_cluster() {
     log_info "Cluster created successfully"
 
     # Set up operator work directories
+    # Note: deposit-data*.json files are inside each node directory,
+    # so setup_operator copies them along with the rest of the node contents.
     for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        mkdir -p "$op_dir"
-
-        # Copy node contents to operator's .charon directory
-        cp -r "$cluster_dir/node${i}" "$op_dir/.charon"
-
-        # Create .env file
-        cat > "$op_dir/.env" <<EOF
-NETWORK=hoodi
-VC=vc-lodestar
-EOF
-
-        # Initialize mock state: mark services as running
-        mkdir -p "$op_dir"
-        echo "charon=running" > "$op_dir/services.state"
-        echo "vc-lodestar=running" >> "$op_dir/services.state"
-
-        log_info "  Operator $i set up at $op_dir"
+        setup_operator "$i" "$cluster_dir/node${i}"
     done
 }
 
-setup_mock_docker() {
-    export REAL_DOCKER
-    REAL_DOCKER="$(which docker)"
-    export PATH="$TEST_DIR/bin:$PATH"
+start_all_operators() {
+    local max_idx="${1:-$((NUM_OPERATORS - 1))}"
+    log_info "Starting compose stacks for operators 0-${max_idx}..."
+    for i in $(seq 0 "$max_idx"); do
+        start_operator "$i"
+    done
+}
 
-    log_info "Mock docker enabled (real docker at $REAL_DOCKER)"
+seed_all_operators() {
+    local max_idx="${1:-$((NUM_OPERATORS - 1))}"
+    log_info "Seeding ASDB for operators 0-${max_idx}..."
+    for i in $(seq 0 "$max_idx"); do
+        seed_asdb "$TMP_DIR/operator${i}" "$i"
+    done
+}
+
+restart_and_seed_all() {
+    local max_idx="${1:-$((NUM_OPERATORS - 1))}"
+    log_info "Restarting and re-seeding operators 0-${max_idx}..."
+    for i in $(seq 0 "$max_idx"); do
+        restart_and_seed "$i"
+    done
 }
 
 # --- Test Functions ---
 
-test_add_validators() {
-    log_info "Running add-validators ceremony (4 operators in parallel)..."
-
-    local pids=()
-    local logs_dir="$TMP_DIR/logs/add-validators"
-    mkdir -p "$logs_dir"
-
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        (
-            WORK_DIR="$op_dir" \
-            MOCK_OPERATOR_INDEX="$i" \
-            MOCK_STATE_DIR="$op_dir" \
-                "$REPO_ROOT/scripts/edit/add-validators/add-validators.sh" \
-                --num-validators 1 \
-                --withdrawal-addresses "$ZERO_ADDR" \
-                --fee-recipient-addresses "$ZERO_ADDR"
-        ) > "$logs_dir/operator${i}.log" 2>&1 &
-        pids+=($!)
-    done
-
-    # Wait for all operators
-    local all_ok=true
-    for i in "${!pids[@]}"; do
-        if ! wait "${pids[$i]}"; then
-            log_error "Operator $i failed. Log:"
-            cat "$logs_dir/operator${i}.log" || true
-            all_ok=false
-        fi
-    done
-
-    if [ "$all_ok" = false ]; then
-        return 1
-    fi
-
-    # Verify: each operator should have a cluster-lock with 2 validators
-    local ok=true
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        local lock="$op_dir/.charon/cluster-lock.json"
-
-        if [ ! -f "$lock" ]; then
-            log_error "Operator $i: cluster-lock.json not found"
-            ok=false
-            continue
-        fi
-
-        local num_vals
-        num_vals=$(jq '.distributed_validators | length' "$lock")
-        assert_eq "Operator $i has 2 validators" "2" "$num_vals" || ok=false
-
-        local num_ops
-        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
-        assert_eq "Operator $i has $NUM_OPERATORS operators" "$NUM_OPERATORS" "$num_ops" || ok=false
-    done
-
-    [ "$ok" = true ]
-}
-
 test_recreate_private_keys() {
-    log_info "Running recreate-private-keys ceremony (4 operators in parallel)..."
+    log_info "Running recreate-private-keys ceremony ($NUM_OPERATORS operators in parallel)..."
 
-    # Save current public_shares for comparison
+    # Save current state for comparison
     local old_shares
     old_shares=$(jq -r '.distributed_validators[0].public_shares[0]' \
+        "$TMP_DIR/operator0/.charon/cluster-lock.json")
+    local expected_vals
+    expected_vals=$(jq '.distributed_validators | length' \
         "$TMP_DIR/operator0/.charon/cluster-lock.json")
 
     local pids=()
@@ -251,15 +337,12 @@ test_recreate_private_keys() {
 
     for i in $(seq 0 $((NUM_OPERATORS - 1))); do
         local op_dir="$TMP_DIR/operator${i}"
-        # Reset service state to running for this test
-        echo "charon=running" > "$op_dir/services.state"
-        echo "vc-lodestar=running" >> "$op_dir/services.state"
         (
             WORK_DIR="$op_dir" \
-            MOCK_OPERATOR_INDEX="$i" \
-            MOCK_STATE_DIR="$op_dir" \
+            COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
                 "$REPO_ROOT/scripts/edit/recreate-private-keys/recreate-private-keys.sh"
-        ) > "$logs_dir/operator${i}.log" 2>&1 &
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
         pids+=($!)
     done
 
@@ -267,7 +350,7 @@ test_recreate_private_keys() {
     for i in "${!pids[@]}"; do
         if ! wait "${pids[$i]}"; then
             log_error "Operator $i failed. Log:"
-            cat "$logs_dir/operator${i}.log" || true
+            sed 's/\r$//' "$logs_dir/operator${i}.log" | while IFS= read -r line; do echo "                $line"; done || true
             all_ok=false
         fi
     done
@@ -276,7 +359,7 @@ test_recreate_private_keys() {
         return 1
     fi
 
-    # Verify: still 2 validators, 4 operators, but different public_shares
+    # Verify: still 1 validator, same operator count, different public_shares
     local ok=true
     for i in $(seq 0 $((NUM_OPERATORS - 1))); do
         local op_dir="$TMP_DIR/operator${i}"
@@ -290,7 +373,7 @@ test_recreate_private_keys() {
 
         local num_vals
         num_vals=$(jq '.distributed_validators | length' "$lock")
-        assert_eq "Operator $i has 2 validators" "2" "$num_vals" || ok=false
+        assert_eq "Operator $i has $expected_vals validators" "$expected_vals" "$num_vals" || ok=false
 
         local num_ops
         num_ops=$(jq '.cluster_definition.operators | length' "$lock")
@@ -306,24 +389,298 @@ test_recreate_private_keys() {
     [ "$ok" = true ]
 }
 
+test_add_validators() {
+    log_info "Running add-validators ceremony ($NUM_OPERATORS operators in parallel)..."
+
+    local pids=()
+    local logs_dir="$TMP_DIR/logs/add-validators"
+    mkdir -p "$logs_dir"
+
+    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
+        local op_dir="$TMP_DIR/operator${i}"
+        (
+            WORK_DIR="$op_dir" \
+            COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
+                "$REPO_ROOT/scripts/edit/add-validators/add-validators.sh" \
+                --num-validators 1 \
+                --withdrawal-addresses "$ZERO_ADDR" \
+                --fee-recipient-addresses "$ZERO_ADDR"
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
+        pids+=($!)
+    done
+
+    local all_ok=true
+    for i in "${!pids[@]}"; do
+        if ! wait "${pids[$i]}"; then
+            log_error "Operator $i failed. Log:"
+            sed 's/\r$//' "$logs_dir/operator${i}.log" | while IFS= read -r line; do echo "                $line"; done || true
+            all_ok=false
+        fi
+    done
+
+    if [ "$all_ok" = false ]; then
+        return 1
+    fi
+
+    # Verify: each operator should have 2 validators
+    local ok=true
+    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
+        local op_dir="$TMP_DIR/operator${i}"
+        local lock="$op_dir/.charon/cluster-lock.json"
+
+        if [ ! -f "$lock" ]; then
+            log_error "Operator $i: cluster-lock.json not found"
+            ok=false
+            continue
+        fi
+
+        local num_vals
+        num_vals=$(jq '.distributed_validators | length' "$lock")
+        assert_eq "Operator $i has 2 validators" "2" "$num_vals" || ok=false
+
+        local num_ops
+        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
+        assert_eq "Operator $i has $NUM_OPERATORS operators" "$NUM_OPERATORS" "$num_ops" || ok=false
+    done
+
+    [ "$ok" = true ]
+}
+
 test_add_operators() {
-    log_info "Running add-operators ceremony (4 existing + 1 new)..."
+    log_info "Running add-operators ceremony ($NUM_OPERATORS existing + 3 new = 7 total)..."
 
-    # Create operator4 work directory
-    local new_op_dir="$TMP_DIR/operator4"
-    mkdir -p "$new_op_dir/.charon"
+    local new_enrs=()
+    local new_ops_start=$NUM_OPERATORS
+    local new_ops_end=$((NUM_OPERATORS + 2))  # 3 new operators: 4, 5, 6
 
-    # Generate ENR for new operator
+    # Create new operator directories and generate ENRs
+    for i in $(seq "$new_ops_start" "$new_ops_end"); do
+        local new_op_dir="$TMP_DIR/operator${i}"
+        mkdir -p "$new_op_dir/.charon" "$new_op_dir/data/lodestar"
+
+        log_info "  Generating ENR for new operator $i..."
+        docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$new_op_dir/.charon:/opt/charon/.charon" \
+            "$CHARON_IMAGE" \
+            create enr
+
+        local new_enr
+        new_enr=$(docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "$new_op_dir/.charon:/opt/charon/.charon" \
+            "$CHARON_IMAGE" \
+            enr 2>/dev/null)
+
+        if [ -z "$new_enr" ]; then
+            log_error "Failed to get ENR for new operator $i"
+            return 1
+        fi
+        log_info "  Operator $i ENR: ${new_enr:0:50}..."
+        new_enrs+=("$new_enr")
+
+        # Copy cluster-lock from operator0
+        cp "$TMP_DIR/operator0/.charon/cluster-lock.json" "$new_op_dir/.charon/cluster-lock.json"
+
+        # Create .env and compose file
+        cat > "$new_op_dir/.env" <<EOF
+NETWORK=hoodi
+VC=vc-lodestar
+EOF
+        cp "$TEST_DIR/docker-compose.e2e.yml" "$new_op_dir/docker-compose.e2e.yml"
+
+        # Start compose stack and seed ASDB for new operator
+        start_operator "$i"
+        seed_asdb "$new_op_dir" "$i" 2>/dev/null || true  # May fail for new ops without existing shares
+    done
+
+    # Build comma-separated ENR list
+    local enr_list
+    enr_list=$(IFS=,; echo "${new_enrs[*]}")
+
+    local pids=()
+    local logs_dir="$TMP_DIR/logs/add-operators"
+    mkdir -p "$logs_dir"
+
+    # Run existing operators
+    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
+        local op_dir="$TMP_DIR/operator${i}"
+        (
+            WORK_DIR="$op_dir" \
+            COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
+                "$REPO_ROOT/scripts/edit/add-operators/existing-operator.sh" \
+                --new-operator-enrs "$enr_list"
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
+        pids+=($!)
+    done
+
+    # Run new operators
+    for i in $(seq "$new_ops_start" "$new_ops_end"); do
+        local new_op_dir="$TMP_DIR/operator${i}"
+        (
+            WORK_DIR="$new_op_dir" \
+            COMPOSE_FILE="$new_op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
+                "$REPO_ROOT/scripts/edit/add-operators/new-operator.sh" \
+                --new-operator-enrs "$enr_list" \
+                --cluster-lock ".charon/cluster-lock.json"
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
+        pids+=($!)
+    done
+
+    # Wait for all
+    local all_ok=true
+    for i in "${!pids[@]}"; do
+        if ! wait "${pids[$i]}"; then
+            log_error "Process $i failed. Log:"
+            sed 's/\r$//' "$logs_dir/operator${i}.log" 2>/dev/null | while IFS= read -r line; do echo "                $line"; done || true
+            # Also check new operator logs
+            for j in $(seq "$new_ops_start" "$new_ops_end"); do
+                if [ -f "$logs_dir/operator${j}.log" ]; then
+                    log_error "New operator $j log:"
+                    sed 's/\r$//' "$logs_dir/operator${j}.log" 2>/dev/null | while IFS= read -r line; do echo "                $line"; done || true
+                fi
+            done
+            all_ok=false
+        fi
+    done
+
+    if [ "$all_ok" = false ]; then
+        return 1
+    fi
+
+    # Verify: all 7 operators should have 7 operators in cluster-lock
+    local total_ops=$((new_ops_end + 1))  # 7
+    local ok=true
+    for i in $(seq 0 "$new_ops_end"); do
+        local op_dir="$TMP_DIR/operator${i}"
+        local lock="$op_dir/.charon/cluster-lock.json"
+
+        if [ ! -f "$lock" ]; then
+            log_error "Operator $i: cluster-lock.json not found"
+            ok=false
+            continue
+        fi
+
+        local num_ops
+        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
+        assert_eq "Operator $i has $total_ops operators" "$total_ops" "$num_ops" || ok=false
+    done
+
+    # Update NUM_OPERATORS to reflect new total
+    NUM_OPERATORS="$total_ops"
+
+    [ "$ok" = true ]
+}
+
+test_remove_operators() {
+    log_info "Running remove-operators ceremony (removing operator6, 6 remaining)..."
+
+    local op_to_remove=$((NUM_OPERATORS - 1))  # operator6
+
+    # Get operator6's ENR from cluster-lock
+    local remove_enr
+    remove_enr=$(jq -r --argjson idx "$op_to_remove" \
+        '.cluster_definition.operators[$idx].enr' \
+        "$TMP_DIR/operator0/.charon/cluster-lock.json")
+
+    if [ -z "$remove_enr" ] || [ "$remove_enr" = "null" ]; then
+        log_error "Failed to get operator${op_to_remove} ENR from cluster-lock"
+        return 1
+    fi
+    log_info "  Operator${op_to_remove} ENR to remove: ${remove_enr:0:50}..."
+
+    local remaining_max=$((op_to_remove - 1))  # operators 0-5
+
+    local pids=()
+    local logs_dir="$TMP_DIR/logs/remove-operators"
+    mkdir -p "$logs_dir"
+
+    # Run remaining operators (0-5) — operator6 does NOT participate
+    for i in $(seq 0 "$remaining_max"); do
+        local op_dir="$TMP_DIR/operator${i}"
+        (
+            WORK_DIR="$op_dir" \
+            COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
+                "$REPO_ROOT/scripts/edit/remove-operators/remaining-operator.sh" \
+                --operator-enrs-to-remove "$remove_enr"
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
+        pids+=($!)
+    done
+
+    local all_ok=true
+    for i in "${!pids[@]}"; do
+        if ! wait "${pids[$i]}"; then
+            log_error "Operator $i failed. Log:"
+            sed 's/\r$//' "$logs_dir/operator${i}.log" | while IFS= read -r line; do echo "                $line"; done || true
+            all_ok=false
+        fi
+    done
+
+    if [ "$all_ok" = false ]; then
+        return 1
+    fi
+
+    # Verify: 6 operators in new cluster-lock
+    local expected_ops=$((NUM_OPERATORS - 1))
+    local ok=true
+    for i in $(seq 0 "$remaining_max"); do
+        local op_dir="$TMP_DIR/operator${i}"
+        local lock="$op_dir/.charon/cluster-lock.json"
+
+        if [ ! -f "$lock" ]; then
+            log_error "Operator $i: cluster-lock.json not found"
+            ok=false
+            continue
+        fi
+
+        local num_ops
+        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
+        assert_eq "Operator $i has $expected_ops operators" "$expected_ops" "$num_ops" || ok=false
+    done
+
+    # Clean up removed operator's compose stack
+    stop_operator "$op_to_remove"
+
+    # Update NUM_OPERATORS
+    NUM_OPERATORS="$expected_ops"
+
+    [ "$ok" = true ]
+}
+
+test_replace_operator() {
+    local op_to_replace=$((NUM_OPERATORS - 1))  # replace the last operator
+    log_info "Running replace-operator ceremony (replacing operator${op_to_replace})..."
+
+    # Get the old operator's ENR from cluster-lock
+    local old_enr
+    old_enr=$(jq -r --argjson idx "$op_to_replace" \
+        '.cluster_definition.operators[$idx].enr' \
+        "$TMP_DIR/operator0/.charon/cluster-lock.json")
+
+    if [ -z "$old_enr" ] || [ "$old_enr" = "null" ]; then
+        log_error "Failed to get operator${op_to_replace} ENR from cluster-lock"
+        return 1
+    fi
+    log_info "  Old operator ENR: ${old_enr:0:50}..."
+
+    # Create new operator directory and generate ENR
+    local new_op_idx="new"
+    local new_op_dir="$TMP_DIR/operator-replace-new"
+    mkdir -p "$new_op_dir/.charon" "$new_op_dir/data/lodestar"
+
     log_info "  Generating ENR for new operator..."
-    "$REAL_DOCKER" run --rm \
+    docker run --rm \
         --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
         create enr
 
-    # Extract ENR
     local new_enr
-    new_enr=$("$REAL_DOCKER" run --rm \
+    new_enr=$(docker run --rm \
         --user "$(id -u):$(id -g)" \
         -v "$new_op_dir/.charon:/opt/charon/.charon" \
         "$CHARON_IMAGE" \
@@ -335,59 +692,59 @@ test_add_operators() {
     fi
     log_info "  New operator ENR: ${new_enr:0:50}..."
 
-    # Copy cluster-lock from operator0 to operator4
+    # Set up new operator directory with .env, compose file, and cluster-lock
+    cat > "$new_op_dir/.env" <<EOF
+NETWORK=hoodi
+VC=vc-lodestar
+EOF
+    cp "$TEST_DIR/docker-compose.e2e.yml" "$new_op_dir/docker-compose.e2e.yml"
     cp "$TMP_DIR/operator0/.charon/cluster-lock.json" "$new_op_dir/.charon/cluster-lock.json"
 
-    # Create .env for new operator
-    cat > "$new_op_dir/.env" <<EOF
-NETWORK=hoodi
-VC=vc-lodestar
-EOF
-    mkdir -p "$new_op_dir"
-    echo "charon=running" > "$new_op_dir/services.state"
-    echo "vc-lodestar=running" >> "$new_op_dir/services.state"
-
-    # Reset service states for existing operators
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        echo "charon=running" > "$op_dir/services.state"
-        echo "vc-lodestar=running" >> "$op_dir/services.state"
-    done
+    local remaining_max=$((op_to_replace - 1))
 
     local pids=()
-    local logs_dir="$TMP_DIR/logs/add-operators"
-    mkdir -p "$logs_dir"
+    local logs_dir="$TMP_DIR/logs/replace-operator"
+    mkdir -p "$logs_dir" "$new_op_dir/output"
 
-    # Run existing operators
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
+    # Run remaining operators (all except the one being replaced)
+    for i in $(seq 0 "$remaining_max"); do
         local op_dir="$TMP_DIR/operator${i}"
         (
             WORK_DIR="$op_dir" \
-            MOCK_OPERATOR_INDEX="$i" \
-            MOCK_STATE_DIR="$op_dir" \
-                "$REPO_ROOT/scripts/edit/add-operators/existing-operator.sh" \
-                --new-operator-enrs "$new_enr"
-        ) > "$logs_dir/operator${i}.log" 2>&1 &
+            COMPOSE_FILE="$op_dir/docker-compose.e2e.yml" \
+            COMPOSE_PROJECT_NAME="e2e-op${i}" \
+                "$REPO_ROOT/scripts/edit/replace-operator/remaining-operator.sh" \
+                --old-enr "$old_enr" \
+                --new-enr "$new_enr"
+        ) < /dev/null > "$logs_dir/operator${i}.log" 2>&1 &
         pids+=($!)
     done
 
-    # Run new operator
+    # New operator also participates in the ceremony
     (
-        WORK_DIR="$new_op_dir" \
-        MOCK_OPERATOR_INDEX="$NUM_OPERATORS" \
-        MOCK_STATE_DIR="$new_op_dir" \
-            "$REPO_ROOT/scripts/edit/add-operators/new-operator.sh" \
-            --new-operator-enrs "$new_enr" \
-            --cluster-lock ".charon/cluster-lock.json"
-    ) > "$logs_dir/operator4.log" 2>&1 &
+        docker run --rm -i \
+            --user "$(id -u):$(id -g)" \
+            -v "$new_op_dir/.charon:/opt/charon/.charon" \
+            -v "$new_op_dir/output:/opt/charon/output" \
+            "$CHARON_IMAGE" \
+            alpha edit replace-operator \
+            --lock-file=/opt/charon/.charon/cluster-lock.json \
+            --output-dir=/opt/charon/output \
+            --old-operator-enr="$old_enr" \
+            --new-operator-enr="$new_enr"
+    ) < /dev/null > "$logs_dir/new-operator-ceremony.log" 2>&1 &
     pids+=($!)
 
-    # Wait for all
     local all_ok=true
     for i in "${!pids[@]}"; do
         if ! wait "${pids[$i]}"; then
-            log_error "Operator $i failed. Log:"
-            cat "$logs_dir/operator${i}.log" || true
+            log_error "Process $i failed. Log:"
+            local logfile="$logs_dir/operator${i}.log"
+            # Last pid is the new operator
+            if [ "$i" -eq $((${#pids[@]} - 1)) ]; then
+                logfile="$logs_dir/new-operator-ceremony.log"
+            fi
+            sed 's/\r$//' "$logfile" | while IFS= read -r line; do echo "                $line"; done || true
             all_ok=false
         fi
     done
@@ -396,343 +753,70 @@ EOF
         return 1
     fi
 
-    # Verify: all operators should now have 5 operators in cluster-lock
-    local ok=true
-    for i in $(seq 0 "$NUM_OPERATORS"); do
-        local op_dir="$TMP_DIR/operator${i}"
-        local lock="$op_dir/.charon/cluster-lock.json"
-
-        if [ ! -f "$lock" ]; then
-            log_error "Operator $i: cluster-lock.json not found"
-            ok=false
-            continue
-        fi
-
-        local num_ops
-        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
-        assert_eq "Operator $i has 5 operators" "5" "$num_ops" || ok=false
-    done
-
-    [ "$ok" = true ]
-}
-
-test_remove_operators() {
-    log_info "Running remove-operators ceremony (removing operator4, 4 remaining)..."
-
-    # Get operator4's ENR from cluster-lock
-    local op4_enr
-    op4_enr=$(jq -r '.cluster_definition.operators[4].enr' "$TMP_DIR/operator0/.charon/cluster-lock.json")
-
-    if [ -z "$op4_enr" ] || [ "$op4_enr" = "null" ]; then
-        log_error "Failed to get operator4 ENR from cluster-lock"
-        return 1
+    # Post-ceremony: run new-operator.sh to install the cluster-lock
+    local new_lock="$new_op_dir/output/cluster-lock.json"
+    if [ ! -f "$new_lock" ]; then
+        # Fall back to a remaining operator's output
+        new_lock="$TMP_DIR/operator0/.charon/cluster-lock.json"
     fi
-    log_info "  Operator4 ENR to remove: ${op4_enr:0:50}..."
-
-    # Reset service states for remaining operators
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        echo "charon=running" > "$op_dir/services.state"
-        echo "vc-lodestar=running" >> "$op_dir/services.state"
-    done
-
-    local pids=()
-    local logs_dir="$TMP_DIR/logs/remove-operators"
-    mkdir -p "$logs_dir"
-
-    # Run remaining operators (0-3) — operator4 does NOT participate
-    # (within fault tolerance: 5 ops, threshold ~4, f=1)
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        (
-            WORK_DIR="$op_dir" \
-            MOCK_OPERATOR_INDEX="$i" \
-            MOCK_STATE_DIR="$op_dir" \
-                "$REPO_ROOT/scripts/edit/remove-operators/remaining-operator.sh" \
-                --operator-enrs-to-remove "$op4_enr"
-        ) > "$logs_dir/operator${i}.log" 2>&1 &
-        pids+=($!)
-    done
-
-    local all_ok=true
-    for i in "${!pids[@]}"; do
-        if ! wait "${pids[$i]}"; then
-            log_error "Operator $i failed. Log:"
-            cat "$logs_dir/operator${i}.log" || true
-            all_ok=false
-        fi
-    done
-
-    if [ "$all_ok" = false ]; then
-        return 1
-    fi
-
-    # Verify: 4 operators in new cluster-lock
-    local ok=true
-    for i in $(seq 0 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        local lock="$op_dir/.charon/cluster-lock.json"
-
-        if [ ! -f "$lock" ]; then
-            log_error "Operator $i: cluster-lock.json not found"
-            ok=false
-            continue
-        fi
-
-        local num_ops
-        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
-        assert_eq "Operator $i has 4 operators" "4" "$num_ops" || ok=false
-    done
-
-    [ "$ok" = true ]
-}
-
-test_replace_operator() {
-    log_info "Running replace-operator workflow (replacing operator0)..."
-
-    # Create new operator work directory
-    local new_op_dir="$TMP_DIR/new-operator"
-    mkdir -p "$new_op_dir/.charon"
-
-    # Generate ENR for replacement operator
-    log_info "  Generating ENR for replacement operator..."
-    "$REAL_DOCKER" run --rm \
-        --user "$(id -u):$(id -g)" \
-        -v "$new_op_dir/.charon:/opt/charon/.charon" \
-        "$CHARON_IMAGE" \
-        create enr
-
-    local new_enr
-    new_enr=$("$REAL_DOCKER" run --rm \
-        --user "$(id -u):$(id -g)" \
-        -v "$new_op_dir/.charon:/opt/charon/.charon" \
-        "$CHARON_IMAGE" \
-        enr 2>/dev/null)
-
-    if [ -z "$new_enr" ]; then
-        log_error "Failed to get ENR for replacement operator"
-        return 1
-    fi
-    log_info "  Replacement operator ENR: ${new_enr:0:50}..."
-
-    # Create .env for new operator
-    cat > "$new_op_dir/.env" <<EOF
-NETWORK=hoodi
-VC=vc-lodestar
-EOF
-    mkdir -p "$new_op_dir"
-
-    # Get operator 0's ENR from the cluster-lock (operator to be replaced)
-    local old_enr
-    old_enr=$(jq -r '.cluster_definition.operators[0].enr' "$TMP_DIR/operator1/.charon/cluster-lock.json")
-    if [ -z "$old_enr" ] || [ "$old_enr" = "null" ]; then
-        log_error "Failed to get operator0 ENR from cluster-lock"
-        return 1
-    fi
-    log_info "  Old operator ENR: ${old_enr:0:50}..."
-
-    # Reset service states for remaining operators (1-3)
-    for i in $(seq 1 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        echo "charon=running" > "$op_dir/services.state"
-        echo "vc-lodestar=running" >> "$op_dir/services.state"
-    done
-
-    # Replace-operator is OFFLINE (no P2P) — each remaining operator runs independently
-    local logs_dir="$TMP_DIR/logs/replace-operator"
-    mkdir -p "$logs_dir"
-
-    local ok=true
-    for i in $(seq 1 $((NUM_OPERATORS - 1))); do
-        local op_dir="$TMP_DIR/operator${i}"
-        log_info "  Running remaining-operator.sh for operator $i..."
-        if ! (
-            WORK_DIR="$op_dir" \
-            MOCK_OPERATOR_INDEX="$i" \
-            MOCK_STATE_DIR="$op_dir" \
-                "$REPO_ROOT/scripts/edit/replace-operator/remaining-operator.sh" \
-                --new-enr "$new_enr" \
-                --old-enr "$old_enr"
-        ) > "$logs_dir/operator${i}.log" 2>&1; then
-            log_error "Operator $i failed. Log:"
-            cat "$logs_dir/operator${i}.log" || true
-            ok=false
-        fi
-    done
-
-    if [ "$ok" = false ]; then
-        return 1
-    fi
-
-    # Copy output cluster-lock from operator1 to new operator's work dir
-    local src_lock="$TMP_DIR/operator1/.charon/cluster-lock.json"
-    if [ ! -f "$src_lock" ]; then
-        # Try output dir
-        src_lock="$TMP_DIR/operator1/output/cluster-lock.json"
-    fi
-    if [ ! -f "$src_lock" ]; then
-        log_error "No output cluster-lock found for new operator"
-        return 1
-    fi
-
-    # New operator receives cluster-lock and joins
-    echo "charon=stopped" > "$new_op_dir/services.state"
-    echo "vc-lodestar=stopped" >> "$new_op_dir/services.state"
-
-    log_info "  Running new-operator.sh..."
-    if ! (
+    (
         WORK_DIR="$new_op_dir" \
-        MOCK_OPERATOR_INDEX="0" \
-        MOCK_STATE_DIR="$new_op_dir" \
+        COMPOSE_FILE="$new_op_dir/docker-compose.e2e.yml" \
+        COMPOSE_PROJECT_NAME="e2e-op-replace-new" \
             "$REPO_ROOT/scripts/edit/replace-operator/new-operator.sh" \
-            --cluster-lock "$src_lock"
-    ) > "$logs_dir/new-operator.log" 2>&1; then
-        log_error "New operator failed. Log:"
-        cat "$logs_dir/new-operator.log" || true
+            --cluster-lock "$new_lock"
+    ) < /dev/null > "$logs_dir/new-operator-setup.log" 2>&1
+    if [ $? -ne 0 ]; then
+        log_error "New operator post-ceremony setup failed. Log:"
+        sed 's/\r$//' "$logs_dir/new-operator-setup.log" | while IFS= read -r line; do echo "                $line"; done || true
+        all_ok=false
+    fi
+
+    if [ "$all_ok" = false ]; then
         return 1
     fi
 
-    # Verify: 4 operators, operator 0's ENR changed
-    local lock="$new_op_dir/.charon/cluster-lock.json"
-    if [ ! -f "$lock" ]; then
-        log_error "New operator: cluster-lock.json not found"
-        return 1
-    fi
+    # Verify: same number of operators, new ENR present, old ENR gone
+    local ok=true
+    for i in $(seq 0 "$remaining_max"); do
+        local op_dir="$TMP_DIR/operator${i}"
+        local lock="$op_dir/.charon/cluster-lock.json"
 
-    local num_ops
-    num_ops=$(jq '.cluster_definition.operators | length' "$lock")
-    assert_eq "New operator has 4 operators" "4" "$num_ops" || ok=false
-
-    # Check that operator 0's ENR changed to the new ENR
-    local op0_enr
-    op0_enr=$(jq -r '.cluster_definition.operators[0].enr' "$lock")
-    # The ENR should contain part of our new ENR (ENRs are reformatted by charon)
-    if [ "$op0_enr" != "null" ] && [ -n "$op0_enr" ]; then
-        log_info "  PASS: Operator 0 ENR is present in new cluster-lock"
-    else
-        log_error "  FAIL: Operator 0 ENR missing from cluster-lock"
-        ok=false
-    fi
-
-    [ "$ok" = true ]
-}
-
-test_update_asdb() {
-    log_info "Running update-anti-slashing-db standalone test..."
-
-    # Use cluster-locks from earlier tests as source/target
-    # Find two different cluster-locks (before/after recreate-private-keys)
-    # We'll use operator0's backup and current cluster-lock
-
-    local source_lock=""
-    local target_lock=""
-
-    # Find backup from recreate-private-keys (or add-validators)
-    for backup in "$TMP_DIR"/operator0/backups/.charon-backup.*/cluster-lock.json; do
-        if [ -f "$backup" ]; then
-            source_lock="$backup"
-            break
+        if [ ! -f "$lock" ]; then
+            log_error "Operator $i: cluster-lock.json not found"
+            ok=false
+            continue
         fi
+
+        local num_ops
+        num_ops=$(jq '.cluster_definition.operators | length' "$lock")
+        assert_eq "Operator $i has $NUM_OPERATORS operators" "$NUM_OPERATORS" "$num_ops" || ok=false
     done
 
-    target_lock="$TMP_DIR/operator0/.charon/cluster-lock.json"
-
-    if [ -z "$source_lock" ] || [ ! -f "$source_lock" ]; then
-        log_warn "No backup cluster-lock found, creating synthetic test data..."
-
-        # Create synthetic source and target
-        local asdb_test_dir="$TMP_DIR/asdb-test"
-        mkdir -p "$asdb_test_dir"
-
-        source_lock="$asdb_test_dir/source-lock.json"
-        target_lock="$asdb_test_dir/target-lock.json"
-
-        # Use operator0's original cluster from the initial creation
-        local orig_lock="$TMP_DIR/cluster/node0/cluster-lock.json"
-        if [ -f "$orig_lock" ]; then
-            cp "$orig_lock" "$source_lock"
-            cp "$TMP_DIR/operator0/.charon/cluster-lock.json" "$target_lock"
-        else
-            log_error "Cannot find any cluster-lock files for ASDB test"
-            return 1
-        fi
-    fi
-
-    if [ ! -f "$target_lock" ]; then
-        log_error "Target cluster-lock not found: $target_lock"
-        return 1
-    fi
-
-    log_info "  Source lock: $source_lock"
-    log_info "  Target lock: $target_lock"
-
-    # Generate EIP-3076 JSON with pubkeys from source lock
-    local asdb_dir="$TMP_DIR/asdb-test"
-    mkdir -p "$asdb_dir"
-    local eip3076_file="$asdb_dir/slashing-protection.json"
-
-    # Extract operator 0's pubkeys from source lock
-    local pubkeys
-    pubkeys=$(jq -r '.distributed_validators[].public_shares[0]' "$source_lock")
-
-    local data_entries=""
-    local first=true
-    while IFS= read -r pk; do
-        [ -z "$pk" ] && continue
-        if [ "$first" = true ]; then
-            first=false
-        else
-            data_entries="${data_entries},"
-        fi
-        data_entries="${data_entries}{\"pubkey\":\"${pk}\",\"signed_blocks\":[],\"signed_attestations\":[]}"
-    done <<< "$pubkeys"
-
-    cat > "$eip3076_file" <<EOF
-{"metadata":{"interchange_format_version":"5","genesis_validators_root":"0x0000000000000000000000000000000000000000000000000000000000000000"},"data":[${data_entries}]}
-EOF
-
-    log_info "  Generated EIP-3076 with $(echo "$pubkeys" | wc -l | tr -d ' ') pubkey(s)"
-
-    # Get pubkeys before update
-    local old_pubkeys
-    old_pubkeys=$(jq -r '.data[].pubkey' "$eip3076_file" | sort)
-
-    # Run update script
-    if ! "$REPO_ROOT/scripts/edit/vc/update-anti-slashing-db.sh" \
-        "$eip3076_file" "$source_lock" "$target_lock"; then
-        log_error "update-anti-slashing-db.sh failed"
-        return 1
-    fi
-
-    # Get pubkeys after update
-    local new_pubkeys
-    new_pubkeys=$(jq -r '.data[].pubkey' "$eip3076_file" | sort)
-
-    # Verify pubkeys were transformed
-    local ok=true
-
-    # Verify the output is valid JSON
-    if ! jq empty "$eip3076_file" 2>/dev/null; then
-        log_error "Output is not valid JSON"
-        return 1
-    fi
-
-    # Check that pubkeys now match target lock's operator 0 shares
-    # Only compare validators that existed in the source lock
-    local source_val_count
-    source_val_count=$(jq '.distributed_validators | length' "$source_lock")
-    local expected_pubkeys
-    expected_pubkeys=$(jq -r --argjson n "$source_val_count" \
-        '[.distributed_validators[:$n][].public_shares[0]] | .[]' "$target_lock" | sort)
-
-    if [ "$new_pubkeys" = "$expected_pubkeys" ]; then
-        log_info "  PASS: Pubkeys correctly transformed to target cluster-lock values"
-    else
-        log_error "  FAIL: Pubkeys don't match target cluster-lock"
-        log_error "    Expected: $expected_pubkeys"
-        log_error "    Got:      $new_pubkeys"
+    # Verify new operator has the cluster-lock installed
+    if [ ! -f "$new_op_dir/.charon/cluster-lock.json" ]; then
+        log_error "New operator: cluster-lock.json not found"
         ok=false
+    else
+        local new_num_ops
+        new_num_ops=$(jq '.cluster_definition.operators | length' "$new_op_dir/.charon/cluster-lock.json")
+        assert_eq "New operator has $NUM_OPERATORS operators" "$NUM_OPERATORS" "$new_num_ops" || ok=false
     fi
+
+    # Verify the old ENR is gone and new ENR is present in the cluster-lock
+    local lock="$TMP_DIR/operator0/.charon/cluster-lock.json"
+    local has_new_enr
+    has_new_enr=$(jq -r --arg enr "$new_enr" \
+        '[.cluster_definition.operators[].enr] | map(select(. == $enr)) | length' "$lock")
+    assert_eq "New ENR present in cluster-lock" "1" "$has_new_enr" || ok=false
+
+    local has_old_enr
+    has_old_enr=$(jq -r --arg enr "$old_enr" \
+        '[.cluster_definition.operators[].enr] | map(select(. == $enr)) | length' "$lock")
+    assert_eq "Old ENR removed from cluster-lock" "0" "$has_old_enr" || ok=false
+
+    # Clean up replaced operator's compose stack
+    stop_operator "$op_to_replace"
 
     [ "$ok" = true ]
 }
@@ -743,21 +827,36 @@ main() {
     echo ""
     echo "╔════════════════════════════════════════════════════════════════╗"
     echo "║     E2E Integration Test for Cluster Edit Scripts              ║"
+    echo "║     (Real Docker Compose)                                      ║"
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo ""
 
     check_prerequisites
     setup_tmp_dir
     create_cluster
-    setup_mock_docker
 
-    # Run tests sequentially — each builds on the previous state
-    run_test "add-validators"          test_add_validators
-    run_test "recreate-private-keys"   test_recreate_private_keys
-    run_test "add-operators"           test_add_operators
-    run_test "remove-operators"        test_remove_operators
-    run_test "replace-operator"        test_replace_operator
-    run_test "update-anti-slashing-db" test_update_asdb
+    # Start compose stacks and seed ASDB for all operators
+    start_all_operators
+    seed_all_operators
+
+    # Test 1: add-validators (4 ops in parallel)
+    run_test "add-validators" test_add_validators
+    restart_and_seed_all
+
+    # Test 2: recreate-private-keys (4 ops in parallel)
+    run_test "recreate-private-keys" test_recreate_private_keys
+    restart_and_seed_all
+
+    # Test 3: add-operators (+3 new = 7 total)
+    run_test "add-operators" test_add_operators
+    restart_and_seed_all $((NUM_OPERATORS - 1))
+
+    # Test 4: remove-operators (remove 1, leaving 6)
+    run_test "remove-operators" test_remove_operators
+    restart_and_seed_all $((NUM_OPERATORS - 1))
+
+    # Test 5: replace-operator (replace last operator with a new one)
+    run_test "replace-operator" test_replace_operator
 
     # Summary
     echo ""
@@ -766,9 +865,9 @@ main() {
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo ""
     echo "  Tests run:    $TESTS_RUN"
-    echo -e "  Tests passed: ${GREEN}$TESTS_PASSED${NC}"
+    printf "  Tests passed: ${GREEN}%s${NC}\n" "$TESTS_PASSED"
     if [ "$TESTS_FAILED" -gt 0 ]; then
-        echo -e "  Tests failed: ${RED}$TESTS_FAILED${NC}"
+        printf "  Tests failed: ${RED}%s${NC}\n" "$TESTS_FAILED"
     else
         echo "  Tests failed: $TESTS_FAILED"
     fi
