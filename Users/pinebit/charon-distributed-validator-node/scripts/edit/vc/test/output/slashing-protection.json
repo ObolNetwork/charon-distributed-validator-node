@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "interchange_format_version": "5",
+    "genesis_validators_root": "0x212f13fc4df078b6cb7db228f1c8307566dcecf900867401a92023d7ba99cb5f"
+  },
+  "data": [
+    {
+      "pubkey": "0xa3fd47653b13a3a0c09d3d1fee3e3c305b8336cbcbfb9bacaf138d21fe7c6b1159a219e70b2d1447143af141c5721b27",
+      "signed_blocks": [
+        {
+          "slot": "81952",
+          "signing_root": "0x4ff6f743a43f3b4f95350831aeaf0a122a1a392922c45d804280284a69eb850b"
+        },
+        {
+          "slot": "81984",
+          "signing_root": "0x5a2b9c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b"
+        }
+      ],
+      "signed_attestations": [
+        {
+          "source_epoch": "2560",
+          "target_epoch": "2561",
+          "signing_root": "0x587d6a4f59a58fe15bdac1234e3d51a1d5c8b2e0e3f5e0f2a1b3c4d5e6f7a8b9"
+        },
+        {
+          "source_epoch": "2561",
+          "target_epoch": "2562",
+          "signing_root": "0x6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b"
+        },
+        {
+          "source_epoch": "2562",
+          "target_epoch": "2563",
+          "signing_root": "0x7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c"
+        }
+      ]
+    }
+  ]
+}

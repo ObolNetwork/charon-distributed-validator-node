@@ -1,0 +1,4 @@
+# Temporary test artifacts
+output/
+data/
+*.tmp

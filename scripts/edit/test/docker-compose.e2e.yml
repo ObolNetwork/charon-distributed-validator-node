@@ -1,0 +1,20 @@
+# Minimal compose file for E2E testing of edit scripts.
+#
+# - charon: busybox placeholder (ceremonies use standalone `docker run`)
+# - vc-lodestar: real lodestar image for ASDB export/import via `docker compose run`
+#
+# Both services use `tail -f /dev/null` to stay alive without real network connections.
+
+services:
+  charon:
+    image: busybox:latest
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+
+  vc-lodestar:
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes:
+      - .charon/validator_keys:/home/charon/validator_keys
+      - ./data/lodestar:/opt/data
+    environment:
+      NETWORK: ${NETWORK:-hoodi}
