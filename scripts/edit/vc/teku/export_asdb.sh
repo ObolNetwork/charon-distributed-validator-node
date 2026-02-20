@@ -3,7 +3,7 @@
 # Script to export Teku validator anti-slashing database to EIP-3076 format.
 #
 # This script is run by continuing operators before the replace-operator ceremony.
-# It exports the slashing protection database from the running vc-teku container
+# It exports the slashing protection database using a temporary container
 # to a JSON file that can be updated and re-imported after the ceremony.
 #
 # Usage: export_asdb.sh [--data-dir <path>] [--output-file <path>]
@@ -14,7 +14,7 @@
 #
 # Requirements:
 #   - .env file must exist with NETWORK variable set
-#   - vc-teku container must be running
+#   - vc-teku container must be STOPPED (to avoid database locking)
 #   - docker and docker compose must be available
 
 set -euo pipefail
@@ -49,15 +49,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -73,11 +77,11 @@ echo "Data directory: $DATA_DIR"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
-# Check if vc-teku container is running
-if ! docker compose ps vc-teku | grep -q Up; then
-    echo "Error: vc-teku container is not running" >&2
-    echo "Please start the validator client before exporting:" >&2
-    echo "  docker compose up -d vc-teku" >&2
+# Check if vc-teku container is running (it should be stopped to avoid DB locking)
+if docker compose ps vc-teku 2>/dev/null | grep -q Up; then
+    echo "Error: vc-teku container is still running" >&2
+    echo "Please stop the validator client before exporting:" >&2
+    echo "  docker compose stop vc-teku" >&2
     exit 1
 fi
 
@@ -85,24 +89,29 @@ fi
 OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
 mkdir -p "$OUTPUT_DIR"
 
-echo "Exporting slashing protection data from vc-teku container..."
+# Make OUTPUT_DIR absolute for docker bind mount
+if [[ "$OUTPUT_DIR" != /* ]]; then
+    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+fi
 
-# Export slashing protection data from the container
-# Teku stores data in /home/data (mapped from ./data/vc-teku)
-# The export command writes to a file we specify
-if ! docker compose exec -T vc-teku /opt/teku/bin/teku slashing-protection export \
+echo "Exporting slashing protection data using vc-teku container..."
+
+# Export slashing protection data using a temporary container based on vc-teku service.
+# Teku stores data in /home/data (mapped from ./data/vc-teku).
+# We use docker compose run to create a temporary container with the same volumes.
+if ! docker compose run --rm -T --no-deps \
+    -v "$OUTPUT_DIR":/tmp/asdb-export \
+    --entrypoint /opt/teku/bin/teku \
+    vc-teku slashing-protection export \
     --data-path=/home/data \
-    --to=/tmp/export.json; then
-    echo "Error: Failed to export slashing protection from vc-teku container" >&2
+    --to=/tmp/asdb-export/slashing-protection.json; then
+    echo "Error: Failed to export slashing protection from vc-teku" >&2
     exit 1
 fi
 
-echo "Copying exported file from container to host..."
-
-# Copy the exported file from container to host
-if ! docker compose cp vc-teku:/tmp/export.json "$OUTPUT_FILE"; then
-    echo "Error: Failed to copy exported file from container" >&2
-    exit 1
+# Move file to expected output path if not already there
+if [ -f "$OUTPUT_DIR/slashing-protection.json" ] && [ "$OUTPUT_FILE" != "$OUTPUT_DIR/slashing-protection.json" ]; then
+    mv "$OUTPUT_DIR/slashing-protection.json" "$OUTPUT_FILE"
 fi
 
 # Validate the exported JSON

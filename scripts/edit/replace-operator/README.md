@@ -31,7 +31,7 @@ Automates the complete workflow for operators staying in the cluster:
 ```bash
 ./scripts/edit/replace-operator/remaining-operator.sh \
     --new-enr "enr:-..." \
-    --operator-index 2
+    --old-enr "enr:-..."
 ```
 
 ### Options
@@ -39,7 +39,7 @@ Automates the complete workflow for operators staying in the cluster:
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--new-enr <enr>` | Yes | ENR of the new operator |
-| `--operator-index <N>` | Yes | Index of operator being replaced |
+| `--old-enr <enr>` | Yes | ENR of the operator being replaced |
 | `--skip-export` | No | Skip ASDB export if already done |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
@@ -47,7 +47,7 @@ Automates the complete workflow for operators staying in the cluster:
 ### Workflow
 
 1. **Export ASDB** - Export anti-slashing database from running VC
-2. **Run ceremony** - Execute `charon edit replace-operator` with new ENR
+2. **Run ceremony** - Execute `charon alpha edit replace-operator` with new ENR
 3. **Update ASDB** - Replace pubkeys in exported ASDB to match new cluster-lock
 4. **Stop containers** - Stop charon and VC
 5. **Backup and replace** - Backup old cluster-lock, install new one

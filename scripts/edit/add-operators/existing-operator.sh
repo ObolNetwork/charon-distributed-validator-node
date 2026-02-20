@@ -111,7 +111,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
+SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
+
 source .env
+
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
+if [ -n "$SAVED_COMPOSE_FILE" ]; then
+    export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
+fi
 
 if [ -z "${NETWORK:-}" ]; then
     log_error "NETWORK variable not set in .env"
@@ -165,15 +177,14 @@ echo ""
 # Step 1: Export anti-slashing database
 log_step "Step 1: Exporting anti-slashing database..."
 
-# Check VC container is running (skip check in dry-run mode)
+# VC container must be stopped before export (Lodestar locks the database while running)
 if [ "$DRY_RUN" = false ]; then
-    if ! docker compose ps "$VC" 2>/dev/null | grep -q Up; then
-        log_error "VC container ($VC) is not running. Start it first:"
-        log_error "  docker compose up -d $VC"
-        exit 1
+    if docker compose ps "$VC" 2>/dev/null | grep -q Up; then
+        log_info "Stopping VC container ($VC) for ASDB export..."
+        docker compose stop "$VC"
     fi
 else
-    log_warn "Would check that $VC container is running"
+    log_warn "Would stop $VC container if running"
 fi
 
 mkdir -p "$ASDB_EXPORT_DIR"
@@ -205,10 +216,16 @@ log_info "Please wait for all operators to connect..."
 echo ""
 
 if [ "$DRY_RUN" = false ]; then
-    docker run --rm -it \
+    # Use -i for stdin (needed for ceremony coordination), skip -t if no TTY available
+    DOCKER_FLAGS="-i"
+    if [ -t 0 ]; then
+        DOCKER_FLAGS="-it"
+    fi
+    
+    docker run --rm $DOCKER_FLAGS \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
         alpha edit add-operators \
         --new-operator-enrs="$NEW_OPERATOR_ENRS" \
         --output-dir=/opt/charon/output

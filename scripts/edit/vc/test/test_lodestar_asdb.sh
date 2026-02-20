@@ -5,11 +5,10 @@
 # This script:
 # 1. Starts vc-lodestar via docker-compose with test override (no charon dependency)
 # 2. Sets up keystores in the container
-# 3. Imports sample slashing protection data (with known pubkey and attestations)
-# 4. Calls scripts/edit/vc/export_asdb.sh to export slashing protection
+# 3. Stops container and imports sample slashing protection data
+# 4. Calls scripts/edit/vc/export_asdb.sh to export slashing protection (container stopped)
 # 5. Runs update-anti-slashing-db.sh to transform pubkeys
-# 6. Stops the container
-# 7. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection
+# 6. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection (container stopped)
 #
 # Usage: ./scripts/edit/vc/test/test_lodestar_asdb.sh
 
@@ -139,14 +138,7 @@ else
     exit 1
 fi
 
-# Start container again for export
-docker compose --profile vc-lodestar up -d vc-lodestar
-sleep 2
-
-# Clean stale LevelDB lock file from previous import run
-docker compose exec -T vc-lodestar rm -f /opt/data/validator-db/LOCK 2>/dev/null || true
-
-# Step 4: Test export using the actual script
+# Step 4: Test export using the actual script (container should remain stopped)
 log_info "Step 4: Testing export_asdb.sh script..."
 
 EXPORT_FILE="$TEST_OUTPUT_DIR/exported-asdb.json"
@@ -206,13 +198,8 @@ else
     exit 1
 fi
 
-# Step 6: Stop container before import (required by import script)
-log_info "Step 6: Stopping vc-lodestar for import..."
-
-docker compose stop vc-lodestar
-
-# Step 7: Test import using the actual script
-log_info "Step 7: Testing import_asdb.sh script..."
+# Step 6: Test import using the actual script (container is already stopped)
+log_info "Step 6: Testing import_asdb.sh script..."
 
 if VC=vc-lodestar "$REPO_ROOT/scripts/edit/vc/import_asdb.sh" --input-file "$UPDATED_FILE"; then
     log_info "Import script successful!"

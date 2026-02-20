@@ -5,11 +5,10 @@
 # This script:
 # 1. Starts vc-prysm via docker-compose with test override (no charon dependency)
 # 2. Sets up wallet and keystores in the container
-# 3. Imports sample slashing protection data (with known pubkey and attestations)
-# 4. Calls scripts/edit/vc/export_asdb.sh to export slashing protection
+# 3. Stops container and imports sample slashing protection data
+# 4. Calls scripts/edit/vc/export_asdb.sh to export slashing protection (container stopped)
 # 5. Runs update-anti-slashing-db.sh to transform pubkeys
-# 6. Stops the container
-# 7. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection
+# 6. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection (container stopped)
 #
 # Usage: ./scripts/edit/vc/test/test_prysm_asdb.sh
 
@@ -186,11 +185,7 @@ else
     exit 1
 fi
 
-# Start container again for export
-docker compose --profile vc-prysm up -d vc-prysm
-sleep 2
-
-# Step 4: Test export using the actual script
+# Step 4: Test export using the actual script (container should remain stopped)
 log_info "Step 4: Testing export_asdb.sh script..."
 
 EXPORT_FILE="$TEST_OUTPUT_DIR/exported-asdb.json"
@@ -250,13 +245,8 @@ else
     exit 1
 fi
 
-# Step 6: Stop container before import (required by import script)
-log_info "Step 6: Stopping vc-prysm for import..."
-
-docker compose stop vc-prysm
-
-# Step 7: Test import using the actual script
-log_info "Step 7: Testing import_asdb.sh script..."
+# Step 6: Test import using the actual script (container is already stopped)
+log_info "Step 6: Testing import_asdb.sh script..."
 
 if VC=vc-prysm "$REPO_ROOT/scripts/edit/vc/import_asdb.sh" --input-file "$UPDATED_FILE"; then
     log_info "Import script successful!"

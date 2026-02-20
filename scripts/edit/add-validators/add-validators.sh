@@ -131,7 +131,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
+SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
+
 source .env
+
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
+if [ -n "$SAVED_COMPOSE_FILE" ]; then
+    export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
+fi
 
 if [ -z "${NETWORK:-}" ]; then
     log_error "NETWORK variable not set in .env"
@@ -222,12 +234,18 @@ log_info "The ceremony will coordinate with other operators via P2P relay."
 log_info "Please wait for all operators to connect..."
 echo ""
 
+# Use -i for stdin (needed for ceremony coordination), skip -t if no TTY available
+DOCKER_FLAGS="-i"
+if [ -t 0 ]; then
+    DOCKER_FLAGS="-it"
+fi
+
 # Build Docker command arguments
 DOCKER_ARGS=(
-    run --rm -it
+    run --rm $DOCKER_FLAGS
     -v "$REPO_ROOT/.charon:/opt/charon/.charon"
     -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output"
-    "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}"
+    "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}"
     alpha edit add-validators
     --num-validators="$NUM_VALIDATORS"
     --output-dir=/opt/charon/output

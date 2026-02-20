@@ -153,7 +153,7 @@ if [ "${1:-}" = "compose" ]; then
             exit 0
             ;;
         exec)
-            # docker compose exec -T <svc> <cmd...>  (ASDB export inside container)
+            # docker compose exec -T <svc> <cmd...>  (legacy ASDB export inside container)
             # Just succeed - the actual data is handled by cp
             exit 0
             ;;
@@ -171,8 +171,54 @@ if [ "${1:-}" = "compose" ]; then
             exit 0
             ;;
         run)
-            # docker compose run --rm ... (ASDB import)
-            # Just succeed
+            # docker compose run --rm ... (ASDB export/import)
+            # Parse arguments to find volume mounts and detect export operations
+            asdb_export_dir=""
+            is_export=false
+            args=("$@")
+            
+            for ((idx=0; idx<${#args[@]}; idx++)); do
+                arg="${args[$idx]}"
+                case "$arg" in
+                    -v)
+                        # Next arg is the volume mount
+                        next_idx=$((idx+1))
+                        if [ $next_idx -lt ${#args[@]} ]; then
+                            mount="${args[$next_idx]}"
+                            host_path="${mount%%:*}"
+                            container_path="${mount#*:}"
+                            # Check if this is the asdb-export mount
+                            if [[ "$container_path" == "/tmp/asdb-export"* ]]; then
+                                asdb_export_dir="$host_path"
+                            fi
+                        fi
+                        ;;
+                    -v*)
+                        # Combined -v/path:/path format
+                        mount="${arg#-v}"
+                        host_path="${mount%%:*}"
+                        container_path="${mount#*:}"
+                        if [[ "$container_path" == "/tmp/asdb-export"* ]]; then
+                            asdb_export_dir="$host_path"
+                        fi
+                        ;;
+                    *export*|slashing-protection-history)
+                        is_export=true
+                        ;;
+                esac
+            done
+            
+            # If this is an export operation with asdb-export mount, generate EIP-3076 file
+            if [ "$is_export" = true ] && [ -n "$asdb_export_dir" ]; then
+                mkdir -p "$asdb_export_dir"
+                # Different VCs create files with different names
+                # Lodestar/Teku/Nimbus: slashing-protection.json
+                # Prysm: slashing_protection.json
+                generate_eip3076 "$asdb_export_dir/slashing-protection.json"
+                # Also create Prysm-style filename 
+                cp "$asdb_export_dir/slashing-protection.json" "$asdb_export_dir/slashing_protection.json" 2>/dev/null || true
+            fi
+            
             exit 0
             ;;
         *)
@@ -236,8 +282,12 @@ case "${1:-}" in
                     new_enr="${1#--new-enr=}"
                     cleaned_args+=("$1")
                     ;;
-                --operator-index=*)
-                    operator_index="${1#--operator-index=}"
+                --new-operator-enr=*)
+                    new_enr="${1#--new-operator-enr=}"
+                    cleaned_args+=("$1")
+                    ;;
+                --old-operator-enr=*)
+                    old_enr="${1#--old-operator-enr=}"
                     cleaned_args+=("$1")
                     ;;
                 *) cleaned_args+=("$1") ;;
@@ -245,8 +295,8 @@ case "${1:-}" in
             shift
         done
 
-        # Check if this is a replace-operator command (mock it since it doesn't exist in v1.8.2)
-        if [ "$charon_cmd" = "replace-operator" ] && [ -n "$new_enr" ] && [ -n "$operator_index" ]; then
+        # Check if this is a replace-operator command (mock it since it doesn't exist in older versions)
+        if [ "$charon_cmd" = "replace-operator" ] && [ -n "$new_enr" ] && [ -n "$old_enr" ]; then
             # Find the cluster-lock via volume mounts
             local_lock=""
             local_output=""
@@ -268,7 +318,17 @@ case "${1:-}" in
 
             if [ -n "$local_lock" ] && [ -f "$local_lock" ] && [ -n "$local_output" ]; then
                 mkdir -p "$local_output"
-                # Replace operator ENR at the given index using jq
+                # Find operator index by matching old_enr
+                operator_index=$(jq -r --arg enr "$old_enr" \
+                    '.cluster_definition.operators | to_entries[] | select(.value.enr == $enr) | .key' \
+                    "$local_lock" 2>/dev/null | head -n 1)
+                
+                if [ -z "$operator_index" ]; then
+                    echo "Mock replace-operator: could not find operator with ENR: $old_enr" >&2
+                    exit 1
+                fi
+                
+                # Replace operator ENR at the found index using jq
                 jq --argjson idx "$operator_index" --arg enr "$new_enr" \
                     '.cluster_definition.operators[$idx].enr = $enr' \
                     "$local_lock" > "$local_output/cluster-lock.json"

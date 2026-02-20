@@ -4,11 +4,10 @@
 #
 # This script:
 # 1. Starts vc-teku via docker-compose with test override (no charon dependency)
-# 2. Imports sample slashing protection data (with known pubkey and attestations)
-# 3. Calls scripts/edit/vc/export_asdb.sh to export slashing protection
+# 2. Stops container and imports sample slashing protection data
+# 3. Calls scripts/edit/vc/export_asdb.sh to export slashing protection (container stopped)
 # 4. Runs update-anti-slashing-db.sh to transform pubkeys
-# 5. Stops the container
-# 6. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection
+# 5. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection (container stopped)
 #
 # Usage: ./scripts/edit/vc/test/test_teku_asdb.sh
 
@@ -122,11 +121,7 @@ else
     exit 1
 fi
 
-# Start container again for export
-docker compose --profile vc-teku up -d vc-teku
-sleep 2
-
-# Step 3: Test export using the actual script
+# Step 3: Test export using the actual script (container should remain stopped)
 log_info "Step 3: Testing export_asdb.sh script..."
 
 EXPORT_FILE="$TEST_OUTPUT_DIR/exported-asdb.json"
@@ -186,13 +181,8 @@ else
     exit 1
 fi
 
-# Step 5: Stop container before import (required by import script)
-log_info "Step 5: Stopping vc-teku for import..."
-
-docker compose stop vc-teku
-
-# Step 6: Test import using the actual script
-log_info "Step 6: Testing import_asdb.sh script..."
+# Step 5: Test import using the actual script (container is already stopped)
+log_info "Step 5: Testing import_asdb.sh script..."
 
 if VC=vc-teku "$REPO_ROOT/scripts/edit/vc/import_asdb.sh" --input-file "$UPDATED_FILE"; then
     log_info "Import script successful!"

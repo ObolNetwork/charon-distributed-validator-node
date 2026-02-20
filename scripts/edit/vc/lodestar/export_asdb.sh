@@ -3,7 +3,7 @@
 # Script to export Lodestar validator anti-slashing database to EIP-3076 format.
 #
 # This script is run by continuing operators before the replace-operator ceremony.
-# It exports the slashing protection database from the running vc-lodestar container
+# It exports the slashing protection database using a temporary container
 # to a JSON file that can be updated and re-imported after the ceremony.
 #
 # Usage: export_asdb.sh [--data-dir <path>] [--output-file <path>]
@@ -14,7 +14,7 @@
 #
 # Requirements:
 #   - .env file must exist with NETWORK variable set
-#   - vc-lodestar container must be running
+#   - vc-lodestar container must be STOPPED (Lodestar locks the database while running)
 #   - docker and docker compose must be available
 
 set -euo pipefail
@@ -49,15 +49,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -73,11 +77,13 @@ echo "Data directory: $DATA_DIR"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
-# Check if vc-lodestar container is running
-if ! docker compose ps vc-lodestar | grep -q Up; then
-    echo "Error: vc-lodestar container is not running" >&2
-    echo "Please start the validator client before exporting:" >&2
-    echo "  docker compose up -d vc-lodestar" >&2
+# Check if vc-lodestar container is running (it should be stopped to avoid DB locking)
+if docker compose ps vc-lodestar 2>/dev/null | grep -q Up; then
+    echo "Error: vc-lodestar container is still running" >&2
+    echo "Please stop the validator client before exporting:" >&2
+    echo "  docker compose stop vc-lodestar" >&2
+    echo "" >&2
+    echo "Lodestar locks the database while running, preventing export." >&2
     exit 1
 fi
 
@@ -85,25 +91,31 @@ fi
 OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
 mkdir -p "$OUTPUT_DIR"
 
-echo "Exporting slashing protection data from vc-lodestar container..."
+# Make OUTPUT_DIR absolute for docker bind mount
+if [[ "$OUTPUT_DIR" != /* ]]; then
+    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+fi
 
-# Export slashing protection data from the container
-# The container writes to /tmp/export.json, then we copy it out
-# Using full path to lodestar binary as found in run.sh to ensure it's found
-if ! docker compose exec -T vc-lodestar node /usr/app/packages/cli/bin/lodestar validator slashing-protection export \
-    --file /tmp/export.json \
+echo "Exporting slashing protection data using vc-lodestar container..."
+
+# Export slashing protection data using a temporary container based on vc-lodestar service.
+# The container writes to /tmp/export.json, then we bind-mount the output directory.
+# We MUST override the entrypoint because the default run.sh ignores arguments.
+if ! docker compose run --rm -T --no-deps \
+    --entrypoint node \
+    -v "$OUTPUT_DIR":/tmp/asdb-export \
+    vc-lodestar /usr/app/packages/cli/bin/lodestar validator slashing-protection export \
+    --file /tmp/asdb-export/slashing-protection.json \
     --dataDir /opt/data \
     --network "$NETWORK"; then
     echo "Error: Failed to export slashing protection from vc-lodestar container" >&2
     exit 1
 fi
 
-echo "Copying exported file from container to host..."
-
-# Copy the exported file from container to host
-if ! docker compose cp vc-lodestar:/tmp/export.json "$OUTPUT_FILE"; then
-    echo "Error: Failed to copy exported file from container" >&2
-    exit 1
+# Move to correct output file if different from default
+EXPORTED_FILE="$OUTPUT_DIR/slashing-protection.json"
+if [ "$EXPORTED_FILE" != "$OUTPUT_FILE" ]; then
+    mv "$EXPORTED_FILE" "$OUTPUT_FILE"
 fi
 
 # Validate the exported JSON

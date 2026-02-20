@@ -114,7 +114,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
+SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
+
 source .env
+
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
+if [ -n "$SAVED_COMPOSE_FILE" ]; then
+    export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
+fi
 
 if [ -z "${NETWORK:-}" ]; then
     log_error "NETWORK variable not set in .env"
@@ -155,7 +167,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
                 create enr
         else
             echo "  [DRY-RUN] docker run --rm ... charon create enr"
@@ -175,7 +187,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             ENR=$(docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
                 enr 2>/dev/null || echo "")
 
             if [ -n "$ENR" ]; then
@@ -282,11 +294,24 @@ log_info "Please wait for all operators to connect..."
 echo ""
 
 if [ "$DRY_RUN" = false ]; then
-    docker run --rm -it \
+    # Use -i for stdin (needed for ceremony coordination), skip -t if no TTY available
+    DOCKER_FLAGS="-i"
+    if [ -t 0 ]; then
+        DOCKER_FLAGS="-it"
+    fi
+    
+    # Handle absolute vs relative cluster-lock path
+    if [[ "$CLUSTER_LOCK_PATH" = /* ]]; then
+        CLUSTER_LOCK_MOUNT="$CLUSTER_LOCK_PATH"
+    else
+        CLUSTER_LOCK_MOUNT="$REPO_ROOT/$CLUSTER_LOCK_PATH"
+    fi
+    
+    docker run --rm $DOCKER_FLAGS \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-        -v "$REPO_ROOT/$CLUSTER_LOCK_PATH:/opt/charon/cluster-lock.json:ro" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+        -v "$CLUSTER_LOCK_MOUNT:/opt/charon/cluster-lock.json:ro" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
         alpha edit add-operators \
         --new-operator-enrs="$NEW_OPERATOR_ENRS" \
         --output-dir=/opt/charon/output \

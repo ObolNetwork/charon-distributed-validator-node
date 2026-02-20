@@ -6,11 +6,10 @@
 # 1. Builds vc-nimbus image if needed
 # 2. Starts vc-nimbus via docker-compose with test override (no charon dependency)
 # 3. Sets up keystores in the container
-# 4. Imports sample slashing protection data (with known pubkey and attestations)
-# 5. Calls scripts/edit/vc/export_asdb.sh to export slashing protection
+# 4. Stops container and imports sample slashing protection data
+# 5. Calls scripts/edit/vc/export_asdb.sh to export slashing protection (container stopped)
 # 6. Runs update-anti-slashing-db.sh to transform pubkeys
-# 7. Stops the container
-# 8. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection
+# 7. Calls scripts/edit/vc/import_asdb.sh to import updated slashing protection (container stopped)
 #
 # Usage: ./scripts/edit/vc/test/test_nimbus_asdb.sh
 
@@ -169,11 +168,7 @@ else
     exit 1
 fi
 
-# Start container again for export
-docker compose --profile vc-nimbus up -d vc-nimbus
-sleep 2
-
-# Step 4: Test export using the actual script
+# Step 4: Test export using the actual script (container should remain stopped)
 log_info "Step 4: Testing export_asdb.sh script..."
 
 EXPORT_FILE="$TEST_OUTPUT_DIR/exported-asdb.json"
@@ -233,13 +228,8 @@ else
     exit 1
 fi
 
-# Step 6: Stop container before import (required by import script)
-log_info "Step 6: Stopping vc-nimbus for import..."
-
-docker compose stop vc-nimbus
-
-# Step 7: Test import using the actual script
-log_info "Step 7: Testing import_asdb.sh script..."
+# Step 6: Test import using the actual script (container is already stopped)
+log_info "Step 6: Testing import_asdb.sh script..."
 
 if VC=vc-nimbus "$REPO_ROOT/scripts/edit/vc/import_asdb.sh" --input-file "$UPDATED_FILE"; then
     log_info "Import script successful!"

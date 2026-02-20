@@ -104,7 +104,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
+SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
+
 source .env
+
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
+if [ -n "$SAVED_COMPOSE_FILE" ]; then
+    export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
+fi
 
 if [ -z "${NETWORK:-}" ]; then
     log_error "NETWORK variable not set in .env"
@@ -145,7 +157,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
                 create enr
         else
             echo "  [DRY-RUN] docker run --rm ... charon create enr"
@@ -165,7 +177,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ -f .charon/charon-enr-private-key ]; then
             ENR=$(docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
                 enr 2>/dev/null || echo "")
             
             if [ -n "$ENR" ]; then
@@ -269,7 +281,7 @@ if [ "$DRY_RUN" = false ] && [ -f .charon/cluster-lock.json ]; then
     # Get our ENR
     OUR_ENR=$(docker run --rm \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
         enr 2>/dev/null || echo "")
     
     if [ -n "$OUR_ENR" ]; then

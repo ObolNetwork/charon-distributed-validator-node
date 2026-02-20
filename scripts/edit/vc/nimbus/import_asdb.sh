@@ -50,15 +50,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -86,6 +90,11 @@ if ! jq empty "$INPUT_FILE" 2>/dev/null; then
     exit 1
 fi
 
+# Make INPUT_FILE absolute for docker bind mount
+if [[ "$INPUT_FILE" != /* ]]; then
+    INPUT_FILE="$(pwd)/$INPUT_FILE"
+fi
+
 # Check if vc-nimbus container is running (it should be stopped)
 if docker compose ps vc-nimbus 2>/dev/null | grep -q Up; then
     echo "Error: vc-nimbus container is still running" >&2
@@ -102,7 +111,7 @@ echo "Importing slashing protection data into vc-nimbus container..."
 # The input file is bind-mounted into the container at /tmp/import.json (read-only).
 # Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
 # Nimbus requires --data-dir BEFORE the subcommand.
-if ! docker compose run --rm -T \
+if ! docker compose run --rm -T --no-deps \
     --entrypoint sh \
     -v "$INPUT_FILE":/tmp/import.json:ro \
     vc-nimbus -c "/home/user/nimbus_beacon_node --data-dir=/home/user/data slashingdb import /tmp/import.json"; then

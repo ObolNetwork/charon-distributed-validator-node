@@ -20,7 +20,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$TEST_DIR/../../.." && pwd)"
-CHARON_VERSION="${CHARON_VERSION:-v1.8.2}"
+CHARON_VERSION="${CHARON_VERSION:-v1.9.0-rc3}"
 CHARON_IMAGE="obolnetwork/charon:${CHARON_VERSION}"
 NUM_OPERATORS=4
 ZERO_ADDR="0x0000000000000000000000000000000000000001"
@@ -522,6 +522,15 @@ VC=vc-lodestar
 EOF
     mkdir -p "$new_op_dir"
 
+    # Get operator 0's ENR from the cluster-lock (operator to be replaced)
+    local old_enr
+    old_enr=$(jq -r '.cluster_definition.operators[0].enr' "$TMP_DIR/operator1/.charon/cluster-lock.json")
+    if [ -z "$old_enr" ] || [ "$old_enr" = "null" ]; then
+        log_error "Failed to get operator0 ENR from cluster-lock"
+        return 1
+    fi
+    log_info "  Old operator ENR: ${old_enr:0:50}..."
+
     # Reset service states for remaining operators (1-3)
     for i in $(seq 1 $((NUM_OPERATORS - 1))); do
         local op_dir="$TMP_DIR/operator${i}"
@@ -543,7 +552,7 @@ EOF
             MOCK_STATE_DIR="$op_dir" \
                 "$REPO_ROOT/scripts/edit/replace-operator/remaining-operator.sh" \
                 --new-enr "$new_enr" \
-                --operator-index 0
+                --old-enr "$old_enr"
         ) > "$logs_dir/operator${i}.log" 2>&1; then
             log_error "Operator $i failed. Log:"
             cat "$logs_dir/operator${i}.log" || true
