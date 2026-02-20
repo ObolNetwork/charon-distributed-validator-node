@@ -26,11 +26,11 @@ Ask the user: **"Are you a remaining operator (performing the replacement) or th
 
 **Additional prerequisites**:
 - `.charon/cluster-lock.json` and `.charon/charon-enr-private-key` must exist
-- VC container must be running (for ASDB export, unless `--skip-export` is used)
+- The script will automatically stop the VC container for ASDB export (unless `--skip-export` is used)
 
 **Arguments to gather**:
 - `--new-enr`: ENR of the new replacement operator
-- `--operator-index`: Index of the operator being replaced (0-based)
+- `--old-enr`: ENR of the operator being replaced
 - `--skip-export` (optional): Skip ASDB export if already done
 - Whether to use `--dry-run` first
 
@@ -38,7 +38,7 @@ Ask the user: **"Are you a remaining operator (performing the replacement) or th
 ```bash
 ./scripts/edit/replace-operator/remaining-operator.sh \
     --new-enr "enr:-..." \
-    --operator-index <N> \
+    --old-enr "enr:-..." \
     [--skip-export] \
     [--dry-run]
 ```

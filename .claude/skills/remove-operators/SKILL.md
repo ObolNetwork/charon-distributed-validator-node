@@ -34,7 +34,7 @@ Ask the user: **"Are you a remaining operator (staying in the cluster) or a remo
 
 **Additional prerequisites**:
 - `.charon/validator_keys/` must exist
-- VC container must be running (for ASDB export)
+- The script will automatically stop the VC container for ASDB export
 
 **Arguments to gather**:
 - `--operator-enrs-to-remove`: Comma-separated ENRs of operators being removed
