@@ -14,8 +14,9 @@ Read `scripts/edit/remove-operators/README.md` for full details if needed.
 
 Common prerequisites:
 1. `.env` file exists with `NETWORK` and `VC` variables set
-2. `.charon/cluster-lock.json` exists
+2. `.charon` directory with `cluster-lock.json` and `validator_keys`
 3. Docker is running
+4. `jq` installed
 
 ## Fault Tolerance Context
 

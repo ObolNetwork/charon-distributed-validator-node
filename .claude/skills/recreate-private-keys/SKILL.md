@@ -18,9 +18,9 @@ Refresh private key shares held by operators while keeping the same validator pu
 
 Before running, verify:
 1. `.env` file exists with `NETWORK` and `VC` variables set
-2. `.charon/cluster-lock.json` and `.charon/validator_keys/` exist
+2. `.charon` directory with `cluster-lock.json` and `validator_keys`
 3. Docker is running
-4. Docker is running (the script will stop the VC container automatically for ASDB export)
+4. `jq` installed
 
 Read `scripts/edit/recreate-private-keys/README.md` for full details if needed.
 

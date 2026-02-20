@@ -15,6 +15,7 @@ Read `scripts/edit/add-operators/README.md` for full details if needed.
 Common prerequisites:
 1. `.env` file exists with `NETWORK` and `VC` variables set
 2. Docker is running
+3. `jq` installed
 
 ## Role Selection
 
