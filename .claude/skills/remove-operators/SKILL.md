@@ -51,7 +51,7 @@ Ask the user: **"Are you a remaining operator (staying in the cluster) or a remo
     [--dry-run]
 ```
 
-After completion, remind the user to **wait ~2 epochs before restarting** containers.
+After completion, the script will print commands to start containers manually. Remind the user to **wait ~2 epochs before starting** containers.
 
 ### If Removed Operator
 

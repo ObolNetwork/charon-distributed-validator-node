@@ -302,13 +302,6 @@ fi
 
 echo ""
 
-# Step 5: Start containers
-log_step "Step 5: Starting containers..."
-
-run_cmd docker compose up -d charon "$VC"
-
-log_info "Containers started"
-
 echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║     New Operator Setup COMPLETED                               ║"
@@ -316,10 +309,12 @@ echo "╚═══════════════════════�
 echo ""
 log_info "Summary:"
 log_info "  - Cluster-lock installed in: .charon/cluster-lock.json"
-log_info "  - Containers started: charon, $VC"
 echo ""
-log_info "Next steps:"
-log_info "  1. Wait for charon to sync with peers: docker compose logs -f charon"
+log_info "When ready, start containers with:"
+echo "  docker compose up -d charon $VC"
+echo ""
+log_info "After starting, verify:"
+log_info "  1. Check charon logs: docker compose logs -f charon"
 log_info "  2. Verify VC is running: docker compose logs -f $VC"
 log_info "  3. Monitor validator duties once synced"
 echo ""

@@ -41,7 +41,8 @@ The script will:
 6. Backup `.charon/` to `./backups/`
 7. Install new key shares
 8. Import updated ASDB
+9. Print commands to start containers manually
 
-After completion, remind the user to **wait ~2 epochs before restarting** containers.
+After completion, remind the user to **wait ~2 epochs before starting** containers.
 
 Remind the user that **all operators must run this script at the same time** for the P2P ceremony to succeed.

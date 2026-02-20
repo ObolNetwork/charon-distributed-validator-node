@@ -46,8 +46,9 @@ The script will:
 1. Validate prerequisites
 2. Display current cluster info (operators, validators)
 3. Run a P2P ceremony (all operators must participate simultaneously)
-4. Backup `.charon/` to `./backups/`
-5. Install new configuration
-6. Restart containers if they were previously running
+4. Stop containers if they were running
+5. Backup `.charon/` to `./backups/`
+6. Install new configuration
+7. Print commands to start containers manually
 
 Remind the user that **all operators must run this script at the same time** for the P2P ceremony to succeed.

@@ -53,13 +53,13 @@ Automates the complete workflow for operators staying in the cluster:
 
 ### Workflow
 
-1. **Export ASDB** - Export anti-slashing database from running VC
+1. **Export ASDB** - Stop VC if running and export anti-slashing database
 2. **Run ceremony** - P2P coordinated remove-operators ceremony with all participants
 3. **Update ASDB** - Replace pubkeys in exported ASDB to match new cluster-lock
 4. **Stop containers** - Stop charon and VC
 5. **Backup and replace** - Backup current `.charon/` to `./backups/`, install new configuration
 6. **Import ASDB** - Import updated anti-slashing database
-7. **Print restart commands** - Display commands to start containers after waiting ~2 epochs
+7. **Print start commands** - Display commands to start containers manually (wait ~2 epochs before starting)
 
 ## For Removed Operators
 

@@ -38,7 +38,7 @@ The script will:
 5. Backup current `.charon` directory to `./backups/`
 6. Move new keys from `./output/` to `.charon/`
 7. Import the updated anti-slashing database
-8. Print restart commands (wait ~2 epochs before starting)
+8. Print start commands (wait ~2 epochs before starting)
 
 ## Options
 

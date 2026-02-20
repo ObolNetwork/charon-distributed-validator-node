@@ -306,22 +306,6 @@ run_cmd mv "$OUTPUT_DIR" .charon
 log_info "New cluster configuration installed to .charon/"
 
 echo ""
-
-# Step 4: Restart containers (if they were running before)
-log_step "Step 4: Restarting containers..."
-
-if [ "$CHARON_WAS_RUNNING" = true ] || [ "$VC_WAS_RUNNING" = true ]; then
-    if [ "$UNVERIFIED" = true ]; then
-        log_warn "Starting charon with CHARON_NO_VERIFY=true (required for --unverified mode)"
-    fi
-    run_cmd docker compose up -d charon "$VC"
-    log_info "Containers restarted"
-else
-    log_info "Containers were not running before, skipping restart"
-    log_info "Start manually with: docker compose up -d charon $VC"
-fi
-
-echo ""
 echo "╔════════════════════════════════════════════════════════════════╗"
 echo "║     Add Validators Workflow COMPLETED                          ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
@@ -330,17 +314,22 @@ log_info "Summary:"
 log_info "  - Old .charon backed up to: $BACKUP_DIR/.charon-backup.$TIMESTAMP"
 log_info "  - New cluster configuration installed in: .charon/"
 log_info "  - $NUM_VALIDATORS new validator(s) added"
-if [ "$CHARON_WAS_RUNNING" = true ] || [ "$VC_WAS_RUNNING" = true ]; then
-    log_info "  - Containers restarted: charon, $VC"
-else
-    log_info "  - Containers not restarted (were not running)"
-fi
-
+echo ""
+log_info "When ready, start containers with:"
+echo "  docker compose up -d charon $VC"
+echo ""
+log_info "After starting, verify:"
+log_info "  1. Check charon logs: docker compose logs -f charon"
+log_info "  2. Verify VC is running: docker compose logs -f $VC"
+log_info "  3. Verify cluster is producing attestations"
+echo ""
 if [ "$UNVERIFIED" = true ]; then
-    echo ""
     log_warn "IMPORTANT: You used --unverified mode."
     log_warn "Ensure CHARON_NO_VERIFY=true is set in your .env file for future restarts."
+    echo ""
 fi
+log_warn "Keep the backup until you've verified normal operation for several epochs."
+echo ""
 
 echo ""
 log_info "Next steps:"
