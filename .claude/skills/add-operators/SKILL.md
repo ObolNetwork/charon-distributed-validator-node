@@ -26,7 +26,7 @@ Ask the user: **"Are you an existing operator in the cluster, or a new operator 
 
 **Additional prerequisites**:
 - `.charon/cluster-lock.json` and `.charon/validator_keys/` must exist
-- VC container must be running (needed for ASDB export)
+- The script will automatically stop the VC container for ASDB export
 
 **Arguments to gather**:
 - `--new-operator-enrs`: Comma-separated ENRs of the new operators joining

@@ -20,7 +20,7 @@ Before running, verify:
 1. `.env` file exists with `NETWORK` and `VC` variables set
 2. `.charon/cluster-lock.json` and `.charon/validator_keys/` exist
 3. Docker is running
-4. VC container must be running (for ASDB export)
+4. Docker is running (the script will stop the VC container automatically for ASDB export)
 
 Read `scripts/edit/recreate-private-keys/README.md` for full details if needed.
 
@@ -34,7 +34,7 @@ Ask the user whether they want to run with `--dry-run` first to preview the oper
 
 The script will:
 1. Validate prerequisites
-2. Export the anti-slashing database from the running VC
+2. Stop the VC container and export the anti-slashing database
 3. Run a P2P ceremony (all operators must participate simultaneously)
 4. Update ASDB pubkeys to match new key shares
 5. Stop containers

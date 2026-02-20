@@ -1,17 +1,17 @@
 ---
 name: export-asdb
-description: Export the anti-slashing database (EIP-3076) from the running validator client
+description: Export the anti-slashing database (EIP-3076) from the validator client
 user-invokable: true
 ---
 
 # Export Anti-Slashing Database
 
-Export the EIP-3076 anti-slashing database from the currently running validator client. The VC container must be running.
+Export the EIP-3076 anti-slashing database from the validator client. The VC container must be stopped before export.
 
 ## Prerequisites
 
 1. `.env` file exists with `VC` variable set
-2. VC container must be **running**
+2. VC container must be **stopped**
 
 Read `scripts/edit/vc/README.md` for full details if needed.
 
