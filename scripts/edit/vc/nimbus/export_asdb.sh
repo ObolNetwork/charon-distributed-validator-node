@@ -3,7 +3,7 @@
 # Script to export Nimbus validator anti-slashing database to EIP-3076 format.
 #
 # This script is run by continuing operators before the replace-operator ceremony.
-# It exports the slashing protection database from the running vc-nimbus container
+# It exports the slashing protection database using a temporary container
 # to a JSON file that can be updated and re-imported after the ceremony.
 #
 # Usage: export_asdb.sh [--data-dir <path>] [--output-file <path>]
@@ -14,7 +14,7 @@
 #
 # Requirements:
 #   - .env file must exist with NETWORK variable set
-#   - vc-nimbus container must be running
+#   - vc-nimbus container must be STOPPED (to avoid database locking)
 #   - docker and docker compose must be available
 
 set -euo pipefail
@@ -49,15 +49,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -73,11 +77,11 @@ echo "Data directory: $DATA_DIR"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
-# Check if vc-nimbus container is running
-if ! docker compose ps vc-nimbus | grep -q Up; then
-    echo "Error: vc-nimbus container is not running" >&2
-    echo "Please start the validator client before exporting:" >&2
-    echo "  docker compose up -d vc-nimbus" >&2
+# Check if vc-nimbus container is running (it should be stopped to avoid DB locking)
+if docker compose ps vc-nimbus 2>/dev/null | grep -q Up; then
+    echo "Error: vc-nimbus container is still running" >&2
+    echo "Please stop the validator client before exporting:" >&2
+    echo "  docker compose stop vc-nimbus" >&2
     exit 1
 fi
 
@@ -85,24 +89,28 @@ fi
 OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
 mkdir -p "$OUTPUT_DIR"
 
-echo "Exporting slashing protection data from vc-nimbus container..."
+# Make OUTPUT_DIR absolute for docker bind mount
+if [[ "$OUTPUT_DIR" != /* ]]; then
+    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+fi
 
-# Export slashing protection data from the container
-# The container writes to /tmp/export.json, then we copy it out
+echo "Exporting slashing protection data using vc-nimbus container..."
+
+# Export slashing protection data using a temporary container based on vc-nimbus service.
 # Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
 # Nimbus requires --data-dir BEFORE the subcommand.
-if ! docker compose exec -T vc-nimbus /home/user/nimbus_beacon_node \
-    --data-dir=/home/user/data slashingdb export /tmp/export.json; then
-    echo "Error: Failed to export slashing protection from vc-nimbus container" >&2
+# We use docker compose run to create a temporary container with the same volumes.
+if ! docker compose run --rm -T --no-deps \
+    -v "$OUTPUT_DIR":/tmp/asdb-export \
+    --entrypoint /home/user/nimbus_beacon_node \
+    vc-nimbus --data-dir=/home/user/data slashingdb export /tmp/asdb-export/slashing-protection.json; then
+    echo "Error: Failed to export slashing protection from vc-nimbus" >&2
     exit 1
 fi
 
-echo "Copying exported file from container to host..."
-
-# Copy the exported file from container to host
-if ! docker compose cp vc-nimbus:/tmp/export.json "$OUTPUT_FILE"; then
-    echo "Error: Failed to copy exported file from container" >&2
-    exit 1
+# Move file to expected output path if not already there
+if [ -f "$OUTPUT_DIR/slashing-protection.json" ] && [ "$OUTPUT_FILE" != "$OUTPUT_DIR/slashing-protection.json" ]; then
+    mv "$OUTPUT_DIR/slashing-protection.json" "$OUTPUT_FILE"
 fi
 
 # Validate the exported JSON

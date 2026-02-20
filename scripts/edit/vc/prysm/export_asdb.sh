@@ -3,7 +3,7 @@
 # Script to export Prysm validator anti-slashing database to EIP-3076 format.
 #
 # This script is run by continuing operators before the replace-operator ceremony.
-# It exports the slashing protection database from the running vc-prysm container
+# It exports the slashing protection database using a temporary container
 # to a JSON file that can be updated and re-imported after the ceremony.
 #
 # Usage: export_asdb.sh [--data-dir <path>] [--output-file <path>]
@@ -14,7 +14,7 @@
 #
 # Requirements:
 #   - .env file must exist with NETWORK variable set
-#   - vc-prysm container must be running
+#   - vc-prysm container must be STOPPED (to avoid database locking)
 #   - docker and docker compose must be available
 
 set -euo pipefail
@@ -49,15 +49,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -73,11 +77,11 @@ echo "Data directory: $DATA_DIR"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
-# Check if vc-prysm container is running
-if ! docker compose ps vc-prysm | grep -q Up; then
-    echo "Error: vc-prysm container is not running" >&2
-    echo "Please start the validator client before exporting:" >&2
-    echo "  docker compose up -d vc-prysm" >&2
+# Check if vc-prysm container is running (it should be stopped to avoid DB locking)
+if docker compose ps vc-prysm 2>/dev/null | grep -q Up; then
+    echo "Error: vc-prysm container is still running" >&2
+    echo "Please stop the validator client before exporting:" >&2
+    echo "  docker compose stop vc-prysm" >&2
     exit 1
 fi
 
@@ -85,27 +89,32 @@ fi
 OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
 mkdir -p "$OUTPUT_DIR"
 
-echo "Exporting slashing protection data from vc-prysm container..."
+# Make OUTPUT_DIR absolute for docker bind mount
+if [[ "$OUTPUT_DIR" != /* ]]; then
+    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+fi
 
-# Export slashing protection data from the container
-# The container writes to /tmp/export.json, then we copy it out
-# Prysm stores data in /data/vc and wallet in /prysm-wallet
-if ! docker compose exec -T vc-prysm /app/cmd/validator/validator slashing-protection-history export \
+echo "Exporting slashing protection data using vc-prysm container..."
+
+# Export slashing protection data using a temporary container based on vc-prysm service.
+# Prysm stores data in /data/vc and wallet in /prysm-wallet.
+# We use docker compose run to create a temporary container with the same volumes.
+if ! docker compose run --rm -T --no-deps \
+    -v "$OUTPUT_DIR":/tmp/asdb-export \
+    --entrypoint /app/cmd/validator/validator \
+    vc-prysm slashing-protection-history export \
     --accept-terms-of-use \
     --datadir=/data/vc \
-    --slashing-protection-export-dir=/tmp \
+    --slashing-protection-export-dir=/tmp/asdb-export \
     --$NETWORK; then
-    echo "Error: Failed to export slashing protection from vc-prysm container" >&2
+    echo "Error: Failed to export slashing protection from vc-prysm" >&2
     exit 1
 fi
 
-echo "Copying exported file from container to host..."
-
 # Prysm creates a file named slashing_protection.json in the export directory
-# Copy the exported file from container to host
-if ! docker compose cp vc-prysm:/tmp/slashing_protection.json "$OUTPUT_FILE"; then
-    echo "Error: Failed to copy exported file from container" >&2
-    exit 1
+# Rename it to match our expected output file name
+if [ -f "$OUTPUT_DIR/slashing_protection.json" ]; then
+    mv "$OUTPUT_DIR/slashing_protection.json" "$OUTPUT_FILE"
 fi
 
 # Validate the exported JSON

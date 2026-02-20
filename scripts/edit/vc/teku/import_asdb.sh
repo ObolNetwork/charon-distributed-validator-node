@@ -50,15 +50,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Preserve COMPOSE_FILE if already set (e.g., by test scripts)
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
 SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 
 # Source .env to get NETWORK
 source .env
 
-# Restore COMPOSE_FILE if it was set before sourcing .env
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
 if [ -n "$SAVED_COMPOSE_FILE" ]; then
     export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
 fi
 
 # Check if NETWORK is set
@@ -86,6 +90,11 @@ if ! jq empty "$INPUT_FILE" 2>/dev/null; then
     exit 1
 fi
 
+# Make INPUT_FILE absolute for docker bind mount
+if [[ "$INPUT_FILE" != /* ]]; then
+    INPUT_FILE="$(pwd)/$INPUT_FILE"
+fi
+
 # Check if vc-teku container is running (it should be stopped)
 if docker compose ps vc-teku 2>/dev/null | grep -q Up; then
     echo "Error: vc-teku container is still running" >&2
@@ -101,7 +110,7 @@ echo "Importing slashing protection data into vc-teku container..."
 # Import slashing protection data using a temporary container based on the vc-teku service.
 # The input file is bind-mounted into the container at /tmp/import.json (read-only).
 # We override the command to run the import instead of the validator client.
-if ! docker compose run --rm -T \
+if ! docker compose run --rm -T --no-deps \
     -v "$INPUT_FILE":/tmp/import.json:ro \
     --entrypoint /opt/teku/bin/teku \
     vc-teku slashing-protection import \

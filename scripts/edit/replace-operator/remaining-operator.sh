@@ -10,7 +10,7 @@ cd "$REPO_ROOT"
 
 # Default values
 NEW_ENR=""
-OPERATOR_INDEX=""
+OLD_ENR=""
 SKIP_EXPORT=false
 DRY_RUN=false
 
@@ -40,7 +40,7 @@ who are staying in the cluster (continuing operators).
 
 Options:
   --new-enr <enr>         ENR of the new operator (required)
-  --operator-index <N>    Index of the operator being replaced (required)
+  --old-enr <enr>         ENR of the operator being replaced (required)
   --skip-export           Skip ASDB export (if already exported)
   --dry-run               Show what would be done without executing
   -h, --help              Show this help message
@@ -48,7 +48,7 @@ Options:
 Example:
   ./scripts/edit/replace-operator/remaining-operator.sh \
       --new-enr "enr:-..." \
-      --operator-index 2
+      --old-enr "enr:-..."
 
 Prerequisites:
   - .env file with NETWORK and VC variables set
@@ -66,8 +66,8 @@ while [[ $# -gt 0 ]]; do
             NEW_ENR="$2"
             shift 2
             ;;
-        --operator-index)
-            OPERATOR_INDEX="$2"
+        --old-enr)
+            OLD_ENR="$2"
             shift 2
             ;;
         --skip-export)
@@ -95,8 +95,8 @@ if [ -z "$NEW_ENR" ]; then
     echo "Use --help for usage information"
     exit 1
 fi
-if [ -z "$OPERATOR_INDEX" ]; then
-    log_error "Missing required argument: --operator-index"
+if [ -z "$OLD_ENR" ]; then
+    log_error "Missing required argument: --old-enr"
     echo "Use --help for usage information"
     exit 1
 fi
@@ -123,7 +123,19 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Preserve COMPOSE_FILE and COMPOSE_PROJECT_NAME if already set (e.g., by test scripts)
+SAVED_COMPOSE_FILE="${COMPOSE_FILE:-}"
+SAVED_COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
+
 source .env
+
+# Restore COMPOSE_FILE and COMPOSE_PROJECT_NAME if they were set before sourcing .env
+if [ -n "$SAVED_COMPOSE_FILE" ]; then
+    export COMPOSE_FILE="$SAVED_COMPOSE_FILE"
+fi
+if [ -n "$SAVED_COMPOSE_PROJECT_NAME" ]; then
+    export COMPOSE_PROJECT_NAME="$SAVED_COMPOSE_PROJECT_NAME"
+fi
 
 if [ -z "${NETWORK:-}" ]; then
     log_error "NETWORK variable not set in .env"
@@ -175,15 +187,14 @@ if [ "$SKIP_EXPORT" = true ]; then
         exit 1
     fi
 else
-    # Check VC container is running (skip check in dry-run mode)
+    # VC container must be stopped before export (Lodestar locks the database while running)
     if [ "$DRY_RUN" = false ]; then
-        if ! docker compose ps "$VC" 2>/dev/null | grep -q Up; then
-            log_error "VC container ($VC) is not running. Start it first:"
-            log_error "  docker compose up -d $VC"
-            exit 1
+        if docker compose ps "$VC" 2>/dev/null | grep -q Up; then
+            log_info "Stopping VC container ($VC) for ASDB export..."
+            docker compose stop "$VC"
         fi
     else
-        log_warn "Would check that $VC container is running"
+        log_warn "Would stop $VC container if running"
     fi
 
     mkdir -p "$ASDB_EXPORT_DIR"
@@ -201,22 +212,28 @@ log_step "Step 2: Running replace-operator ceremony..."
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit replace-operator"
-log_info "  Replacing operator index: $OPERATOR_INDEX"
+log_info "Running: charon alpha edit replace-operator"
+log_info "  Old ENR: ${OLD_ENR:0:50}..."
 log_info "  New ENR: ${NEW_ENR:0:50}..."
 
 if [ "$DRY_RUN" = false ]; then
-    docker run --rm \
+    # Use -i for stdin (needed for ceremony coordination), skip -t if no TTY available
+    DOCKER_FLAGS="-i"
+    if [ -t 0 ]; then
+        DOCKER_FLAGS="-it"
+    fi
+    
+    docker run --rm $DOCKER_FLAGS \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.8.2}" \
-        edit replace-operator \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+        alpha edit replace-operator \
         --lock-file=/opt/charon/.charon/cluster-lock.json \
         --output-dir=/opt/charon/output \
-        --operator-index="$OPERATOR_INDEX" \
-        --new-enr="$NEW_ENR"
+        --old-operator-enr="$OLD_ENR" \
+        --new-operator-enr="$NEW_ENR"
 else
-    echo "  [DRY-RUN] docker run --rm ... charon edit replace-operator ..."
+    echo "  [DRY-RUN] docker run --rm ... charon alpha edit replace-operator ..."
 fi
 
 log_info "New cluster-lock generated at $OUTPUT_DIR/cluster-lock.json"

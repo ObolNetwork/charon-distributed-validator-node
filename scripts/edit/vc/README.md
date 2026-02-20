@@ -24,10 +24,10 @@ When performing cluster edit operations (replace-operator, recreate-private-keys
 Usage:
 
 ```bash
-# Export ASDB from running VC container
+# Export ASDB (VC container must be stopped)
 VC=vc-lodestar ./scripts/edit/vc/export_asdb.sh --output-file ./asdb-export/slashing-protection.json
 
-# Import ASDB into stopped VC container
+# Import ASDB (VC container must be stopped)
 VC=vc-lodestar ./scripts/edit/vc/import_asdb.sh --input-file ./asdb-export/slashing-protection.json
 ```
 
@@ -45,10 +45,12 @@ Each client has its own `export_asdb.sh` and `import_asdb.sh` in a subdirectory:
 
 | Client | Directory | Export requires | Import requires |
 |--------|-----------|-----------------|-----------------|
-| Lodestar | `lodestar/` | Container running | Container stopped |
-| Prysm | `prysm/` | Container running | Container stopped |
-| Teku | `teku/` | Container running | Container stopped |
-| Nimbus | `nimbus/` | Container running | Container stopped |
+| Lodestar | `lodestar/` | Container stopped | Container stopped |
+| Prysm | `prysm/` | Container stopped | Container stopped |
+| Teku | `teku/` | Container stopped | Container stopped |
+| Nimbus | `nimbus/` | Container stopped | Container stopped |
+
+**Note**: All validator clients require the container to be stopped before export/import to avoid database locking issues. The main ceremony scripts (e.g., `replace-operator`, `recreate-private-keys`) handle stopping the VC automatically.
 
 ## Testing
 
