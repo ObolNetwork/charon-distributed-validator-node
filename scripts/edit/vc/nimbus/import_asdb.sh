@@ -111,7 +111,7 @@ echo "Importing slashing protection data into vc-nimbus container..."
 # The input file is bind-mounted into the container at /tmp/import.json (read-only).
 # Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
 # Nimbus requires --data-dir BEFORE the subcommand.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     --entrypoint sh \
     -v "$INPUT_FILE":/tmp/import.json:ro \
     vc-nimbus -c "/home/user/nimbus_beacon_node --data-dir=/home/user/data slashingdb import /tmp/import.json"; then

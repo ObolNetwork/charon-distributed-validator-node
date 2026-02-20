@@ -4,6 +4,17 @@
 # Uses dedicated test data directory to avoid conflicts
 
 services:
+  # Mock charon service that starts quickly for tests
+  # (docker compose run starts dependencies by default)
+  charon:
+    image: busybox:latest
+    entrypoint: ["sh", "-c", "tail -f /dev/null"]
+    volumes: []
+    environment: []
+    ports: []
+    healthcheck:
+      disable: true
+
   vc-lodestar:
     depends_on: []
     entrypoint: ["sh", "-c", "tail -f /dev/null"]

@@ -99,7 +99,7 @@ echo "Exporting slashing protection data using vc-prysm container..."
 # Export slashing protection data using a temporary container based on vc-prysm service.
 # Prysm stores data in /data/vc and wallet in /prysm-wallet.
 # We use docker compose run to create a temporary container with the same volumes.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     -v "$OUTPUT_DIR":/tmp/asdb-export \
     --entrypoint /app/cmd/validator/validator \
     vc-prysm slashing-protection-history export \

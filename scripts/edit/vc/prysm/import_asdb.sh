@@ -111,7 +111,7 @@ echo "Importing slashing protection data into vc-prysm container..."
 # The input file is bind-mounted into the container at /tmp/slashing_protection.json (read-only).
 # We MUST override the entrypoint because the default run.sh ignores arguments.
 # Prysm expects the file to be named slashing_protection.json
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     --entrypoint /app/cmd/validator/validator \
     -v "$INPUT_FILE":/tmp/slashing_protection.json:ro \
     vc-prysm slashing-protection-history import \

@@ -111,7 +111,7 @@ echo "Importing slashing protection data into vc-lodestar container..."
 # The input file is bind-mounted into the container at /tmp/import.json (read-only).
 # We MUST override the entrypoint because the default run.sh ignores arguments.
 # Using --force to allow importing even if some data already exists.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     --entrypoint node \
     -v "$INPUT_FILE":/tmp/import.json:ro \
     vc-lodestar /usr/app/packages/cli/bin/lodestar validator slashing-protection import \
