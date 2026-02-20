@@ -99,7 +99,7 @@ echo "Exporting slashing protection data using vc-teku container..."
 # Export slashing protection data using a temporary container based on vc-teku service.
 # Teku stores data in /home/data (mapped from ./data/vc-teku).
 # We use docker compose run to create a temporary container with the same volumes.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     -v "$OUTPUT_DIR":/tmp/asdb-export \
     --entrypoint /opt/teku/bin/teku \
     vc-teku slashing-protection export \

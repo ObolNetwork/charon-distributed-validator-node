@@ -100,7 +100,7 @@ echo "Exporting slashing protection data using vc-nimbus container..."
 # Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
 # Nimbus requires --data-dir BEFORE the subcommand.
 # We use docker compose run to create a temporary container with the same volumes.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     -v "$OUTPUT_DIR":/tmp/asdb-export \
     --entrypoint /home/user/nimbus_beacon_node \
     vc-nimbus --data-dir=/home/user/data slashingdb export /tmp/asdb-export/slashing-protection.json; then

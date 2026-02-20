@@ -110,7 +110,7 @@ echo "Importing slashing protection data into vc-teku container..."
 # Import slashing protection data using a temporary container based on the vc-teku service.
 # The input file is bind-mounted into the container at /tmp/import.json (read-only).
 # We override the command to run the import instead of the validator client.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     -v "$INPUT_FILE":/tmp/import.json:ro \
     --entrypoint /opt/teku/bin/teku \
     vc-teku slashing-protection import \

@@ -101,7 +101,7 @@ echo "Exporting slashing protection data using vc-lodestar container..."
 # Export slashing protection data using a temporary container based on vc-lodestar service.
 # The container writes to /tmp/export.json, then we bind-mount the output directory.
 # We MUST override the entrypoint because the default run.sh ignores arguments.
-if ! docker compose run --rm -T --no-deps \
+if ! docker compose run --rm -T \
     --entrypoint node \
     -v "$OUTPUT_DIR":/tmp/asdb-export \
     vc-lodestar /usr/app/packages/cli/bin/lodestar validator slashing-protection export \
