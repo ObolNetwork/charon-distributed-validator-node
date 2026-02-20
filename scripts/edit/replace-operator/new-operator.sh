@@ -2,6 +2,7 @@
 
 # Replace-Operator Script for NEW Operator - See README.md for documentation
 # The new operator participates in the ceremony together with remaining operators.
+# Both run the same `charon alpha edit replace-operator` command.
 
 set -euo pipefail
 
@@ -11,7 +12,6 @@ cd "$REPO_ROOT"
 
 # Default values
 CLUSTER_LOCK_PATH=""
-INSTALL_LOCK_PATH=""
 OLD_ENR=""
 GENERATE_ENR=false
 DRY_RUN=false
@@ -38,11 +38,11 @@ Usage: ./scripts/edit/replace-operator/new-operator.sh [OPTIONS]
 
 Helps a new operator join an existing cluster by participating in the
 replace-operator ceremony together with the remaining operators.
+Both remaining and new operators run the same ceremony command.
 
 Options:
   --cluster-lock <path>   Path to the current cluster-lock.json (for ceremony)
   --old-enr <enr>         ENR of the operator being replaced (for ceremony)
-  --install-lock <path>   Install the new cluster-lock after ceremony
   --generate-enr          Generate a new ENR private key if not present
   --dry-run               Show what would be done without executing
   -h, --help              Show this help message
@@ -55,9 +55,6 @@ Examples:
   ./scripts/edit/replace-operator/new-operator.sh \
       --cluster-lock ./received-cluster-lock.json \
       --old-enr "enr:-..."
-
-  # Step 3: Install the new cluster-lock after ceremony completes
-  ./scripts/edit/replace-operator/new-operator.sh --install-lock ./output/cluster-lock.json
 
 Prerequisites:
   - .env file with NETWORK and VC variables set
@@ -72,10 +69,6 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --cluster-lock)
             CLUSTER_LOCK_PATH="$2"
-            shift 2
-            ;;
-        --install-lock)
-            INSTALL_LOCK_PATH="$2"
             shift 2
             ;;
         --old-enr)
@@ -297,91 +290,29 @@ if [ -n "$CLUSTER_LOCK_PATH" ] && [ -n "$OLD_ENR" ]; then
         echo "  [DRY-RUN] docker run --rm ... charon alpha edit replace-operator ..."
     fi
     
-    echo ""
-    echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║     Ceremony COMPLETED                                         ║"
-    echo "╚════════════════════════════════════════════════════════════════╝"
-    echo ""
-    log_info "New cluster-lock generated at $OUTPUT_DIR/cluster-lock.json"
-    echo ""
-    log_info "Now install the new cluster-lock with:"
-    echo "  ./scripts/edit/replace-operator/new-operator.sh --install-lock $OUTPUT_DIR/cluster-lock.json"
-    echo ""
-    
-    exit 0
-fi
-
-# Install-lock mode: --install-lock
-if [ -n "$INSTALL_LOCK_PATH" ]; then
-    log_step "Step 1: Checking prerequisites..."
-    
-    if [ "$DRY_RUN" = false ]; then
-        if [ ! -d .charon ]; then
-            log_error ".charon directory not found"
-            log_info "First generate your ENR with: ./scripts/edit/replace-operator/new-operator.sh --generate-enr"
-            exit 1
-        fi
-
-        if [ ! -f .charon/charon-enr-private-key ]; then
-            log_error ".charon/charon-enr-private-key not found"
-            log_info "First generate your ENR with: ./scripts/edit/replace-operator/new-operator.sh --generate-enr"
-            exit 1
-        fi
-        
-        if [ ! -f "$INSTALL_LOCK_PATH" ]; then
-            log_error "Cluster-lock file not found: $INSTALL_LOCK_PATH"
-            exit 1
-        fi
-    fi
-    
-    log_info "Prerequisites OK"
+    log_info "Ceremony completed successfully"
     
     echo ""
     
-    # Step 2: Stop any running containers
-    log_step "Step 2: Stopping any running containers..."
+    # Step 4: Backup and install new .charon directory
+    log_step "Step 4: Installing new cluster configuration..."
     
-    run_cmd docker compose stop "$VC" charon 2>/dev/null || true
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    mkdir -p "$BACKUP_DIR"
     
-    log_info "Containers stopped"
+    run_cmd mv .charon "$BACKUP_DIR/.charon.$TIMESTAMP"
+    log_info "Old .charon backed up to $BACKUP_DIR/.charon.$TIMESTAMP"
     
-    echo ""
+    run_cmd mv "$OUTPUT_DIR" .charon
+    log_info "New configuration installed to .charon/"
     
-    # Step 3: Install new cluster-lock
-    log_step "Step 3: Installing new cluster-lock..."
-    
-    if [ -f .charon/cluster-lock.json ]; then
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        mkdir -p "$BACKUP_DIR"
-        run_cmd cp .charon/cluster-lock.json "$BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
-        log_info "Old cluster-lock backed up to $BACKUP_DIR/cluster-lock.json.$TIMESTAMP"
-    fi
-    
-    # Remove existing file first (may be read-only from Charon)
-    rm -f .charon/cluster-lock.json
-    run_cmd cp "$INSTALL_LOCK_PATH" .charon/cluster-lock.json
-    log_info "New cluster-lock installed"
-    
-    echo ""
-    
-    # Step 4: Verify cluster-lock matches our ENR
-    log_step "Step 4: Verifying cluster-lock configuration..."
-    
+    # Verify our ENR is in the new cluster-lock
     if [ "$DRY_RUN" = false ] && [ -f .charon/cluster-lock.json ]; then
-        # Get our ENR
-        OUR_ENR=$(docker run --rm \
-            -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-            "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
-            enr 2>/dev/null || echo "")
-        
-        if [ -n "$OUR_ENR" ]; then
-            # Check if our ENR is in the cluster-lock
-            if grep -q "${OUR_ENR:0:50}" .charon/cluster-lock.json 2>/dev/null; then
-                log_info "Verified: Your ENR is present in the cluster-lock"
-            else
-                log_warn "Your ENR may not be in this cluster-lock."
-                log_warn "Make sure you received the correct cluster-lock from the ceremony."
-            fi
+        if grep -q "${OUR_ENR:0:50}" .charon/cluster-lock.json 2>/dev/null; then
+            log_info "Verified: Your ENR is present in the new cluster-lock"
+        else
+            log_warn "Your ENR may not be in this cluster-lock."
+            log_warn "Please verify the ceremony completed successfully."
         fi
         
         # Show cluster info
@@ -394,11 +325,12 @@ if [ -n "$INSTALL_LOCK_PATH" ]; then
     
     echo ""
     echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║     New Operator Setup COMPLETED                               ║"
+    echo "║     Replace-Operator Workflow COMPLETED                        ║"
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo ""
     log_info "Summary:"
-    log_info "  - Cluster-lock installed in: .charon/cluster-lock.json"
+    log_info "  - Old .charon backed up to: $BACKUP_DIR/.charon.$TIMESTAMP"
+    log_info "  - New configuration installed to: .charon/"
     echo ""
     log_warn "╔════════════════════════════════════════════════════════════════╗"
     log_warn "║  IMPORTANT: Wait at least 2 epochs (~13 min) before starting   ║"
@@ -416,6 +348,8 @@ if [ -n "$INSTALL_LOCK_PATH" ]; then
     log_warn "Note: As a new operator, you do NOT have any slashing protection history."
     log_warn "Your VC will start fresh."
     echo ""
+    log_warn "Keep the backup until you've verified normal operation for several epochs."
+    echo ""
     
     exit 0
 fi
@@ -423,9 +357,8 @@ fi
 # Error: missing required arguments
 log_error "Missing required arguments."
 echo ""
-echo "To generate ENR:           --generate-enr"
-echo "To run ceremony:           --cluster-lock <path> --old-enr <enr>"
-echo "To install after ceremony: --install-lock <path>"
+echo "To generate ENR:  --generate-enr"
+echo "To run ceremony:  --cluster-lock <path> --old-enr <enr>"
 echo ""
 echo "Use --help for full usage information."
 exit 1

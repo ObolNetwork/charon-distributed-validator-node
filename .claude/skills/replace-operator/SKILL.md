@@ -51,7 +51,7 @@ After completion, the script will print commands to start containers manually. R
 
 **Script**: `scripts/edit/replace-operator/new-operator.sh`
 
-This is a **three-step process**:
+This is a **two-step process**:
 
 #### Step 1: Generate ENR
 
@@ -79,14 +79,9 @@ After receiving the current `cluster-lock.json` from remaining operators (BEFORE
 
 The new operator runs this **at the same time** as the remaining operators run their ceremony. All operators must participate together.
 
-#### Step 3: Install New Cluster Lock
+After the ceremony completes, the script automatically:
+- Backs up the old `.charon` directory
+- Moves the output directory to `.charon` (contains complete configuration)
+- Prints commands to start containers
 
-After the ceremony completes, install the new cluster-lock:
-
-```bash
-./scripts/edit/replace-operator/new-operator.sh \
-    --install-lock ./output/cluster-lock.json \
-    [--dry-run]
-```
-
-The script will verify the ENR is present in the cluster-lock, install the configuration, and print commands to start containers manually. Note: the new operator does NOT have slashing protection history (fresh start).
+Note: the new operator does NOT have slashing protection history (fresh start).
