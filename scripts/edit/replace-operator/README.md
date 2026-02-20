@@ -60,7 +60,7 @@ Automates the complete workflow for operators staying in the cluster:
 
 ## For New Operators
 
-Three-step workflow for the new operator joining the cluster.
+Two-step workflow for the new operator joining the cluster.
 
 **Step 1:** Generate ENR and share with remaining operators:
 
@@ -76,11 +76,7 @@ Three-step workflow for the new operator joining the cluster.
     --old-enr "enr:-..."
 ```
 
-**Step 3:** After the ceremony completes, install the new cluster-lock:
-
-```bash
-./scripts/edit/replace-operator/new-operator.sh --install-lock ./output/cluster-lock.json
-```
+After the ceremony completes, the script automatically backs up the old `.charon` directory and installs the new configuration from the output directory.
 
 ### Options
 
@@ -88,7 +84,6 @@ Three-step workflow for the new operator joining the cluster.
 |--------|----------|-------------|
 | `--cluster-lock <path>` | No | Path to cluster-lock.json (for ceremony) |
 | `--old-enr <enr>` | No | ENR of the operator being replaced (for ceremony) |
-| `--install-lock <path>` | No | Install the new cluster-lock after ceremony |
 | `--generate-enr` | No | Generate new ENR private key |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |

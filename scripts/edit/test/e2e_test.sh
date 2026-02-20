@@ -753,22 +753,15 @@ EOF
         return 1
     fi
 
-    # Post-ceremony: run new-operator.sh to install the cluster-lock
-    local new_lock="$new_op_dir/output/cluster-lock.json"
-    if [ ! -f "$new_lock" ]; then
-        # Fall back to a remaining operator's output
-        new_lock="$TMP_DIR/operator0/.charon/cluster-lock.json"
-    fi
-    (
-        WORK_DIR="$new_op_dir" \
-        COMPOSE_FILE="$new_op_dir/docker-compose.e2e.yml" \
-        COMPOSE_PROJECT_NAME="e2e-op-replace-new" \
-            "$REPO_ROOT/scripts/edit/replace-operator/new-operator.sh" \
-            --install-lock "$new_lock"
-    ) < /dev/null > "$logs_dir/new-operator-setup.log" 2>&1
-    if [ $? -ne 0 ]; then
-        log_error "New operator post-ceremony setup failed. Log:"
-        sed 's/\r$//' "$logs_dir/new-operator-setup.log" | while IFS= read -r line; do echo "                $line"; done || true
+    # Post-ceremony: install the new .charon directory for the new operator
+    # (The script now does this automatically, but since we ran raw docker for the test,
+    # we do it manually here)
+    if [ -d "$new_op_dir/output" ]; then
+        mv "$new_op_dir/.charon" "$new_op_dir/.charon-backup" 2>/dev/null || true
+        mv "$new_op_dir/output" "$new_op_dir/.charon"
+        log_info "New operator: installed output to .charon"
+    else
+        log_error "New operator: output directory not found after ceremony"
         all_ok=false
     fi
 
