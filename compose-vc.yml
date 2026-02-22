@@ -20,6 +20,7 @@ services:
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${VC_LODESTAR_BUILDER_SELECTION:-builderalways}
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
@@ -46,6 +47,7 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
@@ -101,6 +103,8 @@ services:
       --Xobol-dvt-integration-enabled true
     depends_on: [charon]
     networks: [dvnode]
+    environment:
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
