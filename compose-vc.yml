@@ -20,6 +20,7 @@ services:
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
       BUILDER_SELECTION: ${VC_LODESTAR_BUILDER_SELECTION:-builderalways}
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
@@ -46,6 +47,7 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
@@ -70,6 +72,7 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
+      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
@@ -98,6 +101,7 @@ services:
       --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
+      ${VC_EXTRAS:-}
     depends_on: [charon]
     networks: [dvnode]
     labels:

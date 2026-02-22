@@ -43,4 +43,5 @@ exec /home/user/nimbus_validator_client \
   --metrics \
   --metrics-address=0.0.0.0 \
   --payload-builder=${BUILDER_API_ENABLED} \
-  --distributed
+  --distributed \
+  ${VC_EXTRAS:+$VC_EXTRAS}
