@@ -101,10 +101,9 @@ services:
       --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
+      ${VC_EXTRAS:-}
     depends_on: [charon]
     networks: [dvnode]
-    environment:
-      VC_EXTRAS: ${VC_EXTRAS:-}
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
