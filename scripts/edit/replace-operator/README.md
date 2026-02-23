@@ -36,7 +36,7 @@ Automates the complete workflow for operators staying in the cluster:
     --old-enr "enr:-..."
 ```
 
-**Before running**: Share your current `cluster-lock.json` with the new operator so they can participate in the ceremony.
+**Before running**: Share your current `cluster-lock.json` with the new operator so it can participate in the ceremony.
 
 ### Options
 
@@ -68,7 +68,7 @@ Two-step workflow for the new operator joining the cluster.
 ./scripts/edit/replace-operator/new-operator.sh --generate-enr
 ```
 
-**Step 2:** After receiving `cluster-lock.json` from remaining operators (BEFORE the ceremony), run the ceremony together with all other operators:
+**Step 2:** After receiving `cluster-lock.json` from remaining operators, run the ceremony together with all other operators:
 
 ```bash
 ./scripts/edit/replace-operator/new-operator.sh \

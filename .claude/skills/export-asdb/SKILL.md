@@ -6,6 +6,8 @@ user-invokable: true
 
 # Export Anti-Slashing Database
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Export the EIP-3076 anti-slashing database from the validator client. The VC container must be stopped before export.
 
 ## Prerequisites

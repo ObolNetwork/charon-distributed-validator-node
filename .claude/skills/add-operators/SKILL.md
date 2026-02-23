@@ -6,6 +6,8 @@ user-invokable: true
 
 # Add Operators
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Expand a Charon cluster by adding new operators. This is a coordinated operation involving both existing and new operators.
 
 ## Prerequisites
@@ -14,8 +16,9 @@ Read `scripts/edit/add-operators/README.md` for full details if needed.
 
 Common prerequisites:
 1. `.env` file exists with `NETWORK` and `VC` variables set
-2. Docker is running
-3. `jq` installed
+2. `.charon` directory with `cluster-lock.json` and `charon-enr-private-key`
+3. Docker is running
+4. `jq` installed
 
 ## Role Selection
 
@@ -57,6 +60,7 @@ Ask if the user needs to generate an ENR (first time setup):
 ```
 
 This creates `.charon/charon-enr-private-key` and displays the ENR. Tell the user to **share this ENR with the existing operators**.
+The existing operators, in turn, need to share the `cluster-lock.json` with the new operators, which contains the current cluster configuration and is required for the P2P ceremony.
 
 #### Step 2: Join the Ceremony
 
