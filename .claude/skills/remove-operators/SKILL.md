@@ -6,6 +6,8 @@ user-invokable: true
 
 # Remove Operators
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Remove one or more operators from a Charon cluster. Whether removed operators need to participate depends on fault tolerance.
 
 ## Prerequisites

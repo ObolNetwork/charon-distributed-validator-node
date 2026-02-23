@@ -6,6 +6,8 @@ user-invokable: true
 
 # Import Anti-Slashing Database
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Import an EIP-3076 anti-slashing database into the validator client. The VC container must be stopped.
 
 ## Prerequisites

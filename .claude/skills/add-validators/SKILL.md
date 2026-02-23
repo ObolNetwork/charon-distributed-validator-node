@@ -6,6 +6,8 @@ user-invokable: true
 
 # Add Validators
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Add new validators to an existing Charon distributed validator cluster. All operators must run this simultaneously as it requires a P2P ceremony.
 
 ## Prerequisites

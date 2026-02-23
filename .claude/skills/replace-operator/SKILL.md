@@ -6,6 +6,8 @@ user-invokable: true
 
 # Replace Operator
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Replace a single operator in a Charon cluster with a new one. All participating operators (remaining + new) run a `charon alpha edit replace-operator` ceremony together (P2P via relay). The new operator must receive the current cluster-lock.json before the ceremony begins.
 
 ## Prerequisites
@@ -61,11 +63,12 @@ Ask if the user needs to generate an ENR:
 ./scripts/edit/replace-operator/new-operator.sh --generate-enr
 ```
 
-This creates `.charon/charon-enr-private-key` and displays the ENR. Tell the user to **share this ENR with the remaining operators**.
+This creates `.charon/charon-enr-private-key` and displays the ENR. Tell the user to **share this ENR with the existing operators**.
+The existing operators, in turn, need to share the `cluster-lock.json` with the new operators, which contains the current cluster configuration and is required for the P2P ceremony.
 
 #### Step 2: Run the Ceremony
 
-After receiving the current `cluster-lock.json` from remaining operators (BEFORE the ceremony):
+After receiving the current `cluster-lock.json` from remaining operators:
 - `--cluster-lock`: Path to the received `cluster-lock.json`
 - `--old-enr`: ENR of the operator being replaced
 - Whether to use `--dry-run` first

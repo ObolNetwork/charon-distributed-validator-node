@@ -25,7 +25,7 @@ There are two scripts for the two roles involved:
 - Docker running
 - `jq` installed
 - **Existing operators**: `.charon` directory with `cluster-lock.json` and `validator_keys`
-- **New operators**: Charon ENR private key (generated via `--generate-enr`)
+- **New operators**: `cluster-lock.json` received from existing operators, and ENR private key (generated via `--generate-enr`)
 
 ## For Existing Operators
 
