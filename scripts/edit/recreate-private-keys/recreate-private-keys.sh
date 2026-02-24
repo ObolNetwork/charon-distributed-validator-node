@@ -204,7 +204,7 @@ if [ "$DRY_RUN" = false ]; then
     docker run --rm $DOCKER_FLAGS \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
         alpha edit recreate-private-keys \
         --output-dir=/opt/charon/output
 
