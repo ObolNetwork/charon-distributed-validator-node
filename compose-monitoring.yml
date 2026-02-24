@@ -48,7 +48,7 @@ services:
 
   alloy:
     profiles: [monitoring-log-collector]
-    image: grafana/alloy:${ALLOY_VERSION:-v1.11.3}
+    image: grafana/alloy:${ALLOY_VERSION:-v1.13.2}
     environment:
       CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES:-}
       CLUSTER_NAME: ${CLUSTER_NAME:-}
