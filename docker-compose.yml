@@ -213,7 +213,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-2.9.17}
+    image: grafana/loki:${LOKI_VERSION:-3.6.7}
     profiles: [""]
     user: ":"
     networks: [dvnode]
