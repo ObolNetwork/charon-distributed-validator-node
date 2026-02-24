@@ -22,7 +22,7 @@ services:
     image: bitnamilegacy/node-exporter:${NODE_EXPORTER_VERSION:-1.6.0}
 
   tempo:
-    image: grafana/tempo:${TEMPO_VERSION:-2.7.1}
+    image: grafana/tempo:${TEMPO_VERSION:-2.10.1}
     user: ":"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
