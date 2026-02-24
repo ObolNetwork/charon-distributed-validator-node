@@ -85,14 +85,14 @@ if docker compose ps --format '{{.Status}}' vc-nimbus 2>/dev/null | grep -qi run
     exit 1
 fi
 
-# Create output directory if it doesn't exist
-OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
-mkdir -p "$OUTPUT_DIR"
-
-# Make OUTPUT_DIR absolute for docker bind mount
-if [[ "$OUTPUT_DIR" != /* ]]; then
-    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+# Make paths absolute for docker bind mount
+if [[ "$OUTPUT_FILE" != /* ]]; then
+    OUTPUT_FILE="$(pwd)/$OUTPUT_FILE"
 fi
+OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
 
 echo "Exporting slashing protection data using vc-nimbus container..."
 
@@ -108,9 +108,15 @@ if ! docker compose run --rm -T \
     exit 1
 fi
 
+# Fix file ownership (docker creates it as root)
+EXPORTED_FILE="$OUTPUT_DIR/slashing-protection.json"
+if [ -f "$EXPORTED_FILE" ]; then
+    sudo chown "$(id -u):$(id -g)" "$EXPORTED_FILE"
+fi
+
 # Move file to expected output path if not already there
-if [ -f "$OUTPUT_DIR/slashing-protection.json" ] && [ "$OUTPUT_FILE" != "$OUTPUT_DIR/slashing-protection.json" ]; then
-    mv "$OUTPUT_DIR/slashing-protection.json" "$OUTPUT_FILE"
+if [ "$EXPORTED_FILE" != "$OUTPUT_FILE" ]; then
+    mv "$EXPORTED_FILE" "$OUTPUT_FILE"
 fi
 
 # Validate the exported JSON
