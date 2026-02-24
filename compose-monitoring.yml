@@ -5,7 +5,7 @@
 services:
   prometheus:
     profiles: [monitoring-metrics]
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.53.5}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.55.1}
     user: ":"
     networks: [dvnode]
     environment:
