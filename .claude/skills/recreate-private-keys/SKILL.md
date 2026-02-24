@@ -34,6 +34,8 @@ Ask the user whether they want to run with `--dry-run` first to preview the oper
 ./scripts/edit/recreate-private-keys/recreate-private-keys.sh [--dry-run]
 ```
 
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
+
 The script will:
 1. Validate prerequisites
 2. Stop the VC container and export the anti-slashing database

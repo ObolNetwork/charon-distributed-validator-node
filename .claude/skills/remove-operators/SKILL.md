@@ -54,6 +54,8 @@ Ask the user: **"Are you a remaining operator (staying in the cluster) or a remo
     [--dry-run]
 ```
 
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
+
 After completion, the script will print commands to start containers manually. Remind the user to **wait ~2 epochs before starting** containers.
 
 ### If Removed Operator
@@ -80,5 +82,7 @@ This is **only needed when the removal exceeds fault tolerance**. If within faul
     [--new-threshold N] \
     [--dry-run]
 ```
+
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
 
 The script will participate in the ceremony and then stop your charon and VC containers. No ASDB operations are needed since you're leaving the cluster.

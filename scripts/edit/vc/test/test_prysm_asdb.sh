@@ -103,7 +103,7 @@ docker compose --profile vc-prysm up -d vc-prysm
 sleep 2
 
 # Verify container is running
-if ! docker compose ps vc-prysm | grep -q Up; then
+if ! docker compose ps --format '{{.Status}}' vc-prysm 2>/dev/null | grep -qi running; then
     log_error "Container failed to start. Checking logs:"
     docker compose logs vc-prysm 2>&1 || true
     exit 1

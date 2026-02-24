@@ -47,6 +47,10 @@ The script will:
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
 
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
+
 ## Related
 
 - [Add-Validators Workflow](../add-validators/README.md)

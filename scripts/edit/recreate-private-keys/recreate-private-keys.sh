@@ -159,7 +159,7 @@ log_step "Step 1: Exporting anti-slashing database..."
 
 # VC container must be stopped before export (Lodestar locks the database while running)
 if [ "$DRY_RUN" = false ]; then
-    if docker compose ps "$VC" 2>/dev/null | grep -q Up; then
+    if docker compose ps --format '{{.Status}}' "$VC" 2>/dev/null | grep -qi running; then
         log_info "Stopping VC container ($VC) for ASDB export..."
         docker compose stop "$VC"
     fi

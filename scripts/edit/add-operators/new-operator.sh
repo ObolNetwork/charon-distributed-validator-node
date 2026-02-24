@@ -57,7 +57,7 @@ Prerequisites:
   - .env file with NETWORK and VC variables set
   - For --generate-enr: Docker installed
   - For ceremony: .charon/charon-enr-private-key must exist
-  - For ceremony: Cluster-lock.json received from existing operators
+  - For ceremony: cluster-lock.json received from existing operators
 EOF
     exit 0
 }
@@ -207,6 +207,9 @@ if [ "$GENERATE_ENR" = true ]; then
         log_info "  ./scripts/edit/add-operators/new-operator.sh \\"
         log_info "      --new-operator-enrs \"<all-new-enrs>\" \\"
         log_info "      --cluster-lock <path-to-cluster-lock.json>"
+    else
+        log_error "ENR private key generation failed - .charon/charon-enr-private-key not found"
+        exit 1
     fi
 
     exit 0

@@ -78,7 +78,7 @@ echo "Output file: $OUTPUT_FILE"
 echo ""
 
 # Check if vc-teku container is running (it should be stopped to avoid DB locking)
-if docker compose ps vc-teku 2>/dev/null | grep -q Up; then
+if docker compose ps --format '{{.Status}}' vc-teku 2>/dev/null | grep -qi running; then
     echo "Error: vc-teku container is still running" >&2
     echo "Please stop the validator client before exporting:" >&2
     echo "  docker compose stop vc-teku" >&2

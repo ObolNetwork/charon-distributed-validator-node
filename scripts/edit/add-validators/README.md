@@ -43,6 +43,10 @@ All operators must run this script simultaneously:
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
 
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
+
 ## Workflow
 
 The script performs the following steps:
