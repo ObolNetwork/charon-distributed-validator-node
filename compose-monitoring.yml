@@ -37,7 +37,7 @@ services:
 
   loki:
     profiles: [monitoring-log-aggregator]
-    image: grafana/loki:${LOKI_VERSION:-2.9.15}
+    image: grafana/loki:${LOKI_VERSION:-2.9.17}
     user: ":"
     networks: [dvnode]
     command: -config.file=/etc/loki/loki.yml
