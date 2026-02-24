@@ -87,14 +87,14 @@ if docker compose ps --format '{{.Status}}' vc-lodestar 2>/dev/null | grep -qi r
     exit 1
 fi
 
-# Create output directory if it doesn't exist
-OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
-mkdir -p "$OUTPUT_DIR"
-
-# Make OUTPUT_DIR absolute for docker bind mount
-if [[ "$OUTPUT_DIR" != /* ]]; then
-    OUTPUT_DIR="$(pwd)/$OUTPUT_DIR"
+# Make paths absolute for docker bind mount
+if [[ "$OUTPUT_FILE" != /* ]]; then
+    OUTPUT_FILE="$(pwd)/$OUTPUT_FILE"
 fi
+OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
 
 echo "Exporting slashing protection data using vc-lodestar container..."
 
@@ -112,8 +112,13 @@ if ! docker compose run --rm -T \
     exit 1
 fi
 
-# Move to correct output file if different from default
+# Fix file ownership (docker creates it as root)
 EXPORTED_FILE="$OUTPUT_DIR/slashing-protection.json"
+if [ -f "$EXPORTED_FILE" ]; then
+    sudo chown "$(id -u):$(id -g)" "$EXPORTED_FILE"
+fi
+
+# Move to correct output file if different from default
 if [ "$EXPORTED_FILE" != "$OUTPUT_FILE" ]; then
     mv "$EXPORTED_FILE" "$OUTPUT_FILE"
 fi
