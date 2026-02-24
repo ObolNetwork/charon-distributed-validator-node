@@ -167,7 +167,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
                 create enr
         else
             echo "  [DRY-RUN] docker run --rm ... charon create enr"
@@ -187,7 +187,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             ENR=$(docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
                 enr 2>/dev/null || echo "")
 
             if [ -n "$ENR" ]; then
@@ -314,7 +314,7 @@ if [ "$DRY_RUN" = false ]; then
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
         -v "$CLUSTER_LOCK_MOUNT:/opt/charon/cluster-lock.json:ro" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
         alpha edit add-operators \
         --new-operator-enrs="$NEW_OPERATOR_ENRS" \
         --output-dir=/opt/charon/output \

@@ -169,7 +169,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
                 create enr
         else
             echo "  [DRY-RUN] docker run --rm ... charon create enr"
@@ -189,7 +189,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ -f .charon/charon-enr-private-key ]; then
             ENR=$(docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
                 enr 2>/dev/null || echo "")
             
             if [ -n "$ENR" ]; then
@@ -241,7 +241,7 @@ if [ -n "$CLUSTER_LOCK_PATH" ] && [ -n "$OLD_ENR" ]; then
     # Get our own ENR
     OUR_ENR=$(docker run --rm \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
         enr 2>/dev/null || echo "")
     
     if [ -n "$OUR_ENR" ]; then
@@ -280,7 +280,7 @@ if [ -n "$CLUSTER_LOCK_PATH" ] && [ -n "$OLD_ENR" ]; then
         docker run --rm $DOCKER_FLAGS \
             -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
             -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-            "obolnetwork/charon:${CHARON_VERSION:-v1.9.0-rc3}" \
+            "obolnetwork/charon:${CHARON_VERSION:-v1.9.0}" \
             alpha edit replace-operator \
             --lock-file=/opt/charon/.charon/cluster-lock.json \
             --output-dir=/opt/charon/output \

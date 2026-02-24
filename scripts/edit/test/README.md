@@ -17,7 +17,7 @@ End-to-end tests that verify the cluster edit scripts work correctly across the 
 Override the charon version:
 
 ```bash
-CHARON_VERSION=v1.9.0-rc3 ./scripts/edit/test/e2e_test.sh
+CHARON_VERSION=v1.9.0 ./scripts/edit/test/e2e_test.sh
 ```
 
 ## What It Tests
