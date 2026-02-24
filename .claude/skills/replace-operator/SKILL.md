@@ -47,6 +47,8 @@ Ask the user: **"Are you a remaining operator (performing the replacement) or th
     [--dry-run]
 ```
 
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
+
 After completion, the script will print commands to start containers manually. Remind the user to **wait ~2 epochs before starting** containers.
 
 ### If New Operator
@@ -79,6 +81,8 @@ After receiving the current `cluster-lock.json` from remaining operators:
     --old-enr "enr:-..." \
     [--dry-run]
 ```
+
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
 
 The new operator runs this **at the same time** as the remaining operators run their ceremony. All operators must participate together.
 

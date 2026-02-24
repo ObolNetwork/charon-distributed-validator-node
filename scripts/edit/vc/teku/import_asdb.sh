@@ -96,7 +96,7 @@ if [[ "$INPUT_FILE" != /* ]]; then
 fi
 
 # Check if vc-teku container is running (it should be stopped)
-if docker compose ps vc-teku 2>/dev/null | grep -q Up; then
+if docker compose ps --format '{{.Status}}' vc-teku 2>/dev/null | grep -qi running; then
     echo "Error: vc-teku container is still running" >&2
     echo "Please stop the validator client before importing:" >&2
     echo "  docker compose stop vc-teku" >&2

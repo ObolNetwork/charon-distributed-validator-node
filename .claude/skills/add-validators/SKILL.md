@@ -44,6 +44,8 @@ Run the script from the repository root:
     [--unverified] [--dry-run]
 ```
 
+Set `WORK_DIR` env var to override the repository root directory if running from a custom location.
+
 The script will:
 1. Validate prerequisites
 2. Display current cluster info (operators, validators)

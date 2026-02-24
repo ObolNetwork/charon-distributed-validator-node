@@ -100,7 +100,7 @@ docker compose --profile vc-lodestar up -d vc-lodestar
 sleep 2
 
 # Verify container is running
-if ! docker compose ps vc-lodestar | grep -q Up; then
+if ! docker compose ps --format '{{.Status}}' vc-lodestar 2>/dev/null | grep -qi running; then
     log_error "Container failed to start. Checking logs:"
     docker compose logs vc-lodestar 2>&1 || true
     exit 1

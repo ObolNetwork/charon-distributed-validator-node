@@ -173,10 +173,10 @@ fi
 # Check if containers are currently running
 CHARON_WAS_RUNNING=false
 VC_WAS_RUNNING=false
-if docker compose ps charon 2>/dev/null | grep -q Up; then
+if docker compose ps --format '{{.Status}}' charon 2>/dev/null | grep -qi running; then
     CHARON_WAS_RUNNING=true
 fi
-if docker compose ps "$VC" 2>/dev/null | grep -q Up; then
+if docker compose ps --format '{{.Status}}' "$VC" 2>/dev/null | grep -qi running; then
     VC_WAS_RUNNING=true
 fi
 

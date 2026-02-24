@@ -44,6 +44,10 @@ Automates the complete workflow for operators already in the cluster:
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
 
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
+
 ### Workflow
 
 1. **Export ASDB** - Stop VC if running and export anti-slashing database
@@ -87,6 +91,10 @@ curl -o .charon/cluster-lock.json https://example.com/cluster-lock.json
 | `--generate-enr` | No | Generate new ENR private key |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
+
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
 
 ## Related
 

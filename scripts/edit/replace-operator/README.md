@@ -48,6 +48,10 @@ Automates the complete workflow for operators staying in the cluster:
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
 
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
+
 ### Workflow
 
 1. **Export ASDB** - Stop VC if running and export anti-slashing database
@@ -87,6 +91,10 @@ After the ceremony completes, the script automatically backs up the old `.charon
 | `--generate-enr` | No | Generate new ENR private key |
 | `--dry-run` | No | Preview without executing |
 | `-h, --help` | No | Show help message |
+
+| Environment Variable | Description |
+|----------------------|-------------|
+| `WORK_DIR` | Override the repository root directory (defaults to auto-detected repo root) |
 
 ## Related
 

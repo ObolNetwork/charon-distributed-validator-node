@@ -78,7 +78,7 @@ echo "Output file: $OUTPUT_FILE"
 echo ""
 
 # Check if vc-lodestar container is running (it should be stopped to avoid DB locking)
-if docker compose ps vc-lodestar 2>/dev/null | grep -q Up; then
+if docker compose ps --format '{{.Status}}' vc-lodestar 2>/dev/null | grep -qi running; then
     echo "Error: vc-lodestar container is still running" >&2
     echo "Please stop the validator client before exporting:" >&2
     echo "  docker compose stop vc-lodestar" >&2

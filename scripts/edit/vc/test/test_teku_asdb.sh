@@ -99,7 +99,7 @@ docker compose --profile vc-teku up -d vc-teku
 sleep 2
 
 # Verify container is running
-if ! docker compose ps vc-teku | grep -q Up; then
+if ! docker compose ps --format '{{.Status}}' vc-teku 2>/dev/null | grep -qi running; then
     log_error "Container failed to start. Checking logs:"
     docker compose logs vc-teku 2>&1 || true
     exit 1
