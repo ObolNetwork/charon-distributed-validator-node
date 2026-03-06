@@ -3,6 +3,8 @@ global:
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
   external_labels:
     service_owner: $SERVICE_OWNER # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
+    cluster_name: $CLUSTER_NAME
+    cluster_peer: $CLUSTER_PEER
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
@@ -32,11 +34,6 @@ scrape_configs:
   - job_name: "mev-boost"
     static_configs:
       - targets: ["mev-mevboost:18551","mev-boost:18551"]
-    relabel_configs:
-      - target_label: cluster_name
-        replacement: "$CLUSTER_NAME"
-      - target_label: cluster_peer
-        replacement: "$CLUSTER_PEER"
   - job_name: "lodestar"
     static_configs:
       - targets: [ "lodestar:5064" ]
