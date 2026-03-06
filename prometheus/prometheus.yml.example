@@ -3,6 +3,8 @@ global:
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
   external_labels:
     service_owner: $SERVICE_OWNER # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
+    cluster_name: $CLUSTER_NAME
+    cluster_peer: $CLUSTER_PEER
 
 remote_write:
   - url: https://vm.monitoring.gcp.obol.tech/write
