@@ -12,7 +12,7 @@ services:
 
   cl-grandine:
     profiles: [cl-grandine]
-    image: sifrai/grandine:${GRANDINE_VERSION:-2.0.2}
+    image: sifrai/grandine:${GRANDINE_VERSION:-2.0.3}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_GRANDINE_ALLOY_MONITORED:-true}"
