@@ -50,4 +50,5 @@ echo "Imported all keys"
     --beacon-rest-api-provider="${BEACON_NODE_ADDRESS}" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \
-    --distributed
+    --distributed \
+    ${VC_EXTRAS:+$VC_EXTRAS}
