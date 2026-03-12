@@ -43,7 +43,7 @@ services:
     command: -config.file=/etc/loki/loki.yml
     volumes:
       - ./loki/loki.yml:/etc/loki/loki.yml
-      - ./data/loki:/opt/loki
+      - ./data/loki:/loki
     restart: unless-stopped
 
   alloy:
