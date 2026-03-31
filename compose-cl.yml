@@ -84,7 +84,7 @@ services:
 
   cl-teku:
     profiles: [cl-teku]
-    image: consensys/teku:${CL_TEKU_VERSION:-26.3.0}
+    image: consensys/teku:${CL_TEKU_VERSION:-26.4.0}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
