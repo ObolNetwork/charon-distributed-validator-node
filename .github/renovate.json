@@ -1,66 +1,43 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "enabledManagers": [
-    "github-actions",
-    "regex"
-  ],
+  "extends": ["config:recommended"],
+  "enabledManagers": ["github-actions", "regex"],
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^docker-compose\\.yml$",
-        "^relay/docker-compose\\.yml$"
-      ],
-      "matchStrings": [
-        "image:\\s*obolnetwork/charon:\\$\\{CHARON_VERSION:-v?(?<currentValue>[\\w.-]+)}"
-      ],
+      "fileMatch": ["^docker-compose\\.yml$", "^relay/docker-compose\\.yml$"],
+      "matchStrings": ["image:\\s*obolnetwork/charon:\\$\\{CHARON_VERSION:-v?(?<currentValue>[\\w.-]+)}"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "ObolNetwork/charon",
       "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "(^|/)docker-compose\\.ya?ml$",
-        "(^|/)compose[^/]*\\.ya?ml$"
-      ],
-      "matchStrings": [
-        "image:\\s*(?<depName>[^:\\s]+):\\$\\{[A-Z_]+:-(?<currentValue>[^}]+)\\}"
-      ],
+      "fileMatch": ["(^|/)docker-compose\\.ya?ml$", "(^|/)compose[^/]*\\.ya?ml$"],
+      "matchStrings": ["image:\\s*(?<depName>[^:\\s]+):\\$\\{[A-Z_]+:-(?<currentValue>[^}]+)\\}"],
       "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
     {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "labels": [
-        "renovate/github-actions"
-      ],
+      "description": "GitHub Actions CI updates",
+      "matchManagers": ["github-actions"],
+      "labels": ["renovate/github-actions"],
       "groupName": "GitHub Actions updates"
     },
     {
-      "matchManagers": [
-        "regex"
-      ],
-      "matchDepNames": [
-        "ObolNetwork/charon"
-      ],
-      "labels": [
-        "renovate/charon"
-      ]
+      "description": "Charon updates",
+      "matchManagers": ["regex"],
+      "matchDepNames": ["ObolNetwork/charon"],
+      "labels": ["renovate/charon"],
+      "groupName": "Charon updates"
     },
     {
-      "matchManagers": [
-        "regex"
-      ],
-      "labels": [
-        "renovate/docker"
-      ]
+      "description": "Docker dependency updates (non-Charon)",
+      "matchManagers": ["regex"],
+      "excludeDepNames": ["ObolNetwork/charon"],
+      "labels": ["renovate/docker"],
+      "groupName": "Docker dependency updates"
     }
   ]
 }
