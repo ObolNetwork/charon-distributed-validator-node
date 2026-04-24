@@ -18,7 +18,7 @@ Alternatives:
 - **Obol Stack + `helm-charts/charts/dv-pod`** — Kubernetes-native, production-preferred path for scale.
 - **`lido-charon-distributed-validator-node`** (LCDVN) — the Lido Simple DVT variant of this stack, with `validator-ejector` wired in.
 - **DappNode** (`dappnode/DAppNodePackage-obol-generic`) — third-party appliance.
-- **Stereum**, **Ansible** (on request), **Sedge** (least preferred).
+- **Stereum**, **Ansible** (on request), **Sedge**.
 
 **Prerequisite:** a `.charon/` directory from a completed DKG ceremony must exist in the repo root before `docker compose up`. If the user doesn't have one yet, route them to [docs.obol.org: DKG](https://docs.obol.org/docs/start/dkg) or [launchpad.obol.org](https://launchpad.obol.org) first.
 
@@ -189,7 +189,7 @@ When modifying this repository:
 - **Obol Stack + `helm-charts/charts/dv-pod`** — Kubernetes-native, production-preferred path for scale.
 - **`lido-charon-distributed-validator-node`** — Lido Simple DVT variant of this stack.
 - **DappNode** — third-party appliance (`dappnode/DAppNodePackage-obol-generic`).
-- **Stereum**, **Ansible** (on request), **Sedge** (least preferred).
+- **Stereum**, **Ansible** (on request), **Sedge**.
 
 ## Key docs
 
