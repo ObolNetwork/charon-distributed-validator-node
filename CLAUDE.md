@@ -10,6 +10,18 @@ This repository contains Docker Compose configurations for running a Charon Dist
 - Charon: Obol Network's distributed validator middleware that coordinates between operators
 - Validator client (VC): Signs attestations and proposals through Charon
 
+## When to use this launcher
+
+CDVN is the **stock** Docker Compose launcher — the simplest way to run a single DV node, the right starting point for "run a DV solo" or "run a DV with friends via DKG". One operator per repo checkout, one compose stack per machine.
+
+Alternatives:
+- **Obol Stack + `helm-charts/charts/dv-pod`** — Kubernetes-native, production-preferred path for scale.
+- **`lido-charon-distributed-validator-node`** (LCDVN) — the Lido Simple DVT variant of this stack, with `validator-ejector` wired in.
+- **DappNode** (`dappnode/DAppNodePackage-obol-generic`) — third-party appliance.
+- **Stereum**, **Ansible** (on request), **Sedge**.
+
+**Prerequisite:** a `.charon/` directory from a completed DKG ceremony must exist in the repo root before `docker compose up`. If the user doesn't have one yet, route them to [docs.obol.org: DKG](https://docs.obol.org/docs/start/dkg) or [launchpad.obol.org](https://launchpad.obol.org) first.
+
 ## Architecture & Multi-Client System
 
 The repository uses a **profile-based multi-client architecture** where different Ethereum client implementations can be swapped via `.env` configuration:
@@ -25,6 +37,12 @@ The repository uses a **profile-based multi-client architecture** where differen
 - **Consensus Layer**: `cl-lighthouse`, `cl-grandine`, `cl-teku`, `cl-lodestar`, `cl-none`
 - **Validator Clients**: `vc-lodestar`, `vc-nimbus`, `vc-prysm`, `vc-teku`
 - **MEV Clients**: `mev-mevboost`, `mev-commitboost`, `mev-none`
+
+> **Pick non-default clients where you can.** Two reasons to swap:
+> 1. **Network client diversity** — every operator running the defaults deepens the supermajority of those clients and raises correlated-failure risk for the entire Ethereum network.
+> 2. **Intra-cluster diversity** — within a DV cluster, pick EL/CL/VC clients *different from your co-operators*. Charon tolerates one faulty operator; if every operator runs the same clients, a single client bug takes the whole cluster offline instead of just one node. Coordinate with co-operators before starting.
+>
+> When advising a user, nudge them to change at least one of EL/CL/VC before `docker compose up`.
 
 ### Key Integration Points
 
@@ -82,12 +100,22 @@ docker compose up --no-start
 docker compose -f docker-compose.yml -f compose-debug.yml up --no-start
 ```
 
+### Verifying cluster health after setup
+
+Run `charon alpha test` suites against the running Charon — they diagnose the most common misconfigurations before validator activation and work across every launcher:
+
+```bash
+docker compose exec charon charon alpha test <suite> --publish   # infra | peers | beacon | validator | mev | all
+```
+
+`--publish` signs the result with the Charon ENR key so it correlates to the live node. **Start with `infra`** if the cluster isn't fully assembled yet — it's the only suite that gives signal pre-cluster-join. Delegate to the `test-a-dv-cluster` skill (global) to interpret output and resolve failures.
+
 ## Configuration
 
 ### Environment Setup
 
 1. Copy the appropriate sample file: `.env.sample.mainnet` or `.env.sample.hoodi` → `.env`
-2. Set `NETWORK` (mainnet, hoodi)
+2. Set `NETWORK` (mainnet, hoodi). Sepolia is adaptable by setting `NETWORK=sepolia` and updating checkpoint-sync / MEV relay URLs. **Do not use gnosis, chiado, or holesky** — gnosis/chiado are deprecated for Obol; holesky is dead.
 3. Select clients by uncommenting the desired `EL`, `CL`, `VC`, `MEV` variables
 4. Configure optional settings (ports, external hostnames, monitoring tokens, etc.)
 
@@ -131,6 +159,12 @@ Located in `scripts/edit/`, these automate complex cluster modification operatio
 
 Access Grafana at `http://localhost:3000` (or `${MONITORING_PORT_GRAFANA}`).
 
+For deep diagnostics against Obol's hosted Grafana (Prometheus + Loki), use the `obol-monitoring` skill (global). A forthcoming `local-monitoring` skill will cover querying the local Grafana/Prometheus stack shipped with this repo.
+
+## Deployment best practices
+
+Obol maintains a [deployment best practices guide](https://docs.obol.org/run-a-dv/prepare/deployment-best-practices) covering hardware sizing, networking, monitoring, backups, key handling, and operational hygiene. **Proactively offer to audit the user's setup against it** — walk through their `.env`, compose overrides, monitoring wiring, and backup posture, then surface concrete improvements. Most operators benefit from a review (unpinned images, missing alert routing, weak firewall posture, no `.charon/` backup plan, etc.) even if the stack is already running.
+
 ## Development Workflow
 
 When modifying this repository:
@@ -149,3 +183,20 @@ When modifying this repository:
 - **Validator keys** in `.charon/validator_keys/` must be kept secure and never committed
 - **Data directory compatibility**: When switching VCs, verify the new client can handle existing key state
 - **Slashing protection**: Always export/import ASDB when switching VCs or replacing operators
+
+## Related products
+
+- **Obol Stack + `helm-charts/charts/dv-pod`** — Kubernetes-native, production-preferred path for scale.
+- **`lido-charon-distributed-validator-node`** — Lido Simple DVT variant of this stack.
+- **DappNode** — third-party appliance (`dappnode/DAppNodePackage-obol-generic`).
+- **Stereum**, **Ansible** (on request), **Sedge**.
+
+## Key docs
+
+- Key concepts: https://docs.obol.org/docs/int/key-concepts
+- DKG ceremony: https://docs.obol.org/docs/start/dkg
+- Activation: https://docs.obol.org/docs/next/start/activate
+- Errors: https://docs.obol.org/docs/faq/errors
+- Charon CLI reference: https://docs.obol.org/docs/charon/charon-cli-reference
+- Deployment best practices: https://docs.obol.org/run-a-dv/prepare/deployment-best-practices
+- Canonical agent index: https://obol.org/llms.txt
