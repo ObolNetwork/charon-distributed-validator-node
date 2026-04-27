@@ -10,7 +10,7 @@ services:
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
 
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.36.1}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-1.37.0}
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -126,7 +126,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.40.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.42.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
@@ -172,7 +172,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.10.0}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.11.2}
     user: ":"
     networks: [dvnode]
     environment:
@@ -187,7 +187,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-12.4.1}
+    image: grafana/grafana:${GRAFANA_VERSION:-12.4.3}
     user: ":"
     ports:
       - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
