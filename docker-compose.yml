@@ -11,7 +11,7 @@ services:
 
   nethermind:
     image: nethermind/nethermind:${NETHERMIND_VERSION:-1.37.0}
-    profiles: [""]
+    profiles: [ "" ]
     restart: unless-stopped
     ports:
       - ${NETHERMIND_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -35,7 +35,7 @@ services:
       --Sync.SnapSync=true
       --History.Pruning=Rolling
       --Blocks.BlockProductionBlobLimit=0
-    networks: [dvnode]
+    networks: [ dvnode ]
     volumes:
       - ./data/nethermind:/nethermind/data
       - ./jwt:/root/jwt
@@ -49,7 +49,7 @@ services:
 
   lighthouse:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.1.3}
-    profiles: [""]
+    profiles: [ "" ]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
       - 5054:5054/tcp # P2P TCP
@@ -73,7 +73,7 @@ services:
       --metrics-address=0.0.0.0
       --metrics-port=5054
       --metrics-allow-origin="*"
-    networks: [dvnode]
+    networks: [ dvnode ]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
       - ./jwt:/opt/jwt
@@ -86,7 +86,7 @@ services:
   #  \___|_| |_|\__,_|_|  \___/|_| |_|
 
   charon:
-    image: obolnetwork/charon:${CHARON_VERSION:-v1.9.4}
+    image: obolnetwork/charon:${CHARON_VERSION:-v1.10.0}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
@@ -110,7 +110,7 @@ services:
       - ${CHARON_PORT_P2P_TCP:-3610}:${CHARON_PORT_P2P_TCP:-3610}/tcp # P2P TCP libp2p
     labels:
       - "alloy-monitored=${CHARON_ALLOY_MONITORED:-true}"
-    networks: [dvnode]
+    networks: [ dvnode ]
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -127,10 +127,10 @@ services:
 
   lodestar:
     image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.42.0}
-    profiles: [""]
-    depends_on: [charon]
+    profiles: [ "" ]
+    depends_on: [ charon ]
     entrypoint: /opt/lodestar/run.sh
-    networks: [dvnode]
+    networks: [ dvnode ]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
@@ -152,7 +152,7 @@ services:
 
   mev-boost:
     image: ${MEVBOOST_IMAGE:-flashbots/mev-boost}:${MEVBOOST_VERSION:-1.10.1}
-    profiles: [""]
+    profiles: [ "" ]
     command: |
       -${NETWORK}
       -loglevel=debug
@@ -161,7 +161,7 @@ services:
       -relays=${MEVBOOST_RELAYS}
     labels:
       - "alloy-monitored=${MEV_BOOST_ALLOY_MONITORED:-true}"
-    networks: [dvnode]
+    networks: [ dvnode ]
     restart: unless-stopped
 
   #                        _ _             _
@@ -174,7 +174,7 @@ services:
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v3.11.2}
     user: ":"
-    networks: [dvnode]
+    networks: [ dvnode ]
     environment:
       PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN}
       SERVICE_OWNER: ${SERVICE_OWNER:-obol-cdvn}
@@ -191,7 +191,7 @@ services:
     user: ":"
     ports:
       - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
-    networks: [dvnode]
+    networks: [ dvnode ]
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
