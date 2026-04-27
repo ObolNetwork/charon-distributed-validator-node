@@ -583,12 +583,12 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "F \u00b7 lock_hash": false
+              "F · lock_hash": false
             },
             "includeByName": {},
             "indexByName": {
-              "F \u00b7 lock_hash": 6,
-              "G \u00b7 Link": 0,
+              "F · lock_hash": 6,
+              "G · Link": 0,
               "Network": 1,
               "Operators/Nodes": 2,
               "Threshold": 3,
@@ -596,8 +596,8 @@
               "Validators Total": 5
             },
             "renameByName": {
-              "F \u00b7 lock_hash": "_",
-              "G \u00b7 Link": "Cluster Hash",
+              "F · lock_hash": "_",
+              "G · Link": "Cluster Hash",
               "Network": "",
               "Threshold": ""
             }
@@ -707,7 +707,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 261
+                "value": 157
               }
             ]
           },
@@ -758,6 +758,18 @@
                 "value": {
                   "type": "auto"
                 }
+              },
+              {
+                "id": "custom.inspect",
+                "value": true
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 400
+              },
+              {
+                "id": "custom.width",
+                "value": 489
               }
             ]
           }
@@ -1112,11 +1124,11 @@
                     "options": {
                       "0": {
                         "index": 0,
-                        "text": "\u00a0\u274c"
+                        "text": " ❌"
                       },
                       "1": {
                         "index": 1,
-                        "text": "\u2705"
+                        "text": "✅"
                       }
                     },
                     "type": "value"
@@ -1152,7 +1164,7 @@
                       "from": 1,
                       "result": {
                         "index": 1,
-                        "text": "\u00a0\u274c"
+                        "text": " ❌"
                       },
                       "to": 9
                     },
@@ -1163,7 +1175,7 @@
                       "from": 10,
                       "result": {
                         "index": 2,
-                        "text": "\u2705"
+                        "text": "✅"
                       },
                       "to": 1000
                     },
@@ -1893,7 +1905,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Status and balance of each validator by public key with links to beaconcha.in.\n\nIf present, the \"\u2757\ufe0fPeer Exits\" column indicate the number of peers that submitted partially signed exits for each validator.",
+      "description": "Status and balance of each validator by public key with links to beaconcha.in.\n\nIf present, the \"❗️Peer Exits\" column indicate the number of peers that submitted partially signed exits for each validator.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2184,7 +2196,7 @@
             "renameByName": {
               "Value #A": "",
               "Value #B": "Balance",
-              "Value #C": "\u2757\ufe0fPeer Exits",
+              "Value #C": "❗️Peer Exits",
               "cluster_network": "__hide__",
               "pubkey": " Public Key",
               "pubkey_full": "__hide__",
@@ -2875,7 +2887,7 @@
           "refId": "D"
         }
       ],
-      "title": "Stack Version History (\ud83d\udfe1=BN, \ud83d\udd34=EL, \ud83d\udd35=VC, \ud83d\udfe2=DV)",
+      "title": "Stack Version History (🟡=BN, 🔴=EL, 🔵=VC, 🟢=DV)",
       "type": "state-timeline"
     },
     {
@@ -2971,7 +2983,7 @@
           "refId": "A"
         }
       ],
-      "title": "\u2705 Completed duties by type ",
+      "title": "✅ Completed duties by type ",
       "type": "status-history"
     },
     {
@@ -3051,7 +3063,7 @@
           "refId": "A"
         }
       ],
-      "title": "\u2705 Successful Peer Participation: Duty=$duty",
+      "title": "✅ Successful Peer Participation: Duty=$duty",
       "type": "status-history"
     },
     {
@@ -3136,7 +3148,7 @@
           "refId": "A"
         }
       ],
-      "title": "\u274c Failed duties by type (per $interval)",
+      "title": "❌ Failed duties by type (per $interval)",
       "type": "status-history"
     },
     {
@@ -3216,7 +3228,7 @@
           "refId": "A"
         }
       ],
-      "title": "\ud83d\udea7 Missed Peer Participation: Duty=$duty",
+      "title": "🚧 Missed Peer Participation: Duty=$duty",
       "type": "status-history"
     },
     {
@@ -3319,7 +3331,7 @@
           "refId": "A"
         }
       ],
-      "title": "\u274c Failed duty percentage by type (per $interval)",
+      "title": "❌ Failed duty percentage by type (per $interval)",
       "type": "timeseries"
     },
     {
@@ -3401,7 +3413,7 @@
           "refId": "A"
         }
       ],
-      "title": "\ud83d\udea7 Missed Peer Participation: Peer=$peer",
+      "title": "🚧 Missed Peer Participation: Peer=$peer",
       "type": "status-history"
     },
     {
@@ -3451,7 +3463,7 @@
             }
           },
           "mappings": [],
-          "noValue": "No failures \ud83c\udf89",
+          "noValue": "No failures 🎉",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -3500,7 +3512,7 @@
           "refId": "A"
         }
       ],
-      "title": "\ud83d\udea8 Duty failure reason: $duty (per $interval)",
+      "title": "🚨 Duty failure reason: $duty (per $interval)",
       "type": "timeseries"
     },
     {
@@ -3603,7 +3615,7 @@
           "refId": "A"
         }
       ],
-      "title": "\ud83d\udca5 Broadcasted duties never included on-chain (per $interval)",
+      "title": "💥 Broadcasted duties never included on-chain (per $interval)",
       "type": "timeseries"
     },
     {
@@ -5198,7 +5210,7 @@
                 }
               },
               "mappings": [],
-              "noValue": "No timeouts \ud83c\udf89",
+              "noValue": "No timeouts 🎉",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
@@ -5247,7 +5259,7 @@
               "refId": "B"
             }
           ],
-          "title": "\ud83d\udea8 Consensus Timeouts (per $interval)",
+          "title": "🚨 Consensus Timeouts (per $interval)",
           "type": "timeseries"
         }
       ],
@@ -6256,7 +6268,7 @@
           "refId": "A"
         }
       ],
-      "title": "\ud83d\udea8 Beacon Node API error count (per $interval)",
+      "title": "🚨 Beacon Node API error count (per $interval)",
       "type": "timeseries"
     },
     {
@@ -7745,7 +7757,7 @@
               "refId": "A"
             }
           ],
-          "title": "\ud83d\udea8 Validator API error count (per $interval)",
+          "title": "🚨 Validator API error count (per $interval)",
           "type": "timeseries"
         }
       ],
@@ -7767,7 +7779,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "description": "Type of connections to each peer in the cluster during the time window:\n - \ud83d\udfe2 Green: Direct connection (this is the preferred)\n - \ud83d\udfe1 Yellow: Indirect relay connection (this is ok if only temporary)\n - \ud83d\udd34 Red: No connection to peer (this is a problem)\n\nSee https://docs.obol.tech/docs/charon/networking#external-p2p-network",
+          "description": "Type of connections to each peer in the cluster during the time window:\n - 🟢 Green: Direct connection (this is the preferred)\n - 🟡 Yellow: Indirect relay connection (this is ok if only temporary)\n - 🔴 Red: No connection to peer (this is a problem)\n\nSee https://docs.obol.tech/docs/charon/networking#external-p2p-network",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -7846,7 +7858,7 @@
               "refId": "A"
             }
           ],
-          "title": "Peer Connections (\ud83d\udfe2=direct, \ud83d\udfe1=relay, \ud83d\udd34=not connected)",
+          "title": "Peer Connections (🟢=direct, 🟡=relay, 🔴=not connected)",
           "type": "state-timeline"
         },
         {
@@ -8001,7 +8013,7 @@
               "color": "rgba(255,0,255,0.7)"
             },
             "filterValues": {
-              "le": 1e-09
+              "le": 1e-9
             },
             "legend": {
               "show": true
@@ -9436,6 +9448,6 @@
   "timezone": "utc",
   "title": "Charon Overview",
   "uid": "charon_overview",
-  "version": 46,
+  "version": 2,
   "weekStart": ""
 }
