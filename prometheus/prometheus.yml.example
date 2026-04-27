@@ -1,5 +1,6 @@
 global:
   scrape_interval: 30s # Set the scrape interval to every 30 seconds.
+  scrape_timeout: 25s
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
   external_labels:
     service_owner: "$SERVICE_OWNER" # replace this with your Operator name you want to be identified by, it helps us route alerts and metrics to your notification channels easily
@@ -19,9 +20,16 @@ scrape_configs:
   - job_name: "nethermind"
     static_configs:
       - targets: ["nethermind:8008"]
-  - job_name: "lighthouse"
+  - job_name: "consensus-client"
     static_configs:
-      - targets: ["lighthouse:5054"]
+      - targets:
+          - "lighthouse:5054"
+          - "cl-lighthouse:5054"
+          - "cl-prysm:5054"
+          - "cl-teku:5054"
+          - "cl-nimbus:5054"
+          - "cl-lodestar:5054"
+          - "cl-grandine:5054"
   - job_name: "charon"
     static_configs:
       - targets: ["charon:3620"]
@@ -32,9 +40,9 @@ scrape_configs:
     static_configs:
       - targets: ["mev-mevboost:18551"]
 
-  - job_name: "lodestar"
+  - job_name: "validator-client"
     static_configs:
-      - targets: ["lodestar:5064"]
+      - targets: ["lodestar:5064","vc-lodestar:5064"]
   # Debug
   - job_name: "node-exporter"
     static_configs:
