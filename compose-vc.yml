@@ -11,7 +11,7 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.40.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.42.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -86,7 +86,7 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-26.3.0}
+    image: consensys/teku:${VC_TEKU_VERSION:-26.4.0}
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
