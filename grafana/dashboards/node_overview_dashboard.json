@@ -268,7 +268,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(mev_boost_relay_status_code_total{job=\"mev-boost\"}, relay)",
+        "definition": "label_values(cb_pbs_relay_status_code_total{job=\"commit-boost\"}, relay_id)",
         "includeAll": true,
         "multi": true,
         "label": "Relay Display",
@@ -276,7 +276,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(mev_boost_relay_status_code_total{job=\"mev-boost\"}, relay)",
+          "query": "label_values(cb_pbs_relay_status_code_total{job=\"commit-boost\"}, relay_id)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -4720,7 +4720,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "up{job=\"mev-boost\"}",
+          "expr": "max(up{job=~\"mev-boost|commit-boost\"})",
           "instant": true,
           "range": false,
           "legendFormat": "MEV-Boost"
@@ -4779,7 +4779,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(mev_boost_winning_bid_value_count{job=\"mev-boost\"}[$__range]))",
+          "expr": "sum(increase(mev_boost_winning_bid_value_count{job=\"mev-boost\"}[$__range])) or vector(0)",
           "instant": true,
           "range": false,
           "legendFormat": "bids"
@@ -4879,7 +4879,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "clamp_max(sum by (relay) (mev_boost_relay_status_code_total{http_status_code=\"200\", relay=~\".*$relay_display\", job=\"mev-boost\"}), 1)",
+          "expr": "clamp_max(sum by (relay) (mev_boost_relay_status_code_total{http_status_code=\"200\", relay=~\".*$relay_display\", job=\"mev-boost\"}), 1) or clamp_max(sum by (relay) (mev_boost_relay_status_code_total{relay=~\".*$relay_display\", job=\"mev-boost\"}), 0) or clamp_max(sum by (relay_id) (cb_pbs_relay_status_code_total{http_status_code=\"200\", relay_id=~\".*$relay_display\", job=\"commit-boost\"}), 1) or clamp_max(sum by (relay_id) (cb_pbs_relay_status_code_total{relay_id=~\".*$relay_display\", job=\"commit-boost\"}), 0)",
           "instant": true,
           "range": false,
           "legendFormat": "$relay_display"
@@ -4975,7 +4975,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval])",
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"status\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"status\"}[$__rate_interval])) * 1000",
           "range": true,
           "legendFormat": "status"
         },
@@ -4985,7 +4985,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval])",
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"register_validators\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"register_validators\"}[$__rate_interval])) * 1000",
           "range": true,
           "legendFormat": "register_validators"
         },
@@ -4995,7 +4995,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval])",
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"get_header\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"get_header\"}[$__rate_interval])) * 1000",
           "range": true,
           "legendFormat": "new_header"
         },
@@ -5005,7 +5005,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval])) / sum(rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval]))",
+          "expr": "sum(rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval])) / sum(rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval])) or (sum(rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=~\"submit_blinded_block.*\"}[$__rate_interval])) / sum(rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=~\"submit_blinded_block.*\"}[$__rate_interval]))) * 1000",
           "range": true,
           "legendFormat": "submit_block"
         }
@@ -5193,7 +5193,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "label_replace(label_replace(label_replace(label_replace(\n  sum by (endpoint, http_status_code) (increase(mev_boost_relay_status_code_total{job=\"mev-boost\", relay=~\".*$relay_display\", http_status_code!=\"200\", http_status_code!=\"202\"}[$__range])) > 0\n, \"request\", \"status\", \"endpoint\", \".*/status\"), \"request\", \"register_validators\", \"endpoint\", \".*/validators\"), \"request\", \"new_header\", \"endpoint\", \".*/header/.*\"), \"request\", \"submit_block\", \"endpoint\", \".*/blinded_blocks\")",
+          "expr": "label_replace(label_replace(label_replace(label_replace(\n  sum by (endpoint, http_status_code) (increase(mev_boost_relay_status_code_total{job=\"mev-boost\", relay=~\".*$relay_display\", http_status_code!=\"200\", http_status_code!=\"202\"}[$__range])) > 0\n, \"request\", \"status\", \"endpoint\", \".*/status\"), \"request\", \"register_validators\", \"endpoint\", \".*/validators\"), \"request\", \"new_header\", \"endpoint\", \".*/header/.*\"), \"request\", \"submit_block\", \"endpoint\", \".*/blinded_blocks\")\nor\nlabel_replace(\n  sum by (endpoint, http_status_code) (increase(cb_pbs_relay_status_code_total{job=\"commit-boost\", relay_id=~\".*$relay_display\", http_status_code!=\"200\", http_status_code!=\"202\"}[$__range])) > 0\n, \"request\", \"$1\", \"endpoint\", \"(.*)\")",
           "instant": true,
           "range": false,
           "format": "table",
