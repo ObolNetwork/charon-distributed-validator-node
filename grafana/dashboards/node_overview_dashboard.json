@@ -15,24 +15,16 @@
   "templating": {
     "list": [
       {
-        "allValue": "all",
-        "current": {
-          "text": [
-            "hoodi"
-          ],
-          "value": [
-            "hoodi"
-          ]
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
         "definition": "label_values(app_peer_name,cluster_network)",
         "description": "",
-        "includeAll": true,
+        "includeAll": false,
         "label": "Cluster Network",
-        "multi": true,
+        "multi": false,
         "name": "cluster_network",
         "options": [],
         "query": {
@@ -46,10 +38,7 @@
         "type": "query"
       },
       {
-        "current": {
-          "text": "test",
-          "value": "test"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
@@ -64,17 +53,14 @@
           "query": "label_values(app_peer_name{cluster_network=~\"$cluster_network\"},cluster_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
       },
       {
-        "current": {
-          "text": "24716d9",
-          "value": "24716d9"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
@@ -89,17 +75,14 @@
           "query": "label_values(app_peer_name{cluster_name=\"$cluster_name\"}, cluster_hash)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
       },
       {
-        "current": {
-          "text": "colorful-food",
-          "value": "colorful-food"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
@@ -114,17 +97,14 @@
           "query": "label_values(app_peer_name{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\"}, cluster_peer)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
       },
       {
-        "current": {
-          "text": "charon",
-          "value": "charon"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
@@ -140,7 +120,7 @@
           "query": "label_values(app_peer_name{cluster_name=\"$cluster_name\",cluster_hash=\"$cluster_hash\",cluster_peer=\"$cluster_peer\"},job)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
         "sort": 1,
@@ -251,6 +231,60 @@
         "query": "attester,prepare_aggregator,aggregator,sync_message,prepare_sync_contribution,sync_contribution,proposer,randao,exit,builder_proposer,builder_registration,info_sync",
         "type": "custom",
         "valuesFormat": "csv"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(mev_boost_relay_status_code_total{job=\"mev-boost\"}, relay)",
+        "includeAll": true,
+        "multi": true,
+        "label": "Relay",
+        "name": "relay",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(mev_boost_relay_status_code_total{job=\"mev-boost\"}, relay)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "regexApplyTo": "value",
+        "sort": 1,
+        "type": "query",
+        "hide": 2
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(cb_pbs_relay_status_code_total{job=\"commit-boost\"}, relay_id)",
+        "includeAll": true,
+        "multi": true,
+        "label": "Relay Display",
+        "name": "relay_display",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(cb_pbs_relay_status_code_total{job=\"commit-boost\"}, relay_id)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/(?:https?:\\/\\/[^@]+@)?(.+)/",
+        "regexApplyTo": "value",
+        "sort": 1,
+        "type": "query",
+        "hide": 2
       }
     ]
   },
@@ -639,7 +673,7 @@
           "refId": "A"
         }
       ],
-      "description": "Most recent epoch that has been economically finalized by a 2/3+ validator supermajority. Under normal conditions this sits 2 epochs behind the current epoch. A widening gap (> 4 epochs) signals finality is delayed — typically caused by participation issues or a minority client bug."
+      "description": "Most recent epoch that has been economically finalized by a 2/3+ validator supermajority. Under normal conditions this sits 2 epochs behind the current epoch. A widening gap (> 4 epochs) signals finality is delayed \u2014 typically caused by participation issues or a minority client bug."
     },
     {
       "id": 12,
@@ -945,7 +979,7 @@
           "refId": "A"
         }
       ],
-      "description": "Most recent epoch that has been economically finalized by a 2/3+ validator supermajority. Under normal conditions this sits 2 epochs behind the current epoch. A widening gap (> 4 epochs) signals finality is delayed — typically caused by participation issues or a minority client bug."
+      "description": "Most recent epoch that has been economically finalized by a 2/3+ validator supermajority. Under normal conditions this sits 2 epochs behind the current epoch. A widening gap (> 4 epochs) signals finality is delayed \u2014 typically caused by participation issues or a minority client bug."
     },
     {
       "id": 22,
@@ -1175,7 +1209,7 @@
           "refId": "A"
         }
       ],
-      "description": "Current total active validators in the active set this epoch — i.e. validators eligible to attest and propose. Universal across all clients."
+      "description": "Current total active validators in the active set this epoch \u2014 i.e. validators eligible to attest and propose. Universal across all clients."
     },
     {
       "id": 32,
@@ -1251,7 +1285,7 @@
           "refId": "A"
         }
       ],
-      "description": "Count of all validators in status `pending | active | exited | withdrawable` in the current epoch — i.e. the total validator registry size.\n\n**Coverage gap**: Prysm does not expose a total-validator count. Lighthouse, Teku, Nimbus and Grandine approximate with related metrics — values may differ slightly from the strict spec semantics."
+      "description": "Count of all validators in status `pending | active | exited | withdrawable` in the current epoch \u2014 i.e. the total validator registry size.\n\n**Coverage gap**: Prysm does not expose a total-validator count. Lighthouse, Teku, Nimbus and Grandine approximate with related metrics \u2014 values may differ slightly from the strict spec semantics."
     },
     {
       "id": 40,
@@ -1328,7 +1362,7 @@
           "refId": "A"
         }
       ],
-      "description": "Current total active validators in the active set this epoch — i.e. validators eligible to attest and propose. Universal across all clients."
+      "description": "Current total active validators in the active set this epoch \u2014 i.e. validators eligible to attest and propose. Universal across all clients."
     },
     {
       "id": 42,
@@ -1405,7 +1439,7 @@
           "refId": "A"
         }
       ],
-      "description": "Count of all validators in status `pending | active | exited | withdrawable` in the current epoch — i.e. the total validator registry size.\n\n**Coverage gap**: Prysm does not expose a total-validator count. Lighthouse, Teku, Nimbus and Grandine approximate with related metrics — values may differ slightly from the strict spec semantics."
+      "description": "Count of all validators in status `pending | active | exited | withdrawable` in the current epoch \u2014 i.e. the total validator registry size.\n\n**Coverage gap**: Prysm does not expose a total-validator count. Lighthouse, Teku, Nimbus and Grandine approximate with related metrics \u2014 values may differ slightly from the strict spec semantics."
     },
     {
       "id": 50,
@@ -1489,7 +1523,7 @@
           "refId": "A"
         }
       ],
-      "description": "Current count of libp2p peers connected to this beacon node. A healthy node typically maintains 30–100 peers. Sustained drops usually mean networking issues, a misconfigured port, or peer-scoring problems."
+      "description": "Current count of libp2p peers connected to this beacon node. A healthy node typically maintains 30\u2013100 peers. Sustained drops usually mean networking issues, a misconfigured port, or peer-scoring problems."
     },
     {
       "id": 51,
@@ -1573,7 +1607,7 @@
           "refId": "A"
         }
       ],
-      "description": "Number of partial-message-capable peers in the gossipsub mesh, summed across all topics. Mesh quality determines how fast this node sees new blocks and attestations — low counts lead to block-delay spikes.\n\n**Caveat**: Teku does not expose a direct gossipsub mesh peer gauge. On Teku this panel falls back to `network_subnet_peer_count`, which counts subnet peers rather than per-topic mesh peers — similar magnitude but different semantics."
+      "description": "Number of partial-message-capable peers in the gossipsub mesh, summed across all topics. Mesh quality determines how fast this node sees new blocks and attestations \u2014 low counts lead to block-delay spikes.\n\n**Caveat**: Teku does not expose a direct gossipsub mesh peer gauge. On Teku this panel falls back to `network_subnet_peer_count`, which counts subnet peers rather than per-topic mesh peers \u2014 similar magnitude but different semantics."
     },
     {
       "id": 60,
@@ -1665,7 +1699,7 @@
           "refId": "A"
         }
       ],
-      "description": "Current count of libp2p peers connected to this beacon node. A healthy node typically maintains 30–100 peers. Sustained drops usually mean networking issues, a misconfigured port, or peer-scoring problems."
+      "description": "Current count of libp2p peers connected to this beacon node. A healthy node typically maintains 30\u2013100 peers. Sustained drops usually mean networking issues, a misconfigured port, or peer-scoring problems."
     },
     {
       "id": 61,
@@ -1757,7 +1791,7 @@
           "refId": "A"
         }
       ],
-      "description": "Number of partial-message-capable peers in the gossipsub mesh, summed across all topics. Mesh quality determines how fast this node sees new blocks and attestations — low counts lead to block-delay spikes."
+      "description": "Number of partial-message-capable peers in the gossipsub mesh, summed across all topics. Mesh quality determines how fast this node sees new blocks and attestations \u2014 low counts lead to block-delay spikes."
     },
     {
       "id": 70,
@@ -1911,7 +1945,7 @@
           "refId": "A"
         }
       ],
-      "description": "Number of validator deposits processed from the deposit contract on the execution layer.\n\n**Note**: This is a **since-start** counter — it reflects deposits observed by the running beacon-node process, not a genesis-cumulative total. Restarting the BN resets the value to 0 until new deposits occur. Verified on Lighthouse (`beacon_processed_deposits_total`) and Teku (`beacon_eth1_deposit_total`) — both have this semantic."
+      "description": "Number of validator deposits processed from the deposit contract on the execution layer.\n\n**Note**: This is a **since-start** counter \u2014 it reflects deposits observed by the running beacon-node process, not a genesis-cumulative total. Restarting the BN resets the value to 0 until new deposits occur. Verified on Lighthouse (`beacon_processed_deposits_total`) and Teku (`beacon_eth1_deposit_total`) \u2014 both have this semantic."
     },
     {
       "id": 72,
@@ -2003,7 +2037,7 @@
           "refId": "A"
         }
       ],
-      "description": "90th-percentile block arrival delay relative to the expected slot start. Values above 4 s mean blocks are consistently late to this node — could be a sync issue, poor peer quality, or slow propagation.\n\n**Coverage gap**: Lighthouse and Teku do not expose a histogram-based block-delay metric. The panel will be empty when either is running. Prysm reports delay in milliseconds (normalised to seconds by the panel). Nimbus, Lodestar and Grandine expose native second-based histograms."
+      "description": "90th-percentile block arrival delay relative to the expected slot start. Values above 4 s mean blocks are consistently late to this node \u2014 could be a sync issue, poor peer quality, or slow propagation.\n\n**Coverage gap**: Lighthouse and Teku do not expose a histogram-based block-delay metric. The panel will be empty when either is running. Prysm reports delay in milliseconds (normalised to seconds by the panel). Nimbus, Lodestar and Grandine expose native second-based histograms."
     },
     {
       "id": 73,
@@ -2080,7 +2114,7 @@
           "refId": "A"
         }
       ],
-      "description": "Rate of state-data cache misses per second. High rates indicate cache pressure — the beacon node is falling back to disk for state reads, which slows down attestation processing and head-block updates.\n\n**Coverage gap**: Grandine does not expose a state-cache miss metric; panel will be empty on Grandine.\n\n**Caveat**: Lodestar's fallback (`lodestar_state_cache_size`) is cache *size*, not miss *count* — its numeric meaning differs from the other clients."
+      "description": "Rate of state-data cache misses per second. High rates indicate cache pressure \u2014 the beacon node is falling back to disk for state reads, which slows down attestation processing and head-block updates.\n\n**Coverage gap**: Grandine does not expose a state-cache miss metric; panel will be empty on Grandine.\n\n**Caveat**: Lodestar's fallback (`lodestar_state_cache_size`) is cache *size*, not miss *count* \u2014 its numeric meaning differs from the other clients."
     },
     {
       "id": 74,
@@ -2163,7 +2197,7 @@
       "id": 62,
       "type": "stat",
       "title": "Peers by Client Type",
-      "description": "Current count of connected libp2p peers grouped by the remote peer's client-type.\n\n**Caveat**: Lighthouse, Prysm and Lodestar expose per-peer-type metrics. Teku, Nimbus and Grandine do not — panel will be empty on those clients.",
+      "description": "Current count of connected libp2p peers grouped by the remote peer's client-type.\n\n**Caveat**: Lighthouse, Prysm and Lodestar expose per-peer-type metrics. Teku, Nimbus and Grandine do not \u2014 panel will be empty on those clients.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -2375,7 +2409,7 @@
       "id": 63,
       "type": "timeseries",
       "title": "Peers by Client Type over time",
-      "description": "History of connected libp2p peers grouped by the remote peer's client-type. Useful for tracking whether one client type is disappearing from your peer list over time.\n\n**Caveat**: Lighthouse, Prysm and Lodestar expose per-peer-type metrics. Teku, Nimbus and Grandine do not — panel will be empty on those clients.",
+      "description": "History of connected libp2p peers grouped by the remote peer's client-type. Useful for tracking whether one client type is disappearing from your peer list over time.\n\n**Caveat**: Lighthouse, Prysm and Lodestar expose per-peer-type metrics. Teku, Nimbus and Grandine do not \u2014 panel will be empty on those clients.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -3031,12 +3065,12 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "F · lock_hash": false
+              "F \u00b7 lock_hash": false
             },
             "includeByName": {},
             "indexByName": {
-              "F · lock_hash": 6,
-              "G · Link": 0,
+              "F \u00b7 lock_hash": 6,
+              "G \u00b7 Link": 0,
               "Network": 1,
               "Operators/Nodes": 2,
               "Threshold": 3,
@@ -3044,8 +3078,8 @@
               "Validators Total": 5
             },
             "renameByName": {
-              "F · lock_hash": "_",
-              "G · Link": "Cluster Hash",
+              "F \u00b7 lock_hash": "_",
+              "G \u00b7 Link": "Cluster Hash",
               "Network": "",
               "Threshold": ""
             }
@@ -3572,11 +3606,11 @@
                     "options": {
                       "0": {
                         "index": 0,
-                        "text": " ❌"
+                        "text": "\u00a0\u274c"
                       },
                       "1": {
                         "index": 1,
-                        "text": "✅"
+                        "text": "\u2705"
                       }
                     },
                     "type": "value"
@@ -3612,7 +3646,7 @@
                       "from": 1,
                       "result": {
                         "index": 1,
-                        "text": " ❌"
+                        "text": "\u00a0\u274c"
                       },
                       "to": 9
                     },
@@ -3623,7 +3657,7 @@
                       "from": 10,
                       "result": {
                         "index": 2,
-                        "text": "✅"
+                        "text": "\u2705"
                       },
                       "to": 1000
                     },
@@ -3933,7 +3967,7 @@
           "refId": "A"
         }
       ],
-      "title": "✅ Completed duties by type ",
+      "title": "\u2705 Completed duties by type ",
       "type": "status-history"
     },
     {
@@ -4018,7 +4052,7 @@
           "refId": "A"
         }
       ],
-      "title": "❌ Failed duties by type (per $interval)",
+      "title": "\u274c Failed duties by type (per $interval)",
       "type": "status-history"
     },
     {
@@ -4121,7 +4155,7 @@
           "refId": "A"
         }
       ],
-      "title": "❌ Failed duty percentage by type (per $interval)",
+      "title": "\u274c Failed duty percentage by type (per $interval)",
       "type": "timeseries"
     },
     {
@@ -4171,7 +4205,7 @@
             }
           },
           "mappings": [],
-          "noValue": "No failures 🎉",
+          "noValue": "No failures \ud83c\udf89",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4220,7 +4254,7 @@
           "refId": "A"
         }
       ],
-      "title": "🚨 Duty failure reason: $duty (per $interval)",
+      "title": "\ud83d\udea8 Duty failure reason: $duty (per $interval)",
       "type": "timeseries"
     },
     {
@@ -4323,7 +4357,7 @@
           "refId": "A"
         }
       ],
-      "title": "💥 Broadcasted duties never included on-chain (per $interval)",
+      "title": "\ud83d\udca5 Broadcasted duties never included on-chain (per $interval)",
       "type": "timeseries"
     },
     {
@@ -4373,7 +4407,7 @@
             }
           },
           "mappings": [],
-          "noValue": "No timeouts 🎉",
+          "noValue": "No timeouts \ud83c\udf89",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4422,7 +4456,7 @@
           "refId": "B"
         }
       ],
-      "title": "🚨 Consensus Timeouts (per $interval)",
+      "title": "\ud83d\udea8 Consensus Timeouts (per $interval)",
       "type": "timeseries"
     },
     {
@@ -4430,7 +4464,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Type of connections to each peer in the cluster during the time window:\n - 🟢 Green: Direct connection (this is the preferred)\n - 🟡 Yellow: Indirect relay connection (this is ok if only temporary)\n - 🔴 Red: No connection to peer (this is a problem)\n\nSee https://docs.obol.tech/docs/charon/networking#external-p2p-network",
+      "description": "Type of connections to each peer in the cluster during the time window:\n - \ud83d\udfe2 Green: Direct connection (this is the preferred)\n - \ud83d\udfe1 Yellow: Indirect relay connection (this is ok if only temporary)\n - \ud83d\udd34 Red: No connection to peer (this is a problem)\n\nSee https://docs.obol.tech/docs/charon/networking#external-p2p-network",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4509,7 +4543,7 @@
           "refId": "A"
         }
       ],
-      "title": "Peer Connections (🟢=direct, 🟡=relay, 🔴=not connected)",
+      "title": "Peer Connections (\ud83d\udfe2=direct, \ud83d\udfe1=relay, \ud83d\udd34=not connected)",
       "type": "state-timeline"
     },
     {
@@ -4588,6 +4622,584 @@
       ],
       "title": "Connected Relays",
       "type": "state-timeline"
+    },
+    {
+      "id": 3001,
+      "type": "row",
+      "title": "MEV",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 111
+      },
+      "panels": []
+    },
+    {
+      "id": 3010,
+      "type": "stat",
+      "title": "MEV-Boost Status",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 0,
+        "y": 112
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "UP"
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "text",
+                  "index": 2,
+                  "text": "N/A"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "max(up{job=~\"mev-boost|commit-boost\"})",
+          "instant": true,
+          "range": false,
+          "legendFormat": "MEV-Boost"
+        }
+      ]
+    },
+    {
+      "id": 3013,
+      "type": "stat",
+      "title": "Winning Bids",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 112
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(mev_boost_winning_bid_value_count{job=\"mev-boost\"}[$__range])) or vector(0)",
+          "instant": true,
+          "range": false,
+          "legendFormat": "bids"
+        }
+      ]
+    },
+    {
+      "id": 3015,
+      "type": "stat",
+      "title": "$relay_display",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 0,
+        "y": 116
+      },
+      "repeat": "relay_display",
+      "repeatDirection": "v",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red",
+                  "index": 1
+                }
+              }
+            },
+            {
+              "type": "range",
+              "options": {
+                "from": 1,
+                "to": 1000000000000000.0,
+                "result": {
+                  "text": "UP",
+                  "color": "green",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A",
+                  "color": "text",
+                  "index": 2
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "clamp_max(sum by (relay) (mev_boost_relay_status_code_total{http_status_code=\"200\", relay=~\".*$relay_display\", job=\"mev-boost\"}), 1) or clamp_max(sum by (relay) (mev_boost_relay_status_code_total{relay=~\".*$relay_display\", job=\"mev-boost\"}), 0) or clamp_max(sum by (relay_id) (cb_pbs_relay_status_code_total{http_status_code=\"200\", relay_id=~\".*$relay_display\", job=\"commit-boost\"}), 1) or clamp_max(sum by (relay_id) (cb_pbs_relay_status_code_total{relay_id=~\".*$relay_display\", job=\"commit-boost\"}), 0)",
+          "instant": true,
+          "range": false,
+          "legendFormat": "$relay_display"
+        }
+      ]
+    },
+    {
+      "id": 3016,
+      "type": "timeseries",
+      "title": "Avg Request Latency: $relay_display",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 3,
+        "y": 116
+      },
+      "repeat": "relay_display",
+      "repeatDirection": "v",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/status\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"status\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"status\"}[$__rate_interval])) * 1000",
+          "range": true,
+          "legendFormat": "status"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=\"/eth/v1/builder/validators\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"register_validators\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"register_validators\"}[$__rate_interval])) * 1000",
+          "range": true,
+          "legendFormat": "register_validators"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval]) / rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\"/eth/v1/builder/header/.*\"}[$__rate_interval]) or (rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"get_header\"}[$__rate_interval]) / rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=\"get_header\"}[$__rate_interval])) * 1000",
+          "range": true,
+          "legendFormat": "new_header"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(mev_boost_relay_latency_sum{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval])) / sum(rate(mev_boost_relay_latency_count{job=\"mev-boost\", relay=~\".*$relay_display\", endpoint=~\".*/blinded_blocks\"}[$__rate_interval])) or (sum(rate(cb_pbs_relay_latency_sum{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=~\"submit_blinded_block.*\"}[$__rate_interval])) / sum(rate(cb_pbs_relay_latency_count{job=\"commit-boost\", relay_id=~\".*$relay_display\", endpoint=~\"submit_blinded_block.*\"}[$__rate_interval]))) * 1000",
+          "range": true,
+          "legendFormat": "submit_block"
+        }
+      ]
+    },
+    {
+      "id": 3017,
+      "type": "table",
+      "title": "Non-200/202: $relay_display",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 19,
+        "y": 116
+      },
+      "repeat": "relay_display",
+      "repeatDirection": "v",
+      "noValue": "All OK",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endpoint"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "request"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "endpoint"
+              },
+              {
+                "id": "custom.width",
+                "value": 155
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "http_status_code"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "code"
+              },
+              {
+                "id": "custom.width",
+                "value": 55
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 400
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "count"
+              },
+              {
+                "id": "custom.width",
+                "value": 60
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "frameIndex": 0,
+        "sortBy": [
+          {
+            "displayName": "count",
+            "desc": true
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "http_status_code",
+                "destinationType": "number"
+              }
+            ]
+          }
+        }
+      ],
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "label_replace(label_replace(label_replace(label_replace(\n  sum by (endpoint, http_status_code) (increase(mev_boost_relay_status_code_total{job=\"mev-boost\", relay=~\".*$relay_display\", http_status_code!=\"200\", http_status_code!=\"202\"}[$__range])) > 0\n, \"request\", \"status\", \"endpoint\", \".*/status\"), \"request\", \"register_validators\", \"endpoint\", \".*/validators\"), \"request\", \"new_header\", \"endpoint\", \".*/header/.*\"), \"request\", \"submit_block\", \"endpoint\", \".*/blinded_blocks\")\nor\nlabel_replace(\n  sum by (endpoint, http_status_code) (increase(cb_pbs_relay_status_code_total{job=\"commit-boost\", relay_id=~\".*$relay_display\", http_status_code!=\"200\", http_status_code!=\"202\"}[$__range])) > 0\n, \"request\", \"$1\", \"endpoint\", \"(.*)\")",
+          "instant": true,
+          "range": false,
+          "format": "table",
+          "legendFormat": "__auto"
+        }
+      ]
     }
   ]
 }

@@ -13,7 +13,7 @@ remote_write:
       credentials: "$PROM_REMOTE_WRITE_TOKEN"
     write_relabel_configs:
       - source_labels: [job]
-        regex: "charon|mev-boost"
+        regex: "charon|mev-boost|commit-boost"
         action: keep # Keeps charon metrics and drop metrics from other containers.
 
 scrape_configs:
@@ -39,6 +39,9 @@ scrape_configs:
   - job_name: "mev-boost"
     static_configs:
       - targets: ["mev-mevboost:18551"]
+  - job_name: "commit-boost"
+    static_configs:
+      - targets: ["mev-commitboost:10001"]
 
   - job_name: "validator-client"
     static_configs:
