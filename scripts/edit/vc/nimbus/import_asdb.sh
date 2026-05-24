@@ -10,7 +10,7 @@
 #
 # Options:
 #   --input-file    Path to updated slashing protection JSON (default: ./asdb-export/slashing-protection.json)
-#   --data-dir      Path to Nimbus data directory (default: ./data/nimbus)
+#   --data-dir      Path to Nimbus data directory (default: ./data/vc-nimbus)
 #
 # Requirements:
 #   - .env file must exist with NETWORK variable set
@@ -22,7 +22,7 @@ set -euo pipefail
 
 # Default values
 INPUT_FILE="./asdb-export/slashing-protection.json"
-DATA_DIR="./data/nimbus"
+DATA_DIR="./data/vc-nimbus"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -105,17 +105,18 @@ if docker compose ps --format '{{.Status}}' vc-nimbus 2>/dev/null | grep -qi run
     exit 1
 fi
 
-echo "Importing slashing protection data into vc-nimbus container..."
+# nimbus-beacon uses profile nimbus-maint (not started by compose up).
+export COMPOSE_PROFILES="${COMPOSE_PROFILES}${COMPOSE_PROFILES:+,}nimbus-maint"
 
-# Import slashing protection data using a temporary container based on the vc-nimbus service.
-# The input file is bind-mounted into the container at /tmp/import.json (read-only).
-# Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
-# Nimbus requires --data-dir BEFORE the subcommand.
+echo "Importing slashing protection data into Nimbus data directory..."
+
+# slashingdb lives in nimbus_beacon_node (statusim/nimbus-eth2), not the VC image.
 if ! docker compose run --rm -T \
+    --profile nimbus-maint \
     --entrypoint sh \
     -v "$INPUT_FILE":/tmp/import.json:ro \
-    vc-nimbus -c "/home/user/nimbus_beacon_node --data-dir=/home/user/data slashingdb import /tmp/import.json"; then
-    echo "Error: Failed to import slashing protection into vc-nimbus container" >&2
+    nimbus-beacon -c "/home/user/nimbus_beacon_node --data-dir=/home/user/data slashingdb import /tmp/import.json"; then
+    echo "Error: Failed to import slashing protection into Nimbus data directory" >&2
     exit 1
 fi
 

@@ -191,7 +191,7 @@ services:
 
   cl-nimbus:
     profiles: [ cl-nimbus ]
-    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.3.1}
+    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.5.0}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_NIMBUS_ALLOY_MONITORED:-true}"

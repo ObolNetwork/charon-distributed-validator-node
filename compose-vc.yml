@@ -34,24 +34,51 @@ services:
   # | | | | | | | | | | |_) | |_| \__ \
   # |_| |_|_|_| |_| |_|_.__/ \__,_|___/
 
+  nimbus-beacon-bin:
+    profiles: [vc-nimbus]
+    image: statusim/nimbus-eth2:${VC_NIMBUS_VERSION:-multiarch-v26.5.0}
+    volumes:
+      - nimbus_beacon_node_bin:/out
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "cp -f /home/user/nimbus_beacon_node /out/nimbus_beacon_node && chmod +x /out/nimbus_beacon_node",
+      ]
+    restart: "no"
+
+  # Maintenance-only (ASDB export/import). Not started by compose up; use:
+  #   docker compose --profile nimbus-maint run --rm nimbus-beacon ...
+  nimbus-beacon:
+    profiles: [nimbus-maint]
+    image: statusim/nimbus-eth2:${VC_NIMBUS_VERSION:-multiarch-v26.5.0}
+    networks: [dvnode]
+    volumes:
+      - ./data/vc-nimbus:/home/user/data
+    restart: "no"
+
   vc-nimbus:
     profiles: [vc-nimbus]
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.2.1}"
-    build:
-      context: nimbus
-      args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.2.1}
-    depends_on: [charon]
+    image: statusim/nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.5.0}
+    depends_on:
+      charon:
+        condition: service_started
+      nimbus-beacon-bin:
+        condition: service_completed_successfully
     networks: [dvnode]
+    entrypoint: ["/bin/bash", "/home/user/run.sh"]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+      NIMBUS_BEACON_NODE: /home/user/bin/nimbus_beacon_node
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
-      - ./nimbus/run.sh:/home/user/data/run.sh
-      - .charon/validator_keys:/home/validator_keys
+      - ./nimbus/run.sh:/home/user/run.sh:ro
+      - ./nimbus/import-keys.sh:/import-keys.sh:ro
+      - .charon/validator_keys:/home/validator_keys:ro
       - ./data/vc-nimbus:/home/user/data
+      - nimbus_beacon_node_bin:/home/user/bin:ro
     restart: unless-stopped
 
   #  _ __  _ __ _   _ ___ _ __ ___
@@ -106,3 +133,6 @@ services:
       - .charon/validator_keys:/opt/charon/validator_keys
       - ./data/vc-teku:/home/data
     restart: unless-stopped
+
+volumes:
+  nimbus_beacon_node_bin:

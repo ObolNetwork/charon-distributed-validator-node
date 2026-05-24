@@ -1,46 +1,26 @@
 #!/usr/bin/env bash
+# Start the Nimbus validator client. Preserves ./data/vc-nimbus (no wipe on restart).
+# Imports keys automatically when ./data/vc-nimbus/validators is empty.
 
-# Cleanup nimbus directories if they already exist.
-rm -rf /home/user/data
+set -euo pipefail
 
-# Refer: https://nimbus.guide/keys.html
-# Running a nimbus VC involves two steps which need to run in order:
-# 1. Importing the validator keys
-# 2. And then actually running the VC
-tmpkeys="/home/validator_keys/tmpkeys"
-mkdir -p ${tmpkeys}
+DATA_DIR="/home/user/data"
+export DATA_DIR
+export VALIDATOR_KEYS_DIR="${VALIDATOR_KEYS_DIR:-/home/validator_keys}"
+export NIMBUS_BEACON_NODE="${NIMBUS_BEACON_NODE:-/home/user/bin/nimbus_beacon_node}"
 
-for f in /home/validator_keys/keystore-*.json; do
-  echo "Importing key ${f}"
+bash /import-keys.sh
 
-  # Read password from keystore-*.txt into $password variable.
-  password=$(<"${f//json/txt}")
+if ! find "${DATA_DIR}/validators" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -q .; then
+  echo "Error: key import completed but no validators found in ${DATA_DIR}/validators." >&2
+  exit 1
+fi
 
-  # Copy keystore file to tmpkeys/ directory.
-  cp "${f}" "${tmpkeys}"
-
-  # Import keystore with the password.
-  echo "$password" |
-    /home/user/nimbus_beacon_node deposits import \
-      --data-dir=/home/user/data \
-      /home/validator_keys/tmpkeys
-
-  # Delete tmpkeys/keystore-*.json file that was copied before.
-  filename="$(basename ${f})"
-  rm "${tmpkeys}/${filename}"
-done
-
-# Delete the tmpkeys/ directory since it's no longer needed.
-rm -r ${tmpkeys}
-
-echo "Imported all keys"
-
-# Now run nimbus VC
 exec /home/user/nimbus_validator_client \
-  --data-dir=/home/user/data \
+  --data-dir="${DATA_DIR}" \
   --beacon-node="${BEACON_NODE_ADDRESS}" \
   --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder=${BUILDER_API_ENABLED} \
+  --payload-builder="${BUILDER_API_ENABLED}" \
   --distributed

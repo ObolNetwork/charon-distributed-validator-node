@@ -3,7 +3,7 @@
 # Integration test for export/import ASDB scripts with Nimbus VC.
 #
 # This script:
-# 1. Builds vc-nimbus image if needed
+# 1. Pulls vc-nimbus / nimbus-beacon images if needed
 # 2. Starts vc-nimbus via docker-compose with test override (no charon dependency)
 # 3. Sets up keystores in the container
 # 4. Stops container and imports sample slashing protection data
@@ -52,11 +52,6 @@ COMPOSE_FILE="$TEST_COMPOSE_FILES" docker compose --profile vc-nimbus down 2>/de
 rm -rf "$TEST_DATA_DIR"
 mkdir -p "$TEST_DATA_DIR"
 
-# Copy run.sh into test data directory to satisfy the volume mount from base compose
-# (compose merge keeps the original mount ./nimbus/run.sh:/home/user/data/run.sh,
-# which conflicts with our test data mount unless we provide the file there)
-cp "$REPO_ROOT/nimbus/run.sh" "$TEST_DATA_DIR/run.sh"
-
 # Check prerequisites
 log_info "Checking prerequisites..."
 
@@ -98,18 +93,21 @@ log_info "Using compose files: $COMPOSE_FILE"
 # Create test output directory
 mkdir -p "$TEST_OUTPUT_DIR"
 
-# Step 0: Build vc-nimbus image if needed
-log_info "Step 0: Building vc-nimbus image..."
+# Step 0: Pull images
+log_info "Step 0: Pulling Nimbus images..."
 
-if ! docker compose --profile vc-nimbus build vc-nimbus; then
-    log_error "Failed to build vc-nimbus image"
+if ! docker compose --profile vc-nimbus pull nimbus-beacon-bin vc-nimbus; then
+    log_error "Failed to pull Nimbus images"
     exit 1
 fi
-log_info "Image built successfully"
+log_info "Images ready"
 
-# Step 1: Start vc-nimbus via docker-compose
-log_info "Step 1: Starting vc-nimbus via docker-compose..."
+# Step 1: Stage beacon binary, import keys, then start vc-nimbus
+log_info "Step 1: Staging beacon binary, importing keys, starting vc-nimbus..."
 
+docker compose --profile vc-nimbus run --rm nimbus-beacon-bin
+export COMPOSE_PROFILES="${COMPOSE_PROFILES},nimbus-maint"
+docker compose --profile nimbus-maint run --rm --entrypoint /bin/bash nimbus-beacon /import-keys.sh
 docker compose --profile vc-nimbus up -d vc-nimbus
 
 sleep 2
@@ -123,36 +121,15 @@ fi
 
 log_info "Container started successfully"
 
-# Step 2: Set up keystores using nimbus_beacon_node deposits import
-log_info "Step 2: Setting up keystores..."
+# Step 2: Verify keystores were imported
+log_info "Step 2: Verifying keystores..."
 
-# Create a temporary directory in the container for importing
-docker compose exec -T vc-nimbus sh -c '
-    mkdir -p /home/user/data/validators /tmp/keyimport
-    
-    for f in /home/validator_keys/keystore-*.json; do
-        echo "Importing key from $f"
-        
-        # Read password
-        password=$(cat "${f%.json}.txt")
-        
-        # Copy keystore to temp dir
-        cp "$f" /tmp/keyimport/
-        
-        # Import using nimbus_beacon_node
-        echo "$password" | /home/user/nimbus_beacon_node deposits import \
-            --data-dir=/home/user/data \
-            /tmp/keyimport
-        
-        # Clean temp dir
-        rm /tmp/keyimport/*
-    done
-    
-    rm -rf /tmp/keyimport
-    echo "Done importing keystores"
-'
+if ! find "$TEST_DATA_DIR/validators" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -q .; then
+    log_error "No validators found in $TEST_DATA_DIR/validators after import"
+    exit 1
+fi
 
-log_info "Keystores set up successfully"
+log_info "Keystores verified"
 
 # Step 3: Stop container and import sample slashing protection data
 log_info "Step 3: Importing sample slashing protection data..."
