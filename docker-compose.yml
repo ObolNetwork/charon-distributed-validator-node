@@ -95,7 +95,7 @@ services:
       - CHARON_FALLBACK_BEACON_NODE_ENDPOINTS=${CHARON_FALLBACK_BEACON_NODE_ENDPOINTS:-}
       - CHARON_LOG_LEVEL=${CHARON_LOG_LEVEL:-info}
       - CHARON_LOG_FORMAT=${CHARON_LOG_FORMAT:-console}
-      - CHARON_P2P_RELAYS=${CHARON_P2P_RELAYS:-https://0.relay.obol.tech,https://1.relay.obol.tech/}
+      - CHARON_P2P_RELAYS=${CHARON_P2P_RELAYS:-https://0.relay.obol.tech,https://1.relay.obol.tech/,https://2.relay.obol.dev/,https://3.relay.obol.dev/}
       - CHARON_P2P_EXTERNAL_HOSTNAME=${CHARON_P2P_EXTERNAL_HOSTNAME:-} # Empty default required to avoid warnings.
       - CHARON_P2P_TCP_ADDRESS=0.0.0.0:${CHARON_PORT_P2P_TCP:-3610}
       - CHARON_VALIDATOR_API_ADDRESS=0.0.0.0:3600
