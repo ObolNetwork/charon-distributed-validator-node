@@ -9,7 +9,7 @@
 # Usage: export_asdb.sh [--data-dir <path>] [--output-file <path>]
 #
 # Options:
-#   --data-dir      Path to Nimbus data directory (default: ./data/nimbus)
+#   --data-dir      Path to Nimbus data directory (default: ./data/vc-nimbus)
 #   --output-file   Path for exported slashing protection JSON (default: ./asdb-export/slashing-protection.json)
 #
 # Requirements:
@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # Default values
-DATA_DIR="./data/nimbus"
+DATA_DIR="./data/vc-nimbus"
 OUTPUT_FILE="./asdb-export/slashing-protection.json"
 
 # Parse arguments
@@ -94,17 +94,18 @@ OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
 
-echo "Exporting slashing protection data using vc-nimbus container..."
+# nimbus-beacon uses profile nimbus-maint (not started by compose up).
+export COMPOSE_PROFILES="${COMPOSE_PROFILES}${COMPOSE_PROFILES:+,}nimbus-maint"
 
-# Export slashing protection data using a temporary container based on vc-nimbus service.
-# Note: slashingdb commands are in nimbus_beacon_node, not nimbus_validator_client.
-# Nimbus requires --data-dir BEFORE the subcommand.
-# We use docker compose run to create a temporary container with the same volumes.
+echo "Exporting slashing protection data using nimbus-beacon service..."
+
+# slashingdb lives in nimbus_beacon_node (statusim/nimbus-eth2), not the VC image.
 if ! docker compose run --rm -T \
+    --profile nimbus-maint \
     -v "$OUTPUT_DIR":/tmp/asdb-export \
     --entrypoint /home/user/nimbus_beacon_node \
-    vc-nimbus --data-dir=/home/user/data slashingdb export /tmp/asdb-export/slashing-protection.json; then
-    echo "Error: Failed to export slashing protection from vc-nimbus" >&2
+    nimbus-beacon --data-dir=/home/user/data slashingdb export /tmp/asdb-export/slashing-protection.json; then
+    echo "Error: Failed to export slashing protection from Nimbus data directory" >&2
     exit 1
 fi
 
