@@ -98,6 +98,7 @@ services:
       --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
+      --Xvalidator-client-beacon-api-executor-threads=50
     depends_on: [charon]
     networks: [dvnode]
     labels:
