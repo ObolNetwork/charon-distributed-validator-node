@@ -126,6 +126,7 @@ docker compose exec charon charon alpha test <suite> --publish   # infra | peers
 - `CHARON_BEACON_NODE_ENDPOINTS`: Override default beacon node (defaults to selected CL client)
 - `CHARON_FALLBACK_BEACON_NODE_ENDPOINTS`: Fallback beacon nodes for redundancy
 - `BUILDER_API_ENABLED`: Enable/disable MEV-boost integration
+- `CHARON_GRAFFITI`, `CHARON_GRAFFITI_DISABLE_CLIENT_APPEND`: Block proposal graffiti (set on charon, not the VC)
 - `CLUSTER_NAME`, `CLUSTER_PEER`: Required for monitoring with Alloy/Prometheus
 - `ALERT_DISCORD_IDS`: Discord IDs for Obol Agent monitoring alerts
 
