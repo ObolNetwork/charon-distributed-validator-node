@@ -11,7 +11,7 @@ services:
 
   mev-commitboost:
     profiles: [mev-commitboost]
-    image: ghcr.io/commit-boost/pbs:${MEV_COMMITBOOST_VERSION:-v0.9.6}
+    image: ghcr.io/commit-boost/pbs:${MEV_COMMITBOOST_VERSION:-v0.10.0}
     environment:
       - CB_CONFIG=/etc/commit-boost/config.toml
       - CB_METRICS_PORT=10001
