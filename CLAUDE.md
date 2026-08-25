@@ -26,7 +26,7 @@ Alternatives:
 
 The repository uses a **profile-based multi-client architecture** where different Ethereum client implementations can be swapped via `.env` configuration:
 
-- **Compose file structure**: `compose-el.yml` (execution), `compose-cl.yml` (consensus), `compose-vc.yml` (validator), `compose-mev.yml` (MEV), and `docker-compose.yml` (main/monitoring)
+- **Compose file structure**: `compose-el.yml` (execution), `compose-cl.yml` (consensus), `compose-vc.yml` (validator), `compose-mev.yml` (MEV), and `docker-compose.yml` (main/monitoring). Optional: `compose-debug.yml` (local debug stack), `compose-optimum.yml` (opt-in Optimum Gateway; off unless appended to `COMPOSE_FILE`, see `optimum/README.md`)
 - **Client selection**: Set via environment variables `EL`, `CL`, `VC`, `MEV` in `.env` (e.g., `EL=el-nethermind`, `CL=cl-lighthouse`, `VC=vc-lodestar`, `MEV=mev-mevboost`)
 - **Profiles**: Docker Compose profiles automatically activate the selected clients via `COMPOSE_PROFILES=${EL},${CL},${VC},${MEV}`
 - **Service naming**: Client services use prefixed names (e.g., `el-nethermind`, `cl-lighthouse`, `vc-lodestar`) while the main compose file uses unprefixed names for backward compatibility

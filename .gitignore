@@ -26,3 +26,8 @@ commit-boost/config.toml
 # Allow test fixtures
 !scripts/edit/**/test/fixtures/.charon/
 !scripts/edit/**/test/fixtures/.charon/**
+
+# Optimum Gateway overlay (generated at runtime)
+optimum/config/app_conf.yml
+optimum/identity/
+optimum/cache/
