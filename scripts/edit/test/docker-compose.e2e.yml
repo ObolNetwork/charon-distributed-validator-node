@@ -11,7 +11,7 @@ services:
     entrypoint: ["sh", "-c", "tail -f /dev/null"]
 
   vc-lodestar:
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.45.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.46.0}
     entrypoint: ["sh", "-c", "tail -f /dev/null"]
     volumes:
       - .charon/validator_keys:/home/charon/validator_keys
