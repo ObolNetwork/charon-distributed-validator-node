@@ -40,6 +40,18 @@ done
 
 echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
+PROPOSER_SETTINGS=""
+if [ -f /home/charon/vc-config/proposer-config.json ]; then
+    echo "proposer-config.json found, applying proposer settings"
+    # Lodestar only accepts yml/yaml file extensions; JSON is valid YAML.
+    cp /home/charon/vc-config/proposer-config.json /tmp/proposer-config.yml
+    PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
+else
+    echo "proposer-config.json not found, running without proposer settings"
+fi
+
+# Word splitting of $PROPOSER_SETTINGS is intentional, it is empty or a single flag.
+# shellcheck disable=SC2086
 exec node /usr/app/packages/cli/bin/lodestar validator \
     --dataDir="$DATA_DIR" \
     --keystoresDir="$KEYSTORES_DIR" \
@@ -51,4 +63,5 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --beaconNodes="$BEACON_NODE_ADDRESS" \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
-    --distributed
+    --distributed \
+    $PROPOSER_SETTINGS
