@@ -41,6 +41,14 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+PROPOSER_SETTINGS=()
+if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
+    echo "proposer-config.json found, applying proposer settings"
+    PROPOSER_SETTINGS+=(--proposer-settings-file="/home/charon/vc-config/proposer-config.json")
+else
+    echo "proposer-config.json not found, running without proposer settings"
+fi
+
 # Now run prysm VC
 /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
     --accept-terms-of-use=true \
@@ -50,4 +58,5 @@ echo "Imported all keys"
     --beacon-rest-api-provider="${BEACON_NODE_ADDRESS}" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \
-    --distributed
+    --distributed \
+    "${PROPOSER_SETTINGS[@]}"
