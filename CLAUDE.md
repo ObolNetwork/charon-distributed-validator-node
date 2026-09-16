@@ -35,7 +35,7 @@ The repository uses a **profile-based multi-client architecture** where differen
 
 - **Execution Layer**: `el-nethermind`, `el-reth`, `el-none`
 - **Consensus Layer**: `cl-lighthouse`, `cl-grandine`, `cl-teku`, `cl-lodestar`, `cl-none`
-- **Validator Clients**: `vc-lodestar`, `vc-nimbus`, `vc-prysm`, `vc-teku`
+- **Validator Clients**: `vc-lighthouse`, `vc-lodestar`, `vc-nimbus`, `vc-prysm`, `vc-teku`
 - **MEV Clients**: `mev-mevboost`, `mev-commitboost`, `mev-none`
 
 > **Pick non-default clients where you can.** Two reasons to swap:

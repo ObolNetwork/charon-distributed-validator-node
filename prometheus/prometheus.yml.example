@@ -51,6 +51,7 @@ scrape_configs:
           - "vc-teku:8008"
           - "vc-prysm:8081"
           - "vc-nimbus:8108"
+          - "vc-lighthouse:5064"
   # Debug
   - job_name: "node-exporter"
     static_configs:
