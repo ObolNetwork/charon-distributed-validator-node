@@ -55,6 +55,7 @@ exec /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
     --datadir="/data/vc" \
     --wallet-password-file="/wallet-password.txt" \
     --enable-beacon-rest-api \
+    --monitoring-host=0.0.0.0 \
     --beacon-rest-api-provider="${BEACON_NODE_ADDRESS}" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \

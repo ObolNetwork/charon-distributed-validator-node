@@ -21,4 +21,8 @@ exec /opt/teku/bin/teku validator-client \
     --validators-builder-registration-default-enabled "${BUILDER_API_ENABLED}" \
     --Xobol-dvt-integration-enabled true \
     --Xvalidator-client-beacon-api-executor-threads=50 \
+    --metrics-enabled=true \
+    --metrics-interface=0.0.0.0 \
+    --metrics-port=8008 \
+    --metrics-host-allowlist="*" \
     "${PROPOSER_CONFIG[@]}"
