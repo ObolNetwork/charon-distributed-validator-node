@@ -50,7 +50,7 @@ else
 fi
 
 # Now run prysm VC
-/app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
+exec /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
     --accept-terms-of-use=true \
     --datadir="/data/vc" \
     --wallet-password-file="/wallet-password.txt" \
