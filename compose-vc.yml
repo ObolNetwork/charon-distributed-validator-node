@@ -98,6 +98,7 @@ services:
     image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
     entrypoint: /opt/teku/run.sh
     environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     depends_on:
