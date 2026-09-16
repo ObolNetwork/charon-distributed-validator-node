@@ -35,6 +35,24 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
+  echo "proposer-config.json found, rendering per-validator proposer settings"
+
+  # Emit "<pubkey> <fee recipient> <gas limit>" per validator.
+  jq -r '.proposer_config | to_entries[] | "\(.key) \(.value.fee_recipient) \(.value.builder.gas_limit)"' \
+    /home/charon/vc-config/proposer-config.json |
+    while read -r pubkey fee_recipient gas_limit; do
+      for dir in "/home/user/data/validators/${pubkey}" "/home/user/data/validators/${pubkey#0x}"; do
+        if [[ -d "${dir}" ]]; then
+          echo "${fee_recipient}" >"${dir}/suggested_fee_recipient.hex"
+          echo "${gas_limit}" >"${dir}/suggested_gas_limit.json"
+        fi
+      done
+    done
+else
+  echo "proposer-config.json not found, running without proposer settings"
+fi
+
 # Now run nimbus VC
 exec /home/user/nimbus_validator_client \
   --data-dir=/home/user/data \
