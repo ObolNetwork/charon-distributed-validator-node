@@ -15,8 +15,8 @@ services:
     depends_on:
       charon:
         condition: service_healthy
-    entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
+    entrypoint: /opt/lodestar/run.sh
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
@@ -96,15 +96,15 @@ services:
   vc-teku:
     profiles: [vc-teku]
     image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
+    depends_on:
+      charon:
+        condition: service_healthy
+    networks: [dvnode]
     entrypoint: /opt/teku/run.sh
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
-    depends_on:
-      charon:
-        condition: service_healthy
-    networks: [dvnode]
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
