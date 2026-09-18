@@ -1,11 +1,24 @@
 #!/bin/bash
 
-# Use the charon-generated proposer config when available, otherwise fall back to a
-# zero default fee recipient, which charon overrides pre-gloas.
+# Render Teku's proposer config from the charon-generated canonical config when available:
+# entries only carry fields diverging from default_config, absent fields fall back to it.
+# Otherwise fall back to a zero default fee recipient, which charon overrides pre-gloas.
 PROPOSER_CONFIG=()
 if [[ -f /opt/charon/vc-config/proposer-config.json ]]; then
-    echo "proposer-config.json found, applying proposer settings"
-    PROPOSER_CONFIG+=(--validators-proposer-config="/opt/charon/vc-config/proposer-config.json")
+    echo "proposer-config.json found, rendering teku proposer config"
+    jq --argjson enabled "${BUILDER_API_ENABLED}" '
+        .default_config as $d |
+        {
+            proposer_config: (.proposer_config | map_values({
+                fee_recipient: (.fee_recipient // $d.fee_recipient),
+                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
+            })),
+            default_config: {
+                fee_recipient: $d.fee_recipient,
+                builder: {enabled: $enabled, gas_limit: $d.gas_limit}
+            }
+        }' /opt/charon/vc-config/proposer-config.json >/tmp/teku-proposer-config.json
+    PROPOSER_CONFIG+=(--validators-proposer-config="/tmp/teku-proposer-config.json")
 else
     echo "proposer-config.json not found, running with zero default fee recipient"
     PROPOSER_CONFIG+=(--validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000")

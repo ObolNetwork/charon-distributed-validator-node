@@ -41,10 +41,24 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+# Render Prysm's proposer settings from the charon-generated canonical config when available:
+# entries only carry fields diverging from default_config, absent fields fall back to it.
 PROPOSER_SETTINGS=()
 if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
-    echo "proposer-config.json found, applying proposer settings"
-    PROPOSER_SETTINGS+=(--proposer-settings-file="/home/charon/vc-config/proposer-config.json")
+    echo "proposer-config.json found, rendering prysm proposer settings"
+    jq --argjson enabled "${BUILDER_API_ENABLED}" '
+        .default_config as $d |
+        {
+            proposer_config: (.proposer_config | map_values({
+                fee_recipient: (.fee_recipient // $d.fee_recipient),
+                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
+            })),
+            default_config: {
+                fee_recipient: $d.fee_recipient,
+                builder: {enabled: $enabled, gas_limit: $d.gas_limit}
+            }
+        }' /home/charon/vc-config/proposer-config.json >/tmp/prysm-proposer-settings.json
+    PROPOSER_SETTINGS+=(--proposer-settings-file="/tmp/prysm-proposer-settings.json")
 else
     echo "proposer-config.json not found, running without proposer settings"
 fi
