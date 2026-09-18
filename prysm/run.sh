@@ -51,7 +51,8 @@ done
 # Render Prysm's proposer settings from the charon-generated canonical config when available:
 # entries only carry fields diverging from default_config, absent fields fall back to it.
 # Rendered as v2 settings with a top-level gas_limit, since at the gloas fork Prysm drops the
-# legacy builder.gas_limit. The legacy builder block is kept for pre-gloas registrations.
+# legacy builder.gas_limit. The legacy builder block is kept for pre-gloas registrations, and
+# carries charon's gloas builder configuration when set.
 PROPOSER_SETTINGS=()
 if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
     echo "proposer-config.json found, rendering prysm proposer settings"
@@ -67,7 +68,7 @@ if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
             default_config: {
                 fee_recipient: $d.fee_recipient,
                 gas_limit: $d.gas_limit,
-                builder: {enabled: $enabled, gas_limit: $d.gas_limit}
+                builder: ({enabled: $enabled, gas_limit: $d.gas_limit} + ($d.builder // {}))
             }
         }' "${PROPOSER_CONFIG_FILE}" >/tmp/prysm-proposer-settings.json
     PROPOSER_SETTINGS+=(--proposer-settings-file="/tmp/prysm-proposer-settings.json")
