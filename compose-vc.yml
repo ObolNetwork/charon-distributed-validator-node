@@ -31,6 +31,38 @@ services:
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
     restart: unless-stopped
 
+  #  _ _       _     _   _
+  # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
+  # | | |/ _` | '_ \| __| '_ \ / _ \| | | / __|/ _ \
+  # | | | (_| | | | | |_| | | | (_) | |_| \__ \  __/
+  # |_|_|\__, |_| |_|\__|_| |_|\___/ \__,_|___/\___|
+  #      |___/
+
+  vc-lighthouse:
+    profiles: [vc-lighthouse]
+    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.2.0}"
+    build:
+      context: lighthouse
+      args:
+        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.0}
+    depends_on:
+      charon:
+        condition: service_healthy
+    networks: [dvnode]
+    entrypoint: /opt/lighthouse/run.sh
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+    labels:
+      - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
+    volumes:
+      - ./lighthouse/run.sh:/opt/lighthouse/run.sh
+      - .charon/validator_keys:/opt/charon/validator_keys
+      - .charon/vc-config:/opt/charon/vc-config:ro
+      - ./data/vc-lighthouse:/opt/data
+    restart: unless-stopped
+
   #        _           _
   #  _ __ (_)_ __ ___ | |__  _   _ ___
   # | '_ \| | '_ ` _ \| '_ \| | | / __|
