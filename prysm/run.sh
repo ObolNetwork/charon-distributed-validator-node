@@ -43,21 +43,26 @@ echo "Imported all keys"
 
 # Render Prysm's proposer settings from the charon-generated canonical config when available:
 # entries only carry fields diverging from default_config, absent fields fall back to it.
+# Builder configuration renders as the v2 schema, inherited per key from default_config.
 PROPOSER_SETTINGS=()
 if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
     echo "proposer-config.json found, rendering prysm proposer settings"
     jq --argjson enabled "${BUILDER_API_ENABLED}" '
         .default_config as $d |
+        ($d.builder != null) as $b |
         {
-            proposer_config: (.proposer_config | map_values({
-                fee_recipient: (.fee_recipient // $d.fee_recipient),
-                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
-            })),
-            default_config: {
-                fee_recipient: $d.fee_recipient,
-                builder: {enabled: $enabled, gas_limit: $d.gas_limit}
-            }
-        }' /home/charon/vc-config/proposer-config.json >/tmp/prysm-proposer-settings.json
+            proposer_config: (.proposer_config | map_values(
+                {fee_recipient: (.fee_recipient // $d.fee_recipient)}
+                + (if $b then {gas_limit: (.gas_limit // $d.gas_limit)} else {} end)
+                + {builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}}
+            )),
+            default_config: (
+                {fee_recipient: $d.fee_recipient}
+                + (if $b then {gas_limit: $d.gas_limit} else {} end)
+                + {builder: ({enabled: $enabled, gas_limit: $d.gas_limit} + ($d.builder // {}))}
+            )
+        }
+        + (if $b then {version: 2} else {} end)' /home/charon/vc-config/proposer-config.json >/tmp/prysm-proposer-settings.json
     PROPOSER_SETTINGS+=(--proposer-settings-file="/tmp/prysm-proposer-settings.json")
 else
     echo "proposer-config.json not found, running without proposer settings"

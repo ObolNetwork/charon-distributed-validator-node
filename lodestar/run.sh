@@ -54,6 +54,15 @@ if [ -f /home/charon/vc-config/proposer-config.json ]; then
             proposer_config: {},
             default_config: {fee_recipient: d.fee_recipient, builder: {gas_limit: d.gas_limit}},
         };
+        if (d.builder) {
+            // Per-entry override keys match the keymanager JSON format, pass through verbatim.
+            Object.assign(out.default_config.builder, {
+                min_bid: d.builder.min_bid,
+                boost_factor: d.builder.builder_boost_factor,
+                max_execution_payment: d.builder.max_execution_payment,
+                builders: d.builder.builders,
+            });
+        }
         for (const [pubkey, entry] of Object.entries(src.proposer_config || {})) {
             out.proposer_config[pubkey] = {
                 fee_recipient: entry.fee_recipient ?? d.fee_recipient,
