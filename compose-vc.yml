@@ -12,9 +12,11 @@ services:
   vc-lodestar:
     profiles: [vc-lodestar]
     image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.46.0}
-    depends_on: [charon]
-    entrypoint: /opt/lodestar/run.sh
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
+    entrypoint: /opt/lodestar/run.sh
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
@@ -25,6 +27,7 @@ services:
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
+      - .charon/vc-config:/home/charon/vc-config:ro
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
     restart: unless-stopped
 
@@ -41,7 +44,9 @@ services:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -51,6 +56,7 @@ services:
     volumes:
       - ./nimbus/run.sh:/home/user/data/run.sh
       - .charon/validator_keys:/home/validator_keys
+      - .charon/vc-config:/home/charon/vc-config:ro
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
 
@@ -62,20 +68,28 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.1.8}
+    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.1.8}"
+    build:
+      context: prysm
+      args:
+        VERSION: ${VC_PRYSM_VERSION:-v7.1.8}
     platform: "linux/amd64"
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     entrypoint: /home/prysm/run.sh
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
       - .charon/validator_keys:/home/charon/validator_keys
+      - .charon/vc-config:/home/charon/vc-config:ro
     restart: unless-stopped
 
   #  _       _
@@ -86,24 +100,25 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
-    command: |
-      validator-client
-      --beacon-node-api-endpoint "http://charon:3600"
-      --network="${NETWORK}"
-      --data-base-path=/home/data
-      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-keystore-locking-enabled false
-      --validators-external-signer-slashing-protection-enabled true
-      --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
-      --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
-      --Xobol-dvt-integration-enabled true
-      --Xvalidator-client-beacon-api-executor-threads=50
-    depends_on: [charon]
+    image: "teku-validator-client:${VC_TEKU_VERSION:-26.8.0}"
+    build:
+      context: teku
+      args:
+        VERSION: ${VC_TEKU_VERSION:-26.8.0}
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
+    entrypoint: /opt/teku/run.sh
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
+      - ./teku/run.sh:/opt/teku/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
+      - .charon/vc-config:/opt/charon/vc-config:ro
       - ./data/vc-teku:/home/data
     restart: unless-stopped

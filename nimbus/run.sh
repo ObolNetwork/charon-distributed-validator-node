@@ -35,6 +35,28 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
+  echo "proposer-config.json found, rendering per-validator proposer settings"
+
+  # Resolve each imported validator's settings: proposer_config entries only carry
+  # fields diverging from default_config, absent fields fall back to it.
+  config=/home/charon/vc-config/proposer-config.json
+  for f in /home/validator_keys/keystore-*.json; do
+    pubkey="0x$(jq -r .pubkey "${f}")"
+    fee_recipient=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].fee_recipient // .default_config.fee_recipient' "${config}")
+    gas_limit=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].gas_limit // .default_config.gas_limit' "${config}")
+
+    for dir in "/home/user/data/validators/${pubkey}" "/home/user/data/validators/${pubkey#0x}"; do
+      if [[ -d "${dir}" ]]; then
+        echo "${fee_recipient}" >"${dir}/suggested_fee_recipient.hex"
+        echo "${gas_limit}" >"${dir}/suggested_gas_limit.json"
+      fi
+    done
+  done
+else
+  echo "proposer-config.json not found, running without proposer settings"
+fi
+
 # Now run nimbus VC
 exec /home/user/nimbus_validator_client \
   --data-dir=/home/user/data \
@@ -42,5 +64,5 @@ exec /home/user/nimbus_validator_client \
   --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder=${BUILDER_API_ENABLED} \
+  --payload-builder="${BUILDER_API_ENABLED}" \
   --distributed

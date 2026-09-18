@@ -45,7 +45,12 @@ scrape_configs:
 
   - job_name: "validator-client"
     static_configs:
-      - targets: ["lodestar:5064","vc-lodestar:5064"]
+      - targets:
+          - "lodestar:5064"
+          - "vc-lodestar:5064"
+          - "vc-teku:8008"
+          - "vc-prysm:8081"
+          - "vc-nimbus:8108"
   # Debug
   - job_name: "node-exporter"
     static_configs:
