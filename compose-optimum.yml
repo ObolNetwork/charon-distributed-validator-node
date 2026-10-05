@@ -1,0 +1,26 @@
+# Opt-in Optimum Gateway overlay. Not required for a stock CDVN.
+# Append `:compose-optimum.yml` to COMPOSE_FILE in `.env` (see optimum/README.md).
+# Adds one gateway service on the dvnode network; no CL, charon, or VC command changes.
+
+# Override any defaults specified by `${FOO:-bar}` in `.env` with `FOO=qux`.
+# See .env.sample "Optimum Gateway (opt-in)" section.
+
+services:
+  optimum-gateway:
+    image: getoptimum/gateway:${GATEWAY_VERSION:-v1.1.1}
+    restart: unless-stopped
+    labels:
+      - "alloy-monitored=${OPTIMUM_GATEWAY_ALLOY_MONITORED:-false}"
+    ports:
+      - ${GATEWAY_PORT_LIBP2P:-33212}:33212
+      - ${GATEWAY_PORT_MUMP2P:-43213}:43213
+      - ${GATEWAY_PORT_TELEMETRY:-48123}:48123
+    volumes:
+      - ./optimum/config:/app/config
+      - ./optimum/identity/libp2p:/tmp/libp2p
+      - ./optimum/identity/mump2p:/tmp/mump2p
+      - ./optimum/cache:/gateway/cache
+    environment:
+      OPT_API_KEY: ${OPT_API_KEY}
+    command: ["-config=/app/config/app_conf.yml"]
+    networks: [dvnode]

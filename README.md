@@ -206,6 +206,12 @@ docker compose down cl-grandine
 docker compose up cl-grandine -d
 ```
 
+# Optimum Gateway (opt-in)
+
+Adds an [Optimum Gateway](https://getoptimum.github.io/optimum-gateway/versions/latest/) container on the `dvnode` network so the beacon node can receive blocks earlier via Optimum's mesh. Charon, the validator client, and DV keys are unchanged.
+
+Off by default. To enable, append `:compose-optimum.yml` to `COMPOSE_FILE` and follow [optimum/README.md](optimum/README.md).
+
 # FAQs
 
 Check the Obol docs for frequent [errors and resolutions](https://docs.obol.org/docs/faq/errors)

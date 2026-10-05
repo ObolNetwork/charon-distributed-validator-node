@@ -1,0 +1,15 @@
+log_level: info
+# Must match the Optimum cluster issued with OPT_API_KEY (not the Charon cluster name).
+gateway_cluster_id: REPLACE_GATEWAY_CLUSTER_ID
+
+agent_lib_p2p_port: 33212
+agent_mump2p_port: 43213
+telemetry_enable: true
+telemetry_port: 48123
+identity_libp2p_dir: /tmp/libp2p
+identity_mump2p_dir: /tmp/mump2p
+
+# Populated by init-optimum.sh. Port is the CL container P2P port on dvnode
+# (9000 for most clients; 13000 for cl-prysm).
+direct_cl_peers:
+  - /dns4/REPLACE_CL_HOST/tcp/REPLACE_CL_P2P_PORT/p2p/REPLACE_CL_PEER_ID
