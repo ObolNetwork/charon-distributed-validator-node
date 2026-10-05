@@ -65,6 +65,10 @@ else
 fi
 
 # Now run nimbus VC
+# Note: Nimbus has no flag to request the stateless (include_payload=true) form of gloas
+# block production; it requests stateless only when configured with more than one beacon
+# node. Behind charon (a single beacon node endpoint) it requests the stateful form, which
+# a distributed validator cannot complete. Tracked upstream, see status-im/nimbus-eth2#9084.
 exec /home/user/nimbus_validator_client \
   --data-dir=/home/user/data \
   --beacon-node="${BEACON_NODE_ADDRESS}" \

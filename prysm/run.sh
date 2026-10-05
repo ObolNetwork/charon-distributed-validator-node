@@ -87,4 +87,5 @@ exec /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \
     --distributed \
+    --stateless \
     "${PROPOSER_SETTINGS[@]}"
