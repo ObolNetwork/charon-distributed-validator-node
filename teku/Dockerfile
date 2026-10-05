@@ -1,6 +1,6 @@
 ARG VERSION
 
-FROM ghcr.io/jqlang/jq:1.8.0 AS jq
+FROM ghcr.io/jqlang/jq:1.8.2 AS jq
 
 FROM consensys/teku:${VERSION}
 
