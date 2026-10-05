@@ -86,6 +86,9 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
+    # Note: Teku does not yet implement gloas block production on the validator client
+    # (produceBlockV4), so it has no flag to request the stateless (include_payload=true)
+    # form and cannot propose gloas blocks behind charon today. See Consensys/teku#11172.
     image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
     command: |
       validator-client
