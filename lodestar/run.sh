@@ -40,11 +40,18 @@ done
 
 echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+    [ -f "${PROPOSER_CONFIG_FILE}" ] && break
+    sleep 2
+done
+
 # Render Lodestar's proposer settings from the charon-generated canonical config when
 # available: entries only carry fields diverging from default_config, absent fields
 # fall back to it. Lodestar only accepts yml/yaml file extensions; JSON is valid YAML.
 PROPOSER_SETTINGS=""
-if [ -f /home/charon/vc-config/proposer-config.json ]; then
+if [ -f "${PROPOSER_CONFIG_FILE}" ]; then
     echo "proposer-config.json found, rendering lodestar proposer settings"
     node -e '
         const fs = require("fs");
@@ -61,7 +68,7 @@ if [ -f /home/charon/vc-config/proposer-config.json ]; then
             };
         }
         fs.writeFileSync(process.argv[2], JSON.stringify(out));
-    ' /home/charon/vc-config/proposer-config.json /tmp/proposer-config.yml
+    ' "${PROPOSER_CONFIG_FILE}" /tmp/proposer-config.yml
     PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
 else
     echo "proposer-config.json not found, running without proposer settings"

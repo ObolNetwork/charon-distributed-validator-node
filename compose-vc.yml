@@ -2,6 +2,10 @@
 # ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
+# Each VC mounts .charon read-only and renders its proposer settings from vc-config/proposer-config.json,
+# which charon writes there. .charon is mounted rather than vc-config itself, since Docker would create
+# a missing vc-config as root before charon writes it.
+
 services:
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
@@ -12,9 +16,7 @@ services:
   vc-lodestar:
     profiles: [vc-lodestar]
     image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.46.0}
-    depends_on:
-      charon:
-        condition: service_healthy
+    depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/lodestar/run.sh
     environment:
@@ -27,7 +29,7 @@ services:
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
-      - .charon/vc-config:/home/charon/vc-config:ro
+      - .charon:/opt/charon/node:ro
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
     restart: unless-stopped
 
@@ -39,14 +41,14 @@ services:
 
   vc-nimbus:
     profiles: [vc-nimbus]
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.7.0}"
+    # The -jq suffix makes compose build the image again, as the previous one lacks jq: compose
+    # only builds an image it doesn't have yet.
+    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.7.0}-jq"
     build:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
-    depends_on:
-      charon:
-        condition: service_healthy
+    depends_on: [charon]
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -56,7 +58,7 @@ services:
     volumes:
       - ./nimbus/run.sh:/home/user/data/run.sh
       - .charon/validator_keys:/home/validator_keys
-      - .charon/vc-config:/home/charon/vc-config:ro
+      - .charon:/opt/charon/node:ro
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
 
@@ -74,9 +76,7 @@ services:
       args:
         VERSION: ${VC_PRYSM_VERSION:-v7.1.8}
     platform: "linux/amd64"
-    depends_on:
-      charon:
-        condition: service_healthy
+    depends_on: [charon]
     networks: [dvnode]
     entrypoint: /home/prysm/run.sh
     environment:
@@ -89,7 +89,7 @@ services:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
       - .charon/validator_keys:/home/charon/validator_keys
-      - .charon/vc-config:/home/charon/vc-config:ro
+      - .charon:/opt/charon/node:ro
     restart: unless-stopped
 
   #  _       _
@@ -105,9 +105,7 @@ services:
       context: teku
       args:
         VERSION: ${VC_TEKU_VERSION:-26.8.0}
-    depends_on:
-      charon:
-        condition: service_healthy
+    depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/teku/run.sh
     environment:
@@ -119,6 +117,6 @@ services:
     volumes:
       - ./teku/run.sh:/opt/teku/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
-      - .charon/vc-config:/opt/charon/vc-config:ro
+      - .charon:/opt/charon/node:ro
       - ./data/vc-teku:/home/data
     restart: unless-stopped

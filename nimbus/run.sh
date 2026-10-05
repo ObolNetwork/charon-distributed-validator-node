@@ -35,12 +35,19 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
-if [[ -f /home/charon/vc-config/proposer-config.json ]]; then
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+  [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
+    sleep 2
+done
+
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
   echo "proposer-config.json found, rendering per-validator proposer settings"
 
   # Resolve each imported validator's settings: proposer_config entries only carry
   # fields diverging from default_config, absent fields fall back to it.
-  config=/home/charon/vc-config/proposer-config.json
+  config="${PROPOSER_CONFIG_FILE}"
   for f in /home/validator_keys/keystore-*.json; do
     pubkey="0x$(jq -r .pubkey "${f}")"
     fee_recipient=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].fee_recipient // .default_config.fee_recipient' "${config}")
