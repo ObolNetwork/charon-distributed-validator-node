@@ -41,14 +41,51 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+    [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
+    sleep 2
+done
+
+# Render Prysm's proposer settings from the charon-generated canonical config when available:
+# entries only carry fields diverging from default_config, absent fields fall back to it.
+# Rendered as v2 settings with a top-level gas_limit, since at the gloas fork Prysm drops the
+# legacy builder.gas_limit. The legacy builder block is kept for pre-gloas registrations, and
+# carries charon's gloas builder configuration when set.
+PROPOSER_SETTINGS=()
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
+    echo "proposer-config.json found, rendering prysm proposer settings"
+    jq --argjson enabled "${BUILDER_API_ENABLED}" '
+        .default_config as $d |
+        {
+            version: 2,
+            proposer_config: (.proposer_config | map_values({
+                fee_recipient: (.fee_recipient // $d.fee_recipient),
+                gas_limit: (.gas_limit // $d.gas_limit),
+                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
+            })),
+            default_config: {
+                fee_recipient: $d.fee_recipient,
+                gas_limit: $d.gas_limit,
+                builder: ({enabled: $enabled, gas_limit: $d.gas_limit} + ($d.builder // {}))
+            }
+        }' "${PROPOSER_CONFIG_FILE}" >/tmp/prysm-proposer-settings.json
+    PROPOSER_SETTINGS+=(--proposer-settings-file="/tmp/prysm-proposer-settings.json")
+else
+    echo "proposer-config.json not found, running without proposer settings"
+fi
+
 # Now run prysm VC
-/app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
+exec /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
     --accept-terms-of-use=true \
     --datadir="/data/vc" \
     --wallet-password-file="/wallet-password.txt" \
     --enable-beacon-rest-api \
+    --monitoring-host=0.0.0.0 \
     --beacon-rest-api-provider="${BEACON_NODE_ADDRESS}" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \
     --distributed \
-    --stateless
+    --stateless \
+    "${PROPOSER_SETTINGS[@]}"

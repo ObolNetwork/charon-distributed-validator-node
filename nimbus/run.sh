@@ -35,6 +35,35 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+  [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
+    sleep 2
+done
+
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
+  echo "proposer-config.json found, rendering per-validator proposer settings"
+
+  # Resolve each imported validator's settings: proposer_config entries only carry
+  # fields diverging from default_config, absent fields fall back to it.
+  config="${PROPOSER_CONFIG_FILE}"
+  for f in /home/validator_keys/keystore-*.json; do
+    pubkey="0x$(jq -r .pubkey "${f}")"
+    fee_recipient=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].fee_recipient // .default_config.fee_recipient' "${config}")
+    gas_limit=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].gas_limit // .default_config.gas_limit' "${config}")
+
+    for dir in "/home/user/data/validators/${pubkey}" "/home/user/data/validators/${pubkey#0x}"; do
+      if [[ -d "${dir}" ]]; then
+        echo "${fee_recipient}" >"${dir}/suggested_fee_recipient.hex"
+        echo "${gas_limit}" >"${dir}/suggested_gas_limit.json"
+      fi
+    done
+  done
+else
+  echo "proposer-config.json not found, running without proposer settings"
+fi
+
 # Now run nimbus VC
 # Note: Nimbus has no flag to request the stateless (include_payload=true) form of gloas
 # block production; it requests stateless only when configured with more than one beacon
@@ -46,5 +75,5 @@ exec /home/user/nimbus_validator_client \
   --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder=${BUILDER_API_ENABLED} \
+  --payload-builder="${BUILDER_API_ENABLED}" \
   --distributed

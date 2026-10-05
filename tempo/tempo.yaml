@@ -9,17 +9,23 @@ distributor:
         grpc:
           endpoint: 0.0.0.0:4317
 
-ingester:
-  trace_idle_period: 10s
-  max_block_bytes: 1_048_576
-  max_block_duration: 5m
+backend_scheduler:
+  provider:
+    compaction:
+      compaction:
+        block_retention: 24h
 
-compactor:
+backend_worker:
   compaction:
     block_retention: 24h
 
 storage:
   trace:
     backend: local
+    wal:
+      path: /opt/tempo/wal
     local:
       path: /opt/tempo/traces
+
+usage_report:
+  reporting_enabled: false

@@ -40,6 +40,55 @@ done
 
 echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+    [ -f "${PROPOSER_CONFIG_FILE}" ] && break
+    sleep 2
+done
+
+# Render Lodestar's proposer settings from the charon-generated canonical config when
+# available: entries only carry fields diverging from default_config, absent fields
+# fall back to it. Lodestar only accepts yml/yaml file extensions; JSON is valid YAML.
+PROPOSER_SETTINGS=""
+if [ -f "${PROPOSER_CONFIG_FILE}" ]; then
+    echo "proposer-config.json found, rendering lodestar proposer settings"
+    node -e '
+        const fs = require("fs");
+        const src = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+        const d = src.default_config;
+        const out = {
+            proposer_config: {},
+            default_config: {fee_recipient: d.fee_recipient, builder: {gas_limit: d.gas_limit}},
+        };
+        if (d.builder) {
+            // Per-entry override keys match the keymanager JSON format, pass through verbatim.
+            Object.assign(out.default_config.builder, {
+                min_bid: d.builder.min_bid,
+                boost_factor: d.builder.builder_boost_factor,
+                max_execution_payment: d.builder.max_execution_payment,
+                builders: d.builder.builders,
+            });
+        }
+        for (const [pubkey, entry] of Object.entries(src.proposer_config || {})) {
+            out.proposer_config[pubkey] = {
+                fee_recipient: entry.fee_recipient ?? d.fee_recipient,
+                builder: {gas_limit: entry.gas_limit ?? d.gas_limit},
+            };
+        }
+        fs.writeFileSync(process.argv[2], JSON.stringify(out));
+    ' "${PROPOSER_CONFIG_FILE}" /tmp/proposer-config.yml
+    PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
+    # Lodestar refuses a max execution payment above 0 (trusted payments) without an explicit opt-in.
+    if [ "$(node -p 'require(process.argv[1]).default_config.builder?.max_execution_payment ?? "0"' "${PROPOSER_CONFIG_FILE}")" != "0" ]; then
+        PROPOSER_SETTINGS="${PROPOSER_SETTINGS} --allowDangerousTrustedPayments"
+    fi
+else
+    echo "proposer-config.json not found, running without proposer settings"
+fi
+
+# Word splitting of $PROPOSER_SETTINGS is intentional, it holds zero or more flags.
+# shellcheck disable=SC2086
 exec node /usr/app/packages/cli/bin/lodestar validator \
     --dataDir="$DATA_DIR" \
     --keystoresDir="$KEYSTORES_DIR" \
@@ -52,4 +101,5 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
     --distributed \
-    --payloadLocal=false
+    --payloadLocal=false \
+    $PROPOSER_SETTINGS

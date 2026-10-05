@@ -2,6 +2,10 @@
 # ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
+# Each VC mounts .charon read-only and renders its proposer settings from vc-config/proposer-config.json,
+# which charon writes there. .charon is mounted rather than vc-config itself, since Docker would create
+# a missing vc-config as root before charon writes it.
+
 services:
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
@@ -11,10 +15,10 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.46.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.49.0}
     depends_on: [charon]
-    entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
+    entrypoint: /opt/lodestar/run.sh
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
@@ -25,7 +29,38 @@ services:
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
       - .charon/validator_keys:/home/charon/validator_keys
+      - .charon:/opt/charon/node:ro
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
+    restart: unless-stopped
+
+  #  _ _       _     _   _
+  # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
+  # | | |/ _` | '_ \| __| '_ \ / _ \| | | / __|/ _ \
+  # | | | (_| | | | | |_| | | | (_) | |_| \__ \  __/
+  # |_|_|\__, |_| |_|\__|_| |_|\___/ \__,_|___/\___|
+  #      |___/
+
+  vc-lighthouse:
+    profiles: [vc-lighthouse]
+    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.2.3}"
+    build:
+      context: lighthouse
+      args:
+        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.3}
+    depends_on: [charon]
+    networks: [dvnode]
+    entrypoint: /opt/lighthouse/run.sh
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
+    labels:
+      - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
+    volumes:
+      - ./lighthouse/run.sh:/opt/lighthouse/run.sh
+      - .charon/validator_keys:/opt/charon/validator_keys
+      - .charon:/opt/charon/node:ro
+      - ./data/vc-lighthouse:/opt/data
     restart: unless-stopped
 
   #        _           _
@@ -36,11 +71,13 @@ services:
 
   vc-nimbus:
     profiles: [vc-nimbus]
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.7.0}"
+    # The -jq suffix makes compose build the image again, as the previous one lacks jq: compose
+    # only builds an image it doesn't have yet.
+    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.0}-jq"
     build:
       context: nimbus
       args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
+        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.0}
     depends_on: [charon]
     networks: [dvnode]
     environment:
@@ -51,6 +88,7 @@ services:
     volumes:
       - ./nimbus/run.sh:/home/user/data/run.sh
       - .charon/validator_keys:/home/validator_keys
+      - .charon:/opt/charon/node:ro
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
 
@@ -62,7 +100,11 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.1.8}
+    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.2.0}"
+    build:
+      context: prysm
+      args:
+        VERSION: ${VC_PRYSM_VERSION:-v7.2.0}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
@@ -70,12 +112,14 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
       - .charon/validator_keys:/home/charon/validator_keys
+      - .charon:/opt/charon/node:ro
     restart: unless-stopped
 
   #  _       _
@@ -89,24 +133,23 @@ services:
     # Note: Teku does not yet implement gloas block production on the validator client
     # (produceBlockV4), so it has no flag to request the stateless (include_payload=true)
     # form and cannot propose gloas blocks behind charon today. See Consensys/teku#11172.
-    image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
-    command: |
-      validator-client
-      --beacon-node-api-endpoint "http://charon:3600"
-      --network="${NETWORK}"
-      --data-base-path=/home/data
-      --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys"
-      --validators-keystore-locking-enabled false
-      --validators-external-signer-slashing-protection-enabled true
-      --validators-builder-registration-default-enabled ${BUILDER_API_ENABLED:-true}
-      --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
-      --Xobol-dvt-integration-enabled true
-      --Xvalidator-client-beacon-api-executor-threads=50
+    image: "teku-validator-client:${VC_TEKU_VERSION:-26.9.1}"
+    build:
+      context: teku
+      args:
+        VERSION: ${VC_TEKU_VERSION:-26.9.1}
     depends_on: [charon]
     networks: [dvnode]
+    entrypoint: /opt/teku/run.sh
+    environment:
+      BEACON_NODE_ADDRESS: http://charon:3600
+      NETWORK: ${NETWORK}
+      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
+      - ./teku/run.sh:/opt/teku/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
+      - .charon:/opt/charon/node:ro
       - ./data/vc-teku:/home/data
     restart: unless-stopped
