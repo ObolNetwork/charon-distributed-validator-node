@@ -41,6 +41,9 @@ services:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
+    # Starts as root so run.sh can hand ./data/vc-nimbus to uid 1000; Nimbus itself runs as uid 1000.
+    user: root
+    entrypoint: /home/user/run.sh
     depends_on: [charon]
     networks: [dvnode]
     environment:
@@ -49,7 +52,7 @@ services:
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
-      - ./nimbus/run.sh:/home/user/data/run.sh
+      - ./nimbus/run.sh:/home/user/run.sh
       - .charon/validator_keys:/home/validator_keys
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
@@ -87,6 +90,9 @@ services:
   vc-teku:
     profiles: [vc-teku]
     image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
+    # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
+    user: root
+    entrypoint: /opt/charon/teku/run.sh
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
@@ -104,6 +110,7 @@ services:
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
+      - ./teku/run.sh:/opt/charon/teku/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
       - ./data/vc-teku:/home/data
     restart: unless-stopped
