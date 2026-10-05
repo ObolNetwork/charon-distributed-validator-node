@@ -47,9 +47,7 @@ services:
       context: lighthouse
       args:
         VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.0}
-    depends_on:
-      charon:
-        condition: service_healthy
+    depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/lighthouse/run.sh
     environment:
@@ -61,7 +59,7 @@ services:
     volumes:
       - ./lighthouse/run.sh:/opt/lighthouse/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
-      - .charon/vc-config:/opt/charon/vc-config:ro
+      - .charon:/opt/charon/node:ro
       - ./data/vc-lighthouse:/opt/data
     restart: unless-stopped
 

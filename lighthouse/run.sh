@@ -1,11 +1,17 @@
 #!/bin/bash
 
 KEYS_DIR="/opt/charon/validator_keys"
-PROPOSER_CONFIG="/opt/charon/vc-config/proposer-config.json"
+PROPOSER_CONFIG="/opt/charon/node/vc-config/proposer-config.json"
 VALIDATORS_DIR="/opt/data/validators"
 DEFINITIONS="${VALIDATORS_DIR}/validator_definitions.yml"
 
 mkdir -p "${VALIDATORS_DIR}"
+
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+for _ in $(seq 60); do
+    [[ -f "${PROPOSER_CONFIG}" ]] && break
+    sleep 2
+done
 
 # Author the validator definitions from the mounted charon keystores, replacing
 # `lighthouse account validator import`. The file is regenerated on every start so
