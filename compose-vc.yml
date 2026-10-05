@@ -3,6 +3,16 @@
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
+  # Teku and Nimbus run as uid 1000, but docker creates missing bind mount
+  # directories as root. Hand their data directories to uid 1000 before they start.
+  vc-data-permissions:
+    image: busybox:${BUSYBOX_VERSION:-1.38.0}
+    network_mode: none
+    command: sh -c "chown -R 1000:1000 /vc-teku /vc-nimbus && chmod 700 /vc-teku /vc-nimbus"
+    volumes:
+      - ./data/vc-teku:/vc-teku
+      - ./data/vc-nimbus:/vc-nimbus
+
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
@@ -41,7 +51,11 @@ services:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_started
+      vc-data-permissions:
+        condition: service_completed_successfully
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -99,7 +113,11 @@ services:
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
       --Xvalidator-client-beacon-api-executor-threads=50
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_started
+      vc-data-permissions:
+        condition: service_completed_successfully
     networks: [dvnode]
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
