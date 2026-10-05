@@ -8,8 +8,9 @@ if [ "$(id -u)" = "0" ]; then
   HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
 fi
 
-# Cleanup nimbus directories if they already exist.
-rm -rf /home/user/data
+# Remove previously imported keys, but keep the slashing protection DB
+# (validators/slashing_protection.sqlite3*) across restarts.
+rm -rf /home/user/data/secrets /home/user/data/validators/0x*
 
 # Refer: https://nimbus.guide/keys.html
 # Running a nimbus VC involves two steps which need to run in order:
