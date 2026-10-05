@@ -87,7 +87,7 @@ services:
 
   charon:
     # Latest gloas branch commit: only the gloas build writes the proposer config the VCs read.
-    image: obolnetwork/charon:${CHARON_VERSION:-9affa0d}
+    image: obolnetwork/charon:${CHARON_VERSION:-13d5d92}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
