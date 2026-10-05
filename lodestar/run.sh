@@ -79,11 +79,15 @@ if [ -f "${PROPOSER_CONFIG_FILE}" ]; then
         fs.writeFileSync(process.argv[2], JSON.stringify(out));
     ' "${PROPOSER_CONFIG_FILE}" /tmp/proposer-config.yml
     PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
+    # Lodestar refuses a max execution payment above 0 (trusted payments) without an explicit opt-in.
+    if [ "$(node -p 'require(process.argv[1]).default_config.builder?.max_execution_payment ?? "0"' "${PROPOSER_CONFIG_FILE}")" != "0" ]; then
+        PROPOSER_SETTINGS="${PROPOSER_SETTINGS} --allowDangerousTrustedPayments"
+    fi
 else
     echo "proposer-config.json not found, running without proposer settings"
 fi
 
-# Word splitting of $PROPOSER_SETTINGS is intentional, it is empty or a single flag.
+# Word splitting of $PROPOSER_SETTINGS is intentional, it holds zero or more flags.
 # shellcheck disable=SC2086
 exec node /usr/app/packages/cli/bin/lodestar validator \
     --dataDir="$DATA_DIR" \
