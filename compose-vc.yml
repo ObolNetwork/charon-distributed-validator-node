@@ -3,16 +3,6 @@
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
-  # Teku and Nimbus run as uid 1000, but docker creates missing bind mount
-  # directories as root. Hand their data directories to uid 1000 before they start.
-  vc-data-permissions:
-    image: busybox:${BUSYBOX_VERSION:-1.38.0}
-    network_mode: none
-    command: sh -c "chown -R 1000:1000 /vc-teku /vc-nimbus && chmod 700 /vc-teku /vc-nimbus"
-    volumes:
-      - ./data/vc-teku:/vc-teku
-      - ./data/vc-nimbus:/vc-nimbus
-
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
@@ -51,11 +41,10 @@ services:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
-    depends_on:
-      charon:
-        condition: service_started
-      vc-data-permissions:
-        condition: service_completed_successfully
+    # Starts as root so run.sh can hand ./data/vc-nimbus to uid 1000; Nimbus itself runs as uid 1000.
+    user: root
+    entrypoint: /home/user/run.sh
+    depends_on: [charon]
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -63,7 +52,7 @@ services:
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
-      - ./nimbus/run.sh:/home/user/data/run.sh
+      - ./nimbus/run.sh:/home/user/run.sh
       - .charon/validator_keys:/home/validator_keys
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
@@ -101,6 +90,9 @@ services:
   vc-teku:
     profiles: [vc-teku]
     image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
+    # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
+    user: root
+    entrypoint: /opt/charon/teku/run.sh
     command: |
       validator-client
       --beacon-node-api-endpoint "http://charon:3600"
@@ -113,15 +105,12 @@ services:
       --validators-proposer-default-fee-recipient "0x0000000000000000000000000000000000000000"
       --Xobol-dvt-integration-enabled true
       --Xvalidator-client-beacon-api-executor-threads=50
-    depends_on:
-      charon:
-        condition: service_started
-      vc-data-permissions:
-        condition: service_completed_successfully
+    depends_on: [charon]
     networks: [dvnode]
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
+      - ./teku/run.sh:/opt/charon/teku/run.sh
       - .charon/validator_keys:/opt/charon/validator_keys
       - ./data/vc-teku:/home/data
     restart: unless-stopped
