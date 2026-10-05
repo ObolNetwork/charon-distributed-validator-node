@@ -42,11 +42,11 @@ services:
 
   vc-lighthouse:
     profiles: [vc-lighthouse]
-    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.2.0}"
+    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.2.3}"
     build:
       context: lighthouse
       args:
-        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.0}
+        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.3}
     depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/lighthouse/run.sh
