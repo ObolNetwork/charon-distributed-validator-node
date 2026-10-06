@@ -100,11 +100,11 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.2.0}"
+    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.2.1}"
     build:
       context: prysm
       args:
-        VERSION: ${VC_PRYSM_VERSION:-v7.2.0}
+        VERSION: ${VC_PRYSM_VERSION:-v7.2.1}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]

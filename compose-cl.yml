@@ -156,7 +156,7 @@ services:
 
   cl-prysm:
     profiles: [ cl-prysm ]
-    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.2.0}
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.2.1}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_PRYSM_ALLOY_MONITORED:-true}"
