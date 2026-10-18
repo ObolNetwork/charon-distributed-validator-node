@@ -117,9 +117,6 @@ services:
     volumes:
       - .charon:/opt/charon/.charon
     restart: unless-stopped
-    # Liveness, not readiness: charon serves it once started, after writing or updating
-    # vc-config/proposer-config.json, so validator clients wait for it before reading that file.
-    # Readiness (/readyz) needs a connected validator client, so they can't wait for that.
     healthcheck:
       test: wget -qO- http://localhost:3620/livez
       start_period: 60s
