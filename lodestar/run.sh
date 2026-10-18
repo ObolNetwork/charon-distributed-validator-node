@@ -40,14 +40,9 @@ done
 
 echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
+# Compose starts this validator client once charon is healthy, by when charon has written or
+# updated proposer-config.json.
 PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-
-# Charon writes or updates proposer-config.json when it starts, before it serves the validator
-# API, so wait for the API to accept connections: the file is then current, not a stale one.
-for _ in $(seq 60); do
-    node -e 'const u = new URL(process.env.BEACON_NODE_ADDRESS); require("net").connect(u.port || 80, u.hostname).on("connect", () => process.exit(0)).on("error", () => process.exit(1))' && break
-    sleep 2
-done
 
 # Render Lodestar's proposer settings from the charon-generated canonical config when
 # available: entries only carry fields diverging from default_config, absent fields

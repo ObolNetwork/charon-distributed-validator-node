@@ -7,14 +7,8 @@ DEFINITIONS="${VALIDATORS_DIR}/validator_definitions.yml"
 
 mkdir -p "${VALIDATORS_DIR}"
 
-# Charon writes or updates proposer-config.json when it starts, before it serves the validator
-# API, so wait for the API to accept connections: the file is then current, not a stale one.
-CHARON_ADDR="${BEACON_NODE_ADDRESS#*://}"
-CHARON_ADDR="${CHARON_ADDR%%/*}"
-for _ in $(seq 60); do
-    (exec 3<>"/dev/tcp/${CHARON_ADDR%:*}/${CHARON_ADDR##*:}") 2>/dev/null && break
-    sleep 2
-done
+# Compose starts this validator client once charon is healthy, by when charon has written or
+# updated proposer-config.json.
 
 # Author the validator definitions from the mounted charon keystores, replacing
 # `lighthouse account validator import`. The file is regenerated on every start so

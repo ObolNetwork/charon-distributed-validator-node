@@ -16,7 +16,9 @@ services:
   vc-lodestar:
     profiles: [vc-lodestar]
     image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.49.0}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     entrypoint: /opt/lodestar/run.sh
     environment:
@@ -47,7 +49,9 @@ services:
       context: lighthouse
       args:
         VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.2.3}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     entrypoint: /opt/lighthouse/run.sh
     environment:
@@ -78,7 +82,9 @@ services:
       context: nimbus
       args:
         VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.0}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -106,7 +112,9 @@ services:
       args:
         VERSION: ${VC_PRYSM_VERSION:-v7.2.0}
     platform: "linux/amd64"
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     entrypoint: /home/prysm/run.sh
     environment:
@@ -138,7 +146,9 @@ services:
       context: teku
       args:
         VERSION: ${VC_TEKU_VERSION:-26.9.1}
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     networks: [dvnode]
     entrypoint: /opt/teku/run.sh
     environment:

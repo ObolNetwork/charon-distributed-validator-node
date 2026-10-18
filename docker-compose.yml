@@ -117,8 +117,13 @@ services:
     volumes:
       - .charon:/opt/charon/.charon
     restart: unless-stopped
+    # Liveness, not readiness: charon serves it once started, after writing or updating
+    # vc-config/proposer-config.json, so validator clients wait for it before reading that file.
+    # Readiness (/readyz) needs a connected validator client, so they can't wait for that.
     healthcheck:
-      test: wget -qO- http://localhost:3620/readyz
+      test: wget -qO- http://localhost:3620/livez
+      start_period: 60s
+      start_interval: 1s
 
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
@@ -129,7 +134,9 @@ services:
   lodestar:
     image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.49.0}
     profiles: [""]
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_healthy
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:

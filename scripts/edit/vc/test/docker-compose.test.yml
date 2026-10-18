@@ -12,8 +12,10 @@ services:
     volumes: []
     environment: []
     ports: []
+    # Healthy right away, the validator clients wait for charon to be healthy.
     healthcheck:
-      disable: true
+      test: ["CMD", "true"]
+      interval: 1s
 
   vc-lodestar:
     depends_on: []

@@ -35,16 +35,9 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+# Compose starts this validator client once charon is healthy, by when charon has written or
+# updated proposer-config.json.
 PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-
-# Charon writes or updates proposer-config.json when it starts, before it serves the validator
-# API, so wait for the API to accept connections: the file is then current, not a stale one.
-CHARON_ADDR="${BEACON_NODE_ADDRESS#*://}"
-CHARON_ADDR="${CHARON_ADDR%%/*}"
-for _ in $(seq 60); do
-    (exec 3<>"/dev/tcp/${CHARON_ADDR%:*}/${CHARON_ADDR##*:}") 2>/dev/null && break
-    sleep 2
-done
 
 if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
   echo "proposer-config.json found, rendering per-validator proposer settings"
