@@ -40,10 +40,12 @@ done
 
 echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
 
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
 PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+
+# Charon writes or updates proposer-config.json when it starts, before it serves the validator
+# API, so wait for the API to accept connections: the file is then current, not a stale one.
 for _ in $(seq 60); do
-    [ -f "${PROPOSER_CONFIG_FILE}" ] && break
+    node -e 'const u = new URL(process.env.BEACON_NODE_ADDRESS); require("net").connect(u.port || 80, u.hostname).on("connect", () => process.exit(0)).on("error", () => process.exit(1))' && break
     sleep 2
 done
 

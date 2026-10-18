@@ -7,9 +7,12 @@ DEFINITIONS="${VALIDATORS_DIR}/validator_definitions.yml"
 
 mkdir -p "${VALIDATORS_DIR}"
 
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+# Charon writes or updates proposer-config.json when it starts, before it serves the validator
+# API, so wait for the API to accept connections: the file is then current, not a stale one.
+CHARON_ADDR="${BEACON_NODE_ADDRESS#*://}"
+CHARON_ADDR="${CHARON_ADDR%%/*}"
 for _ in $(seq 60); do
-    [[ -f "${PROPOSER_CONFIG}" ]] && break
+    (exec 3<>"/dev/tcp/${CHARON_ADDR%:*}/${CHARON_ADDR##*:}") 2>/dev/null && break
     sleep 2
 done
 
