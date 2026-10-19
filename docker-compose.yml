@@ -10,7 +10,7 @@ services:
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
 
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-2.1.0}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-2.2.0}
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.2.3}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.0}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -87,7 +87,7 @@ services:
 
   charon:
     # Latest gloas branch commit: only the gloas build writes the proposer config the VCs read.
-    image: obolnetwork/charon:${CHARON_VERSION:-9affa0d}
+    image: obolnetwork/charon:${CHARON_VERSION:-6e59dc0}
     environment:
       - CHARON_BEACON_NODE_ENDPOINTS=${CHARON_BEACON_NODE_ENDPOINTS:-http://${CL:-lighthouse}:5052}
       - CHARON_BEACON_NODE_TIMEOUT=${CHARON_BEACON_NODE_TIMEOUT:-3s}
@@ -127,7 +127,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.49.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
