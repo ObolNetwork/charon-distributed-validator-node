@@ -48,6 +48,26 @@ mv "${DEFINITIONS}.tmp" "${DEFINITIONS}"
 
 echo "Generated ${DEFINITIONS}"
 
+# From the gloas fork, Lighthouse requests bids from the builders in builder_definitions.yml and
+# signs their builder request auths for charon to aggregate. Render it from charon's builder
+# settings, builder entries fall back to them for absent fields. JSON is valid YAML.
+BUILDERS="${VALIDATORS_DIR}/builder_definitions.yml"
+rm -f "${BUILDERS}"
+if [[ -f "${PROPOSER_CONFIG}" ]] && jq -e '.default_config.builder' "${PROPOSER_CONFIG}" >/dev/null; then
+    jq '.default_config.builder as $d | {
+        min_bid: ($d.min_bid | tonumber),
+        builder_boost_factor: ($d.builder_boost_factor | tonumber),
+        builders: [$d.builders[] | {
+            enabled: true,
+            url: .url,
+            max_execution_payment: ((.max_execution_payment // $d.max_execution_payment) | tonumber)
+        }
+        + (if .min_bid then {min_bid: (.min_bid | tonumber)} else {} end)
+        + (if .builder_boost_factor then {builder_boost_factor: (.builder_boost_factor | tonumber)} else {} end)]
+    }' "${PROPOSER_CONFIG}" >"${BUILDERS}"
+    echo "Generated ${BUILDERS}"
+fi
+
 EXTRA_FLAGS=()
 if [[ ! -f "${PROPOSER_CONFIG}" ]]; then
     # Global fallbacks when validator definitions carry no proposer settings: the zero

@@ -31,6 +31,20 @@ else
     PROPOSER_CONFIG+=(--validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000")
 fi
 
+# From the gloas fork, Teku signs builder request auths for the builders in --Xbuilder-urls one
+# epoch ahead for charon to aggregate. Its builder settings are global, so per-builder overrides
+# don't apply.
+BUILDER_ARGS=()
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]] && jq -e '.default_config.builder.builders[0]' "${PROPOSER_CONFIG_FILE}" >/dev/null; then
+    builder() { jq -r ".default_config.builder.$1" "${PROPOSER_CONFIG_FILE}"; }
+    BUILDER_ARGS=(
+        --Xbuilder-urls="$(jq -r '[.default_config.builder.builders[].url] | join(",")' "${PROPOSER_CONFIG_FILE}")"
+        --Xbuilder-min-bid="$(builder min_bid)"
+        --Xbuilder-boost-factor="$(builder builder_boost_factor)"
+        --Xbuilder-max-execution-payment="$(builder max_execution_payment)"
+    )
+fi
+
 exec /opt/teku/bin/teku validator-client \
     --beacon-node-api-endpoint "${BEACON_NODE_ADDRESS}" \
     --network="${NETWORK}" \
@@ -45,4 +59,5 @@ exec /opt/teku/bin/teku validator-client \
     --metrics-interface=0.0.0.0 \
     --metrics-port=8008 \
     --metrics-host-allowlist="*" \
-    "${PROPOSER_CONFIG[@]}"
+    "${PROPOSER_CONFIG[@]}" \
+    "${BUILDER_ARGS[@]}"

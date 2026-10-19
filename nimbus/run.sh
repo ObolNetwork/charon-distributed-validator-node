@@ -64,6 +64,19 @@ else
   echo "proposer-config.json not found, running without proposer settings"
 fi
 
+# Nimbus takes a single builder: pass the first of charon's builders, whose request auth it
+# signs inline with each gloas block request for charon to aggregate.
+BUILDER_ARGS=()
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]] && jq -e '.default_config.builder.builders[0]' "${PROPOSER_CONFIG_FILE}" >/dev/null; then
+  builder() { jq -r ".default_config.builder as \$d | \$d.builders[0].$1 // \$d.$1" "${PROPOSER_CONFIG_FILE}"; }
+  BUILDER_ARGS=(
+    --payload-builder-url="$(builder url)"
+    --builder-min-bid="$(builder min_bid)"
+    --builder-boost-factor="$(builder builder_boost_factor)"
+    --builder-max-execution-payment="$(builder max_execution_payment)"
+  )
+fi
+
 # Now run nimbus VC
 # Note: Nimbus has no flag to request the stateless (include_payload=true) form of gloas
 # block production; it requests stateless only when configured with more than one beacon
@@ -76,4 +89,5 @@ exec /home/user/nimbus_validator_client \
   --metrics \
   --metrics-address=0.0.0.0 \
   --payload-builder="${BUILDER_API_ENABLED}" \
+  "${BUILDER_ARGS[@]}" \
   --distributed
