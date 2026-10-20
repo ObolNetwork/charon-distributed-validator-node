@@ -24,7 +24,7 @@ This is done with mind, that small improvements on CDVN can be made without bein
 
 # Adding Validators
 
-Starting with charon v1.6, you can add validators to your cluster using the `charon alpha add-validators` command. Note that this is an experimental feature and should not be used in production (Mainnet). The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
+Starting with charon v1.12, you can add validators to your cluster using the `charon edit add-validators` command (earlier versions use `charon alpha edit add-validators`). The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
 
 1. Review the `add-validators` command [CLI reference](https://docs.obol.org/next/learn/charon/charon-cli-reference).
 2. Ensure this folder contains a valid `.charon` directory currently used by the running node. Keep the DV node running during the process.
@@ -32,11 +32,11 @@ Starting with charon v1.6, you can add validators to your cluster using the `cha
 
 ```sh
 # If you prefer running a pre-built charon binary
-charon alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --output-dir=output
+charon edit add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --output-dir=output
 
 # Or, if you prefer running it using Docker
 # (replace 'latest' with the most recent version if needed: https://hub.docker.com/r/obolnetwork/charon/tags)
-docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:latest alpha add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --data-dir=/opt/charon/.charon --output-dir=/opt/charon/output
+docker run --rm -v "$(pwd):/opt/charon" obolnetwork/charon:latest edit add-validators --num-validators 10 --withdrawal-addresses=0x<your_withdrawal_address> --fee-recipient-addresses=0x<your_fee_recipient_address> --data-dir=/opt/charon/.charon --output-dir=/opt/charon/output
 ```
 
 This command will create a new cluster configuration that includes both existing and new validators. It will also generate the necessary keys for the new validators and deposit-data files. A new configuration will be saved in the `output` directory.

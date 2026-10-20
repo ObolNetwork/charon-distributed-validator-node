@@ -10,14 +10,12 @@ These scripts help operators replace a single operator in an existing distribute
 - **Infrastructure migration**: Moving an operator to new infrastructure
 - **Recovery**: Replacing an operator whose keys may have been compromised
 
-> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
-
 There are two scripts for the two roles involved:
 
 - **`remaining-operator.sh`** - For operators staying in the cluster
 - **`new-operator.sh`** - For the new operator joining the cluster
 
-**Important**: All participating operators (remaining + new) run the `charon alpha edit replace-operator` ceremony together. The new operator must receive the current `cluster-lock.json` BEFORE the ceremony begins.
+**Important**: All participating operators (remaining + new) run the `charon edit replace-operator` ceremony together. The new operator must receive the current `cluster-lock.json` BEFORE the ceremony begins.
 
 ## Prerequisites
 
@@ -55,7 +53,7 @@ Automates the complete workflow for operators staying in the cluster:
 ### Workflow
 
 1. **Export ASDB** - Stop VC if running and export anti-slashing database
-2. **Run ceremony** - Execute `charon alpha edit replace-operator` with new ENR
+2. **Run ceremony** - Execute `charon edit replace-operator` with new ENR
 3. **Update ASDB** - Replace pubkeys in exported ASDB to match new cluster-lock
 4. **Stop containers** - Stop charon and VC
 5. **Backup and replace** - Backup old cluster-lock, install new one
