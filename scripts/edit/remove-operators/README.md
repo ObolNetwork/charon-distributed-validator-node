@@ -12,8 +12,6 @@ These scripts help operators remove specific operators from an existing distribu
 
 **Important**: This is a coordinated ceremony. All participating operators must run their respective scripts simultaneously to complete the process.
 
-> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
-
 There are two scripts for the two roles involved:
 
 - **`remaining-operator.sh`** - For operators staying in the cluster
