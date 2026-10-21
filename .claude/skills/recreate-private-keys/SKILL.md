@@ -6,6 +6,8 @@ user-invokable: true
 
 # Recreate Private Keys
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Refresh private key shares held by operators while keeping the same validator public keys. Validators stay registered on the beacon chain - only the operator key shares change. All operators must participate simultaneously.
 
 ## Use Cases

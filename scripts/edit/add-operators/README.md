@@ -12,6 +12,8 @@ These scripts help operators expand an existing distributed validator cluster by
 
 **Important**: This is a coordinated ceremony. All operators (existing AND new) must run their respective scripts simultaneously to complete the process.
 
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
+
 There are two scripts for the two roles involved:
 
 - **`existing-operator.sh`** - For operators already in the cluster

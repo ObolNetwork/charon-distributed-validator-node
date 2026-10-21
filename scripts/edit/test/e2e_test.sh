@@ -727,7 +727,7 @@ EOF
             -v "$new_op_dir/.charon:/opt/charon/.charon" \
             -v "$new_op_dir/output:/opt/charon/output" \
             "$CHARON_IMAGE" \
-            edit replace-operator \
+            alpha edit replace-operator \
             --lock-file=/opt/charon/.charon/cluster-lock.json \
             --output-dir=/opt/charon/output \
             --old-operator-enr="$old_enr" \

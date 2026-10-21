@@ -6,6 +6,8 @@ user-invokable: true
 
 # Add Operators
 
+> **Warning:** This is an alpha feature and is not yet recommended for production use.
+
 Expand a Charon cluster by adding new operators. This is a coordinated operation involving both existing and new operators.
 
 ## Prerequisites
