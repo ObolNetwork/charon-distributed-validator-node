@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Docker creates missing bind mount directories as root. Start as root only to
+# hand /home/data to uid 1000, then re-run this script as uid 1000.
+if [ "$(id -u)" = "0" ]; then
+  chown -R 1000:1000 /home/data
+  chmod 700 /home/data
+  HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
+fi
+
 # On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
 PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
 for _ in $(seq 60); do

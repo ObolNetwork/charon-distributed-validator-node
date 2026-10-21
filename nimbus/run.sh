@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
-# Cleanup nimbus directories if they already exist.
-rm -rf /home/user/data
+# Docker creates missing bind mount directories as root. Start as root only to
+# hand /home/user/data to uid 1000, then re-run this script as uid 1000.
+if [ "$(id -u)" = "0" ]; then
+  chown -R 1000:1000 /home/user/data
+  chmod 700 /home/user/data
+  HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
+fi
+
+# Remove previously imported keys, but keep the slashing protection DB
+# (validators/slashing_protection.sqlite3*) across restarts.
+rm -rf /home/user/data/secrets /home/user/data/validators/0x*
 
 # Refer: https://nimbus.guide/keys.html
 # Running a nimbus VC involves two steps which need to run in order:
