@@ -187,7 +187,7 @@ echo ""
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit recreate-private-keys"
+log_info "Running: charon alpha edit recreate-private-keys"
 log_info "  Output directory: $OUTPUT_DIR"
 log_info ""
 log_info "The ceremony will coordinate with other operators via P2P relay."
@@ -204,8 +204,8 @@ if [ "$DRY_RUN" = false ]; then
     docker run --rm $DOCKER_FLAGS \
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.12.0}" \
-        edit recreate-private-keys \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.11.2}" \
+        alpha edit recreate-private-keys \
         --output-dir=/opt/charon/output
 
     # Verify ceremony output
@@ -217,7 +217,7 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
 else
-    echo "  [DRY-RUN] docker run --rm -it ... charon edit recreate-private-keys --output-dir=output"
+    echo "  [DRY-RUN] docker run --rm -it ... charon alpha edit recreate-private-keys --output-dir=output"
 fi
 
 echo ""

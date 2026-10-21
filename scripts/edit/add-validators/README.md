@@ -11,6 +11,8 @@ This script helps operators add new validators to an existing distributed valida
 
 **Important**: This is a coordinated ceremony. All operators must run this script simultaneously to complete the process.
 
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
+
 ## Prerequisites
 
 - `.env` file with `NETWORK` and `VC` variables set

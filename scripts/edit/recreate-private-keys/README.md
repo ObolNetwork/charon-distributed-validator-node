@@ -12,6 +12,8 @@ This script helps operators recreate validator private key shares while keeping 
 
 **Important**: This operation maintains the same validator public keys, so validators remain registered on the beacon chain without any changes. Only the underlying private key shares held by operators are refreshed.
 
+> **Warning**: This is an alpha feature in Charon and is not yet recommended for production use.
+
 ## Prerequisites
 
 - `.env` file with `NETWORK` and `VC` variables set

@@ -167,7 +167,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.12.0}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.11.2}" \
                 create enr
         else
             echo "  [DRY-RUN] docker run --rm ... charon create enr"
@@ -187,7 +187,7 @@ if [ "$GENERATE_ENR" = true ]; then
         if [ "$DRY_RUN" = false ]; then
             ENR=$(docker run --rm \
                 -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
-                "obolnetwork/charon:${CHARON_VERSION:-v1.12.0}" \
+                "obolnetwork/charon:${CHARON_VERSION:-v1.11.2}" \
                 enr 2>/dev/null || echo "")
 
             if [ -n "$ENR" ]; then
@@ -288,7 +288,7 @@ echo ""
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit add-operators"
+log_info "Running: charon alpha edit add-operators"
 log_info "  New operator ENRs: ${NEW_OPERATOR_ENRS:0:80}..."
 log_info "  Output directory: $OUTPUT_DIR"
 log_info ""
@@ -314,8 +314,8 @@ if [ "$DRY_RUN" = false ]; then
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
         -v "$CLUSTER_LOCK_MOUNT:/opt/charon/cluster-lock.json:ro" \
-        "obolnetwork/charon:${CHARON_VERSION:-v1.12.0}" \
-        edit add-operators \
+        "obolnetwork/charon:${CHARON_VERSION:-v1.11.2}" \
+        alpha edit add-operators \
         --new-operator-enrs="$NEW_OPERATOR_ENRS" \
         --output-dir=/opt/charon/output \
         --lock-file=/opt/charon/cluster-lock.json \
@@ -332,7 +332,7 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
 else
-    echo "  [DRY-RUN] docker run --rm -it ... charon edit add-operators --new-operator-enrs=... --output-dir=$OUTPUT_DIR --lock-file=... --private-key-file=..."
+    echo "  [DRY-RUN] docker run --rm -it ... charon alpha edit add-operators --new-operator-enrs=... --output-dir=$OUTPUT_DIR --lock-file=... --private-key-file=..."
 fi
 
 echo ""
