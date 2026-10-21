@@ -214,7 +214,7 @@ log_warn "All operators (remaining + new) must run the ceremony together."
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit replace-operator"
+log_info "Running: charon alpha edit replace-operator"
 log_info "  Old ENR: ${OLD_ENR:0:50}..."
 log_info "  New ENR: ${NEW_ENR:0:50}..."
 
@@ -229,13 +229,13 @@ if [ "$DRY_RUN" = false ]; then
         -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
         "obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}" \
-        edit replace-operator \
+        alpha edit replace-operator \
         --lock-file=/opt/charon/.charon/cluster-lock.json \
         --output-dir=/opt/charon/output \
         --old-operator-enr="$OLD_ENR" \
         --new-operator-enr="$NEW_ENR"
 else
-    echo "  [DRY-RUN] docker run --rm ... charon edit replace-operator ..."
+    echo "  [DRY-RUN] docker run --rm ... charon alpha edit replace-operator ..."
 fi
 
 log_info "New cluster-lock generated at $OUTPUT_DIR/cluster-lock.json"

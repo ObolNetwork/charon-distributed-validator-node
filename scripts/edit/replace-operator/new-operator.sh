@@ -2,7 +2,7 @@
 
 # Replace-Operator Script for NEW Operator - See README.md for documentation
 # The new operator participates in the ceremony together with remaining operators.
-# Both run the same `charon edit replace-operator` command.
+# Both run the same `charon alpha edit replace-operator` command.
 
 set -euo pipefail
 
@@ -281,13 +281,13 @@ if [ -n "$CLUSTER_LOCK_PATH" ] && [ -n "$OLD_ENR" ]; then
             -v "$REPO_ROOT/.charon:/opt/charon/.charon" \
             -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output" \
             "obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}" \
-            edit replace-operator \
+            alpha edit replace-operator \
             --lock-file=/opt/charon/.charon/cluster-lock.json \
             --output-dir=/opt/charon/output \
             --old-operator-enr="$OLD_ENR" \
             --new-operator-enr="$OUR_ENR"
     else
-        echo "  [DRY-RUN] docker run --rm ... charon edit replace-operator ..."
+        echo "  [DRY-RUN] docker run --rm ... charon alpha edit replace-operator ..."
     fi
     
     log_info "Ceremony completed successfully"

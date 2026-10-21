@@ -226,7 +226,7 @@ echo ""
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit add-validators"
+log_info "Running: charon alpha edit add-validators"
 log_info "  Number of validators: $NUM_VALIDATORS"
 log_info "  Output directory: $OUTPUT_DIR"
 log_info ""
@@ -246,7 +246,7 @@ DOCKER_ARGS=(
     -v "$REPO_ROOT/.charon:/opt/charon/.charon"
     -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output"
     "obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}"
-    edit add-validators
+    alpha edit add-validators
     --num-validators="$NUM_VALIDATORS"
     --output-dir=/opt/charon/output
 )
@@ -276,7 +276,7 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
 else
-    echo "  [DRY-RUN] docker run --rm -it ... charon edit add-validators --num-validators=$NUM_VALIDATORS --output-dir=$OUTPUT_DIR"
+    echo "  [DRY-RUN] docker run --rm -it ... charon alpha edit add-validators --num-validators=$NUM_VALIDATORS --output-dir=$OUTPUT_DIR"
 fi
 
 echo ""

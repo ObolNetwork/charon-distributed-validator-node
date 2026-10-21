@@ -239,7 +239,7 @@ echo ""
 
 mkdir -p "$OUTPUT_DIR"
 
-log_info "Running: charon edit remove-operators"
+log_info "Running: charon alpha edit remove-operators"
 log_info "  Operators to remove: ${OPERATOR_ENRS_TO_REMOVE:0:80}..."
 log_info "  Output directory: $OUTPUT_DIR"
 log_info ""
@@ -260,7 +260,7 @@ if [ "$DRY_RUN" = false ]; then
         -v "$REPO_ROOT/.charon:/opt/charon/.charon"
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output"
         "obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}"
-        edit remove-operators
+        alpha edit remove-operators
         --operator-enrs-to-remove="$OPERATOR_ENRS_TO_REMOVE"
         --output-dir=/opt/charon/output
     )
@@ -286,7 +286,7 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
 else
-    echo "  [DRY-RUN] docker run --rm -it ... charon edit remove-operators --operator-enrs-to-remove=... --output-dir=$OUTPUT_DIR"
+    echo "  [DRY-RUN] docker run --rm -it ... charon alpha edit remove-operators --operator-enrs-to-remove=... --output-dir=$OUTPUT_DIR"
 fi
 
 echo ""
