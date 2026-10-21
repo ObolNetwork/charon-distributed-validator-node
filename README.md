@@ -24,7 +24,7 @@ This is done with mind, that small improvements on CDVN can be made without bein
 
 # Adding Validators
 
-Starting with charon v1.12, you can add validators to your cluster using the `charon edit add-validators` command (earlier versions use `charon alpha edit add-validators`). The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
+Starting with charon v2.0, you can add validators to your cluster using the `charon edit add-validators` command (earlier versions use `charon alpha edit add-validators`). The example below is designed for the default configuration provided by this repository and assumes the stack uses the Lodestar validator client.
 
 1. Review the `add-validators` command [CLI reference](https://docs.obol.org/next/learn/charon/charon-cli-reference).
 2. Ensure this folder contains a valid `.charon` directory currently used by the running node. Keep the DV node running during the process.
