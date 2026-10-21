@@ -19,7 +19,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$TEST_DIR/../../.." && pwd)"
-CHARON_VERSION="${CHARON_VERSION:-v1.12.0}"
+CHARON_VERSION="${CHARON_VERSION:-v1.11.2}"
 CHARON_IMAGE="obolnetwork/charon:${CHARON_VERSION}"
 LODESTAR_IMAGE="chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}"
 NUM_OPERATORS=4
@@ -727,7 +727,7 @@ EOF
             -v "$new_op_dir/.charon:/opt/charon/.charon" \
             -v "$new_op_dir/output:/opt/charon/output" \
             "$CHARON_IMAGE" \
-            edit replace-operator \
+            alpha edit replace-operator \
             --lock-file=/opt/charon/.charon/cluster-lock.json \
             --output-dir=/opt/charon/output \
             --old-operator-enr="$old_enr" \
