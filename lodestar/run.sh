@@ -87,6 +87,8 @@ else
     echo "proposer-config.json not found, running without proposer settings"
 fi
 
+# Request the stateful gloas block form (payload kept on the beacon node), which charon expects from
+# distributed validators.
 # Word splitting of $PROPOSER_SETTINGS is intentional, it holds zero or more flags.
 # shellcheck disable=SC2086
 exec node /usr/app/packages/cli/bin/lodestar validator \
@@ -101,5 +103,5 @@ exec node /usr/app/packages/cli/bin/lodestar validator \
     --builder="$BUILDER_API_ENABLED" \
     --builder.selection="$BUILDER_SELECTION" \
     --distributed \
-    --payloadLocal=false \
+    --payloadLocal=true \
     $PROPOSER_SETTINGS
