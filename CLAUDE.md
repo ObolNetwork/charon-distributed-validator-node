@@ -35,7 +35,7 @@ The repository uses a **profile-based multi-client architecture** where differen
 
 - **Execution Layer**: `el-nethermind`, `el-reth`, `el-none`
 - **Consensus Layer**: `cl-lighthouse`, `cl-grandine`, `cl-teku`, `cl-lodestar`, `cl-none`
-- **Validator Clients**: `vc-lodestar`, `vc-nimbus`, `vc-prysm`, `vc-teku`
+- **Validator Clients**: `vc-lighthouse`, `vc-lodestar`, `vc-nimbus`, `vc-prysm`, `vc-teku`
 - **MEV Clients**: `mev-mevboost`, `mev-commitboost`, `mev-none`
 
 > **Pick non-default clients where you can.** Two reasons to swap:
@@ -114,8 +114,8 @@ docker compose exec charon charon alpha test <suite> --publish   # infra | peers
 
 ### Environment Setup
 
-1. Copy the appropriate sample file: `.env.sample.mainnet` or `.env.sample.hoodi` → `.env`
-2. Set `NETWORK` (mainnet, hoodi). Sepolia is adaptable by setting `NETWORK=sepolia` and updating checkpoint-sync / MEV relay URLs. **Do not use gnosis, chiado, or holesky** — gnosis/chiado are deprecated for Obol; holesky is dead.
+1. Copy the appropriate sample file: `.env.sample.mainnet`, `.env.sample.hoodi` or `.env.sample.sepolia` → `.env`
+2. Set `NETWORK` (mainnet, hoodi, sepolia). **Do not use gnosis, chiado, or holesky** — gnosis/chiado are deprecated for Obol; holesky is dead.
 3. Select clients by uncommenting the desired `EL`, `CL`, `VC`, `MEV` variables
 4. Configure optional settings (ports, external hostnames, monitoring tokens, etc.)
 

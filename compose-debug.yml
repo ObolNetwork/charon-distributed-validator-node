@@ -5,7 +5,7 @@
 
 services:
   cadvisor:
-    image: ghcr.io/google/cadvisor:${CADVISOR_VERSION:-v0.60.5}
+    image: ghcr.io/google/cadvisor:${CADVISOR_VERSION:-v0.60.6}
     command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
     privileged: true
     volumes:
@@ -19,10 +19,10 @@ services:
     restart: unless-stopped
 
   node-exporter:
-    image: bitnamilegacy/node-exporter:${NODE_EXPORTER_VERSION:-1.9.1}
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v1.12.1}
 
   tempo:
-    image: grafana/tempo:${TEMPO_VERSION:-2.10.8}
+    image: grafana/tempo:${TEMPO_VERSION:-3.1.0}
     user: ":"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-3.7.6}
+    image: grafana/loki:${LOKI_VERSION:-3.7.8}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:

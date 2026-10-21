@@ -44,6 +44,48 @@ rm -r ${tmpkeys}
 
 echo "Imported all keys"
 
+# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
+PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
+for _ in $(seq 60); do
+  [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
+    sleep 2
+done
+
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
+  echo "proposer-config.json found, rendering per-validator proposer settings"
+
+  # Resolve each imported validator's settings: proposer_config entries only carry
+  # fields diverging from default_config, absent fields fall back to it.
+  config="${PROPOSER_CONFIG_FILE}"
+  for f in /home/validator_keys/keystore-*.json; do
+    pubkey="0x$(jq -r .pubkey "${f}")"
+    fee_recipient=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].fee_recipient // .default_config.fee_recipient' "${config}")
+    gas_limit=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].gas_limit // .default_config.gas_limit' "${config}")
+
+    for dir in "/home/user/data/validators/${pubkey}" "/home/user/data/validators/${pubkey#0x}"; do
+      if [[ -d "${dir}" ]]; then
+        echo "${fee_recipient}" >"${dir}/suggested_fee_recipient.hex"
+        echo "${gas_limit}" >"${dir}/suggested_gas_limit.json"
+      fi
+    done
+  done
+else
+  echo "proposer-config.json not found, running without proposer settings"
+fi
+
+# Nimbus takes a single builder: pass the first of charon's builders, whose request auth it
+# signs inline with each gloas block request for charon to aggregate.
+BUILDER_ARGS=()
+if [[ -f "${PROPOSER_CONFIG_FILE}" ]] && jq -e '.default_config.builder.builders[0]' "${PROPOSER_CONFIG_FILE}" >/dev/null; then
+  builder() { jq -r ".default_config.builder as \$d | \$d.builders[0].$1 // \$d.$1" "${PROPOSER_CONFIG_FILE}"; }
+  BUILDER_ARGS=(
+    --payload-builder-url="$(builder url)"
+    --builder-min-bid="$(builder min_bid)"
+    --builder-boost-factor="$(builder builder_boost_factor)"
+    --builder-max-execution-payment="$(builder max_execution_payment)"
+  )
+fi
+
 # Now run nimbus VC
 exec /home/user/nimbus_validator_client \
   --data-dir=/home/user/data \
@@ -51,5 +93,6 @@ exec /home/user/nimbus_validator_client \
   --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder=${BUILDER_API_ENABLED} \
+  --payload-builder="${BUILDER_API_ENABLED}" \
+  "${BUILDER_ARGS[@]}" \
   --distributed

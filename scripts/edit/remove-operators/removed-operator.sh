@@ -235,7 +235,7 @@ if [ "$DRY_RUN" = false ]; then
         run --rm $DOCKER_FLAGS
         -v "$REPO_ROOT/.charon:/opt/charon/.charon"
         -v "$REPO_ROOT/$OUTPUT_DIR:/opt/charon/output"
-        "obolnetwork/charon:${CHARON_VERSION:-v1.11.2}"
+        "obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}"
         alpha edit remove-operators
         --operator-enrs-to-remove="$OPERATOR_ENRS_TO_REMOVE"
         --participating-operator-enrs="$PARTICIPATING_OPERATOR_ENRS"

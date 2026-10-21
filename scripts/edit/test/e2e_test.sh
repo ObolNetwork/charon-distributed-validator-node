@@ -19,7 +19,7 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$TEST_DIR/../../.." && pwd)"
-CHARON_VERSION="${CHARON_VERSION:-v1.11.2}"
+CHARON_VERSION="${CHARON_VERSION:-v2.0.0-rc2}"
 CHARON_IMAGE="obolnetwork/charon:${CHARON_VERSION}"
 LODESTAR_IMAGE="chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.38.0}"
 NUM_OPERATORS=4
