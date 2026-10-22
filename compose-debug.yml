@@ -22,7 +22,7 @@ services:
     image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v1.12.1}
 
   tempo:
-    image: grafana/tempo:${TEMPO_VERSION:-3.1.0}
+    image: grafana/tempo:${TEMPO_VERSION:-3.1.1}
     user: ":"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-3.7.8}
+    image: grafana/loki:${LOKI_VERSION:-3.7.9}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:

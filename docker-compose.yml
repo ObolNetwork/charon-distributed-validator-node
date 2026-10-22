@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.0}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.1}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -173,7 +173,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.15.0}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.15.1}
     user: ":"
     networks: [dvnode]
     environment:
@@ -188,7 +188,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-13.2.3}
+    image: grafana/grafana:${GRAFANA_VERSION:-13.2.4}
     user: ":"
     ports:
       - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
