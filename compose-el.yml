@@ -48,7 +48,7 @@ services:
 
   el-reth:
     profiles: [el-reth]
-    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v2.7.0}
+    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v2.8.0}
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
