@@ -11,7 +11,7 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.46.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.50.0}
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -36,11 +36,11 @@ services:
 
   vc-nimbus:
     profiles: [vc-nimbus]
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.7.0}"
+    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.1}"
     build:
       context: nimbus
       args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.7.0}
+        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.1}
     # Starts as root so run.sh can hand ./data/vc-nimbus to uid 1000; Nimbus itself runs as uid 1000.
     user: root
     entrypoint: /home/user/run.sh
@@ -65,7 +65,7 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.1.8}
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.3.0}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
@@ -89,7 +89,7 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: consensys/teku:${VC_TEKU_VERSION:-26.8.0}
+    image: consensys/teku:${VC_TEKU_VERSION:-26.10.1}
     # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
     user: root
     entrypoint: /opt/charon/teku/run.sh
