@@ -12,7 +12,7 @@ services:
 
   cl-grandine:
     profiles: [ cl-grandine ]
-    image: sifrai/grandine:${GRANDINE_VERSION:-3.0.0-rc.1}
+    image: sifrai/grandine:${GRANDINE_VERSION:-3.0.0-rc.2}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_GRANDINE_ALLOY_MONITORED:-true}"
@@ -47,7 +47,7 @@ services:
 
   cl-lighthouse:
     profiles: [ cl-lighthouse ]
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.2}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LIGHTHOUSE_ALLOY_MONITORED:-true}"
@@ -84,7 +84,7 @@ services:
 
   cl-teku:
     profiles: [ cl-teku ]
-    image: consensys/teku:${CL_TEKU_VERSION:-26.10.1}
+    image: consensys/teku:${CL_TEKU_VERSION:-26.10.2}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
@@ -120,7 +120,7 @@ services:
 
   cl-lodestar:
     profiles: [ cl-lodestar ]
-    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.0}
+    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.1}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
@@ -156,7 +156,7 @@ services:
 
   cl-prysm:
     profiles: [ cl-prysm ]
-    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.3.0}
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.3.1}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_PRYSM_ALLOY_MONITORED:-true}"
@@ -191,7 +191,7 @@ services:
 
   cl-nimbus:
     profiles: [ cl-nimbus ]
-    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.10.1}
+    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.10.2}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_NIMBUS_ALLOY_MONITORED:-true}"
