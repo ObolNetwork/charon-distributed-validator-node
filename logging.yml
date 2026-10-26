@@ -7,11 +7,24 @@ services:
       CLUSTER_PEER: ${CLUSTER_PEER}
     volumes:
       - ./alloy:/etc/alloy
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks: [dvnode]
+    networks: [dvnode, docker-api]
+    depends_on: [docker-socket-proxy]
     entrypoint: /etc/alloy/run.sh
     command: ["/bin/alloy", "run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data"]
     restart: unless-stopped
 
+  # Gives Alloy read-only access to container metadata and logs instead of the full Docker API.
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:${DOCKER_SOCKET_PROXY_VERSION:-v0.5.0}
+    environment:
+      CONTAINERS: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [docker-api]
+    restart: unless-stopped
+
 networks:
   dvnode:
+  # Only Alloy and the Docker socket proxy join this network, and it has no external access.
+  docker-api:
+    internal: true

@@ -206,6 +206,25 @@ docker compose down cl-grandine
 docker compose up cl-grandine -d
 ```
 
+# Security
+
+- **Grafana is only published on `127.0.0.1`.** To view it from another machine, use an SSH tunnel: `ssh -L 3000:127.0.0.1:3000 <user>@<node>`, then open `http://localhost:3000`. Anonymous visitors get read-only access, and password logins are disabled because dashboards and datasources are provisioned from this repo.
+- **Docker-published ports bypass host firewalls such as `ufw`.** Only bind a port to a non-loopback address (e.g. `MONITORING_IP_GRAFANA`, `EL_IP_HTTP`) if a provider or network firewall restricts who can reach it. By default only the P2P ports are published on all interfaces.
+- **Avoid descriptive hostnames.** DNS names and TLS certificates naming the network or what the node runs (e.g. `mainnet`, `validator`) make a node easy to find with internet-wide scans.
+- **If you ran a release before the Grafana hardening,** Grafana now starts from a fresh Docker volume and no longer uses `data/grafana`. After upgrading, run `./grafana/security-check.sh` (it may need `sudo`). It reports whether Grafana is published on a public address and lists any service accounts, tokens, users, datasources and plugins in the old `data/grafana` that this stack does not create. Report findings to security@obol.tech, then delete `data/grafana`.
+- **Upgrading leaves the old Grafana database behind.** Anything created in the Grafana UI, such as custom dashboards, alert rules, contact points or users, stays in the unused `data/grafana` and does not carry over to the fresh Grafana. Before upgrading, export any custom dashboards (Share > Export) and note your alert rules. Do not copy the old database across, as it may contain unauthorized changes. To set customizations up again, add dashboards as JSON files under `grafana/dashboards/`, or re-enable logins with your own admin password in a `docker-compose.override.yml`, adding `:docker-compose.override.yml` to the end of `COMPOSE_FILE` in `.env` so it is loaded:
+
+  ```yaml
+  services:
+    grafana:
+      environment:
+        GF_AUTH_DISABLE_LOGIN_FORM: "false"
+        GF_AUTH_BASIC_ENABLED: "true"
+        GF_SECURITY_ADMIN_PASSWORD: "<a strong password>"
+  ```
+
+  `GF_SECURITY_ADMIN_PASSWORD` only applies when Grafana creates its database. If Grafana has already started, set the password with `docker compose exec grafana grafana cli admin reset-admin-password '<a strong password>'`. Keep Grafana bound to `127.0.0.1` either way.
+
 # FAQs
 
 Check the Obol docs for frequent [errors and resolutions](https://docs.obol.org/docs/faq/errors)
