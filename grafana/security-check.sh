@@ -21,10 +21,11 @@ findings=0
 warn() {
   echo "  [!] $*"
   findings=$((findings + 1))
+  return 0
 }
 
 echo "== Grafana port binding"
-if binding=$(docker compose port grafana 3000 2>/dev/null) && [ -n "$binding" ]; then
+if binding=$(docker compose port grafana 3000 2>/dev/null) && [[ -n "$binding" ]]; then
   echo "  grafana:3000 is published on $binding"
   case "$binding" in
     127.0.0.1:* | "[::1]:"*) echo "  OK: only reachable from this host" ;;
@@ -36,9 +37,9 @@ fi
 
 echo
 echo "== Grafana database ($DB)"
-if [ ! -e "$DB" ]; then
+if [[ ! -e "$DB" ]]; then
   echo "  not found, nothing to check"
-elif [ ! -r "$DB" ]; then
+elif [[ ! -r "$DB" ]]; then
   echo "  cannot read it, re-run with sudo"
   exit 2
 elif ! command -v python3 >/dev/null; then
@@ -72,7 +73,7 @@ for name, kind, url, created in rows("SELECT name, type, url, created FROM data_
         print(f"datasource: {name} type={kind} url={url} (created {created})")
 EOF
   )
-  if [ -n "$db_findings" ]; then
+  if [[ -n "$db_findings" ]]; then
     while IFS= read -r line; do warn "$line"; done <<<"$db_findings"
   else
     echo "  OK: no service accounts, tokens, extra users or unexpected datasources"
@@ -82,9 +83,9 @@ fi
 echo
 echo "== Grafana plugins ($PLUGINS_DIR)"
 unexpected_plugins=0
-if [ -d "$PLUGINS_DIR" ]; then
+if [[ -d "$PLUGINS_DIR" ]]; then
   for plugin in "$PLUGINS_DIR"/*; do
-    [ -e "$plugin" ] || continue
+    [[ -e "$plugin" ]] || continue
     name=$(basename "$plugin")
     case " $EXPECTED_PLUGINS " in
       *" $name "*) echo "  preinstalled by Grafana: $name" ;;
@@ -95,10 +96,10 @@ if [ -d "$PLUGINS_DIR" ]; then
     esac
   done
 fi
-[ "$unexpected_plugins" -eq 0 ] && echo "  OK: no unexpected plugins installed"
+[[ "$unexpected_plugins" -eq 0 ]] && echo "  OK: no unexpected plugins installed"
 
 echo
-if [ "$findings" -eq 0 ]; then
+if [[ "$findings" -eq 0 ]]; then
   echo "No issues found."
 else
   echo "Found $findings issue(s). This stack provisions everything Grafana needs from files, so service accounts,"
@@ -106,9 +107,9 @@ else
   echo "Please report it to security@obol.tech."
 fi
 
-if [ -d "$(dirname "$DB")" ]; then
+if [[ -d "$(dirname "$DB")" ]]; then
   echo
   echo "Grafana no longer uses $(dirname "$DB"). Delete it with: sudo rm -rf $(dirname "$DB")"
 fi
 
-[ "$findings" -eq 0 ]
+[[ "$findings" -eq 0 ]]
