@@ -1,5 +1,5 @@
 discovery.docker "docker" {
-	host = "unix:///var/run/docker.sock"
+	host = "tcp://docker-socket-proxy:2375"
 }
 
 loki.process "docker" {
@@ -70,7 +70,7 @@ discovery.relabel "docker" {
 }
 
 loki.source.docker "docker" {
-	host          = "unix:///var/run/docker.sock"
+	host          = "tcp://docker-socket-proxy:2375"
 	targets       = discovery.docker.docker.targets
 	forward_to    = [loki.process.docker.receiver]
 	relabel_rules = discovery.relabel.docker.rules
