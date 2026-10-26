@@ -10,7 +10,7 @@ services:
   # |_| |_|\___|\__|_| |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|
 
   nethermind:
-    image: nethermind/nethermind:${NETHERMIND_VERSION:-2.2.0}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-2.2.1}
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -48,7 +48,7 @@ services:
   #      |___/
 
   lighthouse:
-    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.1}
+    image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.2}
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -127,7 +127,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.0}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.1}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh

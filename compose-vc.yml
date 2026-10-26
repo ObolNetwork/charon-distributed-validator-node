@@ -15,7 +15,7 @@ services:
 
   vc-lodestar:
     profiles: [vc-lodestar]
-    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.50.0}
+    image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.50.1}
     depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/lodestar/run.sh
@@ -42,11 +42,11 @@ services:
 
   vc-lighthouse:
     profiles: [vc-lighthouse]
-    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.3.1}"
+    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.3.2}"
     build:
       context: lighthouse
       args:
-        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.3.1}
+        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.3.2}
     depends_on: [charon]
     networks: [dvnode]
     entrypoint: /opt/lighthouse/run.sh
@@ -73,11 +73,11 @@ services:
     profiles: [vc-nimbus]
     # The -jq suffix makes compose build the image again, as the previous one lacks jq: compose
     # only builds an image it doesn't have yet.
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.1}-jq"
+    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.2}-jq"
     build:
       context: nimbus
       args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.1}
+        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.2}
     # Starts as root so run.sh can hand ./data/vc-nimbus to uid 1000; Nimbus itself runs as uid 1000.
     user: root
     entrypoint: /home/user/run.sh
@@ -103,11 +103,11 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.3.0}"
+    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.3.1}"
     build:
       context: prysm
       args:
-        VERSION: ${VC_PRYSM_VERSION:-v7.3.0}
+        VERSION: ${VC_PRYSM_VERSION:-v7.3.1}
     platform: "linux/amd64"
     depends_on: [charon]
     networks: [dvnode]
@@ -133,11 +133,11 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: "teku-validator-client:${VC_TEKU_VERSION:-26.10.1}"
+    image: "teku-validator-client:${VC_TEKU_VERSION:-26.10.2}"
     build:
       context: teku
       args:
-        VERSION: ${VC_TEKU_VERSION:-26.10.1}
+        VERSION: ${VC_TEKU_VERSION:-26.10.2}
     # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
     user: root
     depends_on: [charon]
