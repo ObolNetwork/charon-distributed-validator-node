@@ -14,8 +14,12 @@ set -uo pipefail
 DB="${GRAFANA_DB:-data/grafana/grafana.db}"
 PLUGINS_DIR="${GRAFANA_PLUGINS_DIR:-data/grafana/plugins}"
 EXPECTED_DATASOURCES="Prometheus Loki Tempo"
-# Grafana Labs apps that Grafana preinstalls itself.
-EXPECTED_PLUGINS="grafana-lokiexplore-app grafana-exploretraces-app grafana-metricsdrilldown-app grafana-pyroscope-app"
+# Plugins that Grafana 13 preinstalls and keeps updated in data/grafana/plugins by itself, including core
+# datasources that Grafana now ships as separate plugins. See "Installing plugins" in Grafana's startup log.
+EXPECTED_PLUGINS="elasticsearch grafana-advisor-app grafana-exploretraces-app grafana-lokiexplore-app
+grafana-metricsdrilldown-app grafana-postgresql-datasource grafana-pyroscope-app grafana-pyroscope-datasource
+influxdb jaeger loki mssql mysql opentsdb prometheus stackdriver tempo zipkin"
+EXPECTED_PLUGINS="${EXPECTED_PLUGINS//$'\n'/ }"
 findings=0
 
 warn() {
