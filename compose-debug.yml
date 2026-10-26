@@ -28,6 +28,8 @@ services:
     volumes:
       - ./tempo:/etc/tempo
       - ./data/tempo:/opt/tempo
+    # Grafana reaches Tempo and Loki over the monitoring network defined in docker-compose.yml.
+    networks: [default, monitoring]
     restart: unless-stopped
 
   loki:
@@ -37,6 +39,7 @@ services:
     volumes:
       - ./loki/loki.yml:/etc/loki/loki.yml
       - ./data/loki:/loki
+    networks: [default, monitoring]
     restart: unless-stopped
 
   charon:
