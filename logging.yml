@@ -18,6 +18,8 @@ services:
     image: tecnativa/docker-socket-proxy:${DOCKER_SOCKET_PROXY_VERSION:-v0.5.0}
     environment:
       CONTAINERS: 1
+      # Alloy's container discovery also lists networks.
+      NETWORKS: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks: [docker-api]
