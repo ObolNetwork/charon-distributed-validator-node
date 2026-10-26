@@ -52,7 +52,7 @@ services:
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
-      - 5054:5054/tcp # P2P TCP
+      - ${LIGHTHOUSE_IP_METRICS:-127.0.0.1}:5054:5054/tcp # Metrics
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/udp # P2P UDP
       - ${LIGHTHOUSE_IP_HTTP:-127.0.0.1}:${LIGHTHOUSE_PORT_HTTP:-5052}:5052 # BN TCP
     labels:
@@ -174,7 +174,7 @@ services:
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v3.15.1}
     user: ":"
-    networks: [dvnode]
+    networks: [dvnode, monitoring]
     environment:
       PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN}
       SERVICE_OWNER: ${SERVICE_OWNER:-obol-cdvn}
@@ -188,17 +188,24 @@ services:
 
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-13.2.4}
-    user: ":"
     ports:
-      - ${MONITORING_IP_GRAFANA:-0.0.0.0}:${MONITORING_PORT_GRAFANA:-3000}:3000
-    networks: [dvnode]
+      - ${MONITORING_IP_GRAFANA:-127.0.0.1}:${MONITORING_PORT_GRAFANA:-3000}:3000
+    networks: [monitoring]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
     volumes:
       - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/datasource.yml
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/dashboards:/etc/dashboards
-      - ./data/grafana:/var/lib/grafana
+      # A named volume lets Grafana run as its own non-root user. Nothing in it needs keeping: dashboards and datasources are provisioned.
+      - grafana-data:/var/lib/grafana
     restart: unless-stopped
 
 networks:
   dvnode:
+  # Grafana only joins this network, so it can reach the monitoring backends but not charon or the clients.
+  monitoring:
+
+volumes:
+  grafana-data:

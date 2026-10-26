@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: read
 jobs:
   create_containers:
     # Ensures default fresh checkout can create containers.
@@ -12,3 +14,25 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
     - run: docker compose up --no-start
     - run: docker compose -f docker-compose.yml -f compose-debug.yml up --no-start
+
+  check_exposure:
+    # Ensures the defaults only expose P2P ports and keep anonymous Grafana access read-only.
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+    - run: 'pip install --only-binary :all: pyyaml==6.0.2'
+    - run: python3 .github/scripts/check_exposure.py
+
+  render_configs:
+    # Ensures every sample .env and the logging overlay produce a valid merged compose config.
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+    - run: |
+        for env in .env.sample.*; do
+          echo "Rendering $env"
+          cp "$env" .env
+          docker compose --profile '*' config --quiet
+        done
+        rm .env
+        docker compose -f docker-compose.yml -f logging.yml config --quiet

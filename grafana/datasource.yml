@@ -20,7 +20,7 @@ datasources:
       tlsAuth: false
       tlsAuthWithCACert: false
     version: 1
-    editable: true
+    editable: false
 
   - name: Loki
     type: loki
@@ -30,7 +30,7 @@ datasources:
     basicAuth: false
     isDefault: false
     version: 1
-    editable: true
+    editable: false
 
   - name: Tempo
     type: tempo
@@ -40,4 +40,4 @@ datasources:
     basicAuth: false
     isDefault: false
     version: 1
-    editable: true
+    editable: false
