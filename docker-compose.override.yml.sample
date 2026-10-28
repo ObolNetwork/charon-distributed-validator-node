@@ -18,19 +18,19 @@
   #nethermind:
     # Disable nethermind
     #profiles: [disable]
-    # Bind nethermind internal ports to host ports
+    # Bind nethermind internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 8545:8545 # JSON-RPC
-      #- 8551:8551 # AUTH-RPC
-      #- 8008:8008 # Metrics
+      #- 127.0.0.1:8545:8545 # JSON-RPC
+      #- 127.0.0.1:8551:8551 # AUTH-RPC
+      #- 127.0.0.1:8008:8008 # Metrics
 
   #lighthouse:
     # Disable lighthouse
     #profiles: [disable]
-    # Bind lighthouse internal ports to host ports
+    # Bind lighthouse internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 5052:5052 # HTTP
-      #- 5054:5054 # Metrics
+      #- 127.0.0.1:5052:5052 # HTTP
+      #- 127.0.0.1:5054:5054 # Metrics
 
   #charon:
     # Configure any additional env var flags in .env.charon.more
@@ -38,28 +38,28 @@
     # Uncomment the extra_hosts section if you are trying to communicate with a CL running in a different docker network on the same machine 
     #extra_hosts:
       #- "host.docker.internal:host-gateway"
-    # Bind charon internal ports to host ports
+    # Bind charon internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 3600:3600/tcp # Validator API
-      #- 3620:3620/tcp # Monitoring
+      #- 127.0.0.1:3600:3600/tcp # Validator API
+      #- 127.0.0.1:3620:3620/tcp # Monitoring
 
   #lodestar:
     # Disable lodestar
     #profiles: [disable]
-    # Bind lodestar internal ports to host ports
+    # Bind lodestar internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 5064:5064 # Metrics
+      #- 127.0.0.1:5064:5064 # Metrics
 
   #prometheus:
     # Disable prometheus
     #profiles: [disable]
-    # Bind prometheus internal ports to host ports
+    # Bind prometheus internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 9090:9090 # Metrics
+      #- 127.0.0.1:9090:9090 # Metrics
 
   #mev-boost:
     # Disable mev-boost
     #profiles: [disable]
-    # Bind mev-boost internal ports to host ports
+    # Bind mev-boost internal ports to host ports. Keep 127.0.0.1: Docker-published ports bypass ufw and other host firewalls.
     #ports:
-      #- 18550:18550 # Metrics
+      #- 127.0.0.1:18550:18550 # Metrics
