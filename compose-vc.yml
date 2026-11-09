@@ -133,11 +133,11 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: "teku-validator-client:${VC_TEKU_VERSION:-26.10.2}"
+    image: "teku-validator-client:${VC_TEKU_VERSION:-26.10.3}"
     build:
       context: teku
       args:
-        VERSION: ${VC_TEKU_VERSION:-26.10.2}
+        VERSION: ${VC_TEKU_VERSION:-26.10.3}
     # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
     user: root
     depends_on: [charon]
