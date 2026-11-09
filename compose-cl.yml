@@ -84,7 +84,7 @@ services:
 
   cl-teku:
     profiles: [ cl-teku ]
-    image: consensys/teku:${CL_TEKU_VERSION:-26.10.1}
+    image: consensys/teku:${CL_TEKU_VERSION:-26.10.3}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
@@ -120,7 +120,7 @@ services:
 
   cl-lodestar:
     profiles: [ cl-lodestar ]
-    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.0}
+    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.1}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
@@ -156,7 +156,7 @@ services:
 
   cl-prysm:
     profiles: [ cl-prysm ]
-    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.3.0}
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.3.1}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_PRYSM_ALLOY_MONITORED:-true}"
@@ -191,7 +191,7 @@ services:
 
   cl-nimbus:
     profiles: [ cl-nimbus ]
-    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.10.1}
+    image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.10.2}
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_NIMBUS_ALLOY_MONITORED:-true}"
