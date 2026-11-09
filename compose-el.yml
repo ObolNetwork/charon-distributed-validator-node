@@ -11,7 +11,7 @@ services:
 
   el-nethermind:
     profiles: [el-nethermind]
-    image: nethermind/nethermind:${EL_NETHERMIND_VERSION:-2.2.1}
+    image: nethermind/nethermind:${NETHERMIND_VERSION:-${EL_NETHERMIND_VERSION:-2.2.1}}
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -30,6 +30,7 @@ services:
       --JsonRpc.EnginePort=8551
       --JsonRpc.Host=0.0.0.0
       --JsonRpc.Port=8545
+      --JsonRpc.EnabledModules=[Eth,Subscribe,TxPool,Web3,Proof,Net,Health,Rpc]
       --Metrics.Enabled=true
       --Metrics.ExposePort=8008
       --Sync.SnapSync=true
@@ -48,7 +49,7 @@ services:
 
   el-reth:
     profiles: [el-reth]
-    image: ghcr.io/paradigmxyz/reth:${EL_RETH_VERSION:-v2.8.1}
+    image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.8.1}}
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP

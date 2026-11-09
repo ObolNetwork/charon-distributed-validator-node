@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks this node's Grafana for internet exposure and for signs of unauthorized changes.
+# Checks this node's published ports and Grafana for internet exposure, and Grafana for signs of unauthorized changes.
 # Releases before the Grafana hardening granted anonymous users the Admin role and published
 # Grafana on all interfaces, so anyone who could reach port 3000 could change Grafana.
 #
@@ -21,10 +21,18 @@ grafana-metricsdrilldown-app grafana-postgresql-datasource grafana-pyroscope-app
 influxdb jaeger loki mssql mysql opentsdb prometheus stackdriver tempo zipkin"
 EXPECTED_PLUGINS="${EXPECTED_PLUGINS//$'\n'/ }"
 findings=0
+exposed=0
 
 warn() {
   echo "  [!] $*"
   findings=$((findings + 1))
+  return 0
+}
+
+# exposure reports a port reachable from the internet. It is counted apart from signs of tampering.
+exposure() {
+  echo "  [!] $*"
+  exposed=$((exposed + 1))
   return 0
 }
 
@@ -33,11 +41,31 @@ if binding=$(docker compose port grafana 3000 2>/dev/null) && [[ -n "$binding" ]
   echo "  grafana:3000 is published on $binding"
   case "$binding" in
     127.0.0.1:* | "[::1]:"*) echo "  OK: only reachable from this host" ;;
-    *) warn "Grafana is published on a non-loopback address. Docker-published ports bypass ufw, so it is reachable unless a provider or network firewall blocks it. Set MONITORING_IP_GRAFANA=127.0.0.1 in .env and run: docker compose up -d grafana" ;;
+    *) exposure "Grafana is published on a non-loopback address. Docker-published ports bypass ufw, so it is reachable unless a provider or network firewall blocks it. Set MONITORING_IP_GRAFANA=127.0.0.1 in .env and run: docker compose up -d grafana" ;;
   esac
 else
   echo "  grafana is not running or not published"
 fi
+
+echo
+echo "== Other published ports"
+# Container ports that peers must reach: EL, CL (incl. Prysm's 13000/12000) and charon.
+P2P_PORTS=" 30303 9000 12000 13000 3610 "
+before=$exposed
+while read -r service ports; do
+  IFS=',' read -ra mappings <<<"$ports"
+  for mapping in "${mappings[@]}"; do
+    mapping="${mapping# }"
+    [[ "$mapping" == *"->"* ]] || continue
+    host="${mapping%%->*}"
+    container_port="${mapping##*->}"
+    container_port="${container_port%%/*}"
+    case "$host" in 127.0.0.1:* | "[::1]:"* | "::1:"*) continue ;; esac
+    [[ "$P2P_PORTS" == *" $container_port "* || "$service" == grafana ]] && continue
+    exposure "$service publishes port $container_port on $host. Docker-published ports bypass ufw, so it is reachable unless a provider or network firewall blocks it. Bind it to 127.0.0.1 in .env or docker-compose.override.yml."
+  done
+done < <(docker compose ps --format '{{.Service}} {{.Ports}}' 2>/dev/null)
+[[ $exposed == "$before" ]] && echo "  OK: only P2P ports are published on non-loopback addresses"
 
 echo
 echo "== Grafana database ($DB)"
@@ -52,6 +80,7 @@ elif ! command -v python3 >/dev/null; then
 else
   db_findings=$(
     python3 -I - "$DB" "$EXPECTED_DATASOURCES" <<'EOF'
+import json
 import sqlite3
 import sys
 
@@ -75,12 +104,68 @@ for login, created in rows("SELECT login, created FROM user WHERE is_service_acc
 for name, kind, url, created in rows("SELECT name, type, url, created FROM data_source"):
     if name not in expected:
         print(f"datasource: {name} type={kind} url={url} (created {created})")
+for name, created in rows("SELECT name, created FROM org WHERE id != 1"):
+    print(f"organization: {name} (created {created})")
+for title, created in rows("SELECT title, created FROM dashboard WHERE id NOT IN (SELECT dashboard_id FROM dashboard_provisioning)"):
+    print(f"dashboard or folder not provisioned by this stack: {title} (created {created})")
+
+
+# Grafana 12 and later store dashboards and folders in the resource table, and every change in resource_history
+# (action 3 is a delete). Dashboards provisioned from files are annotated as managed by file provisioning.
+def unprovisioned(value):
+    """Returns the title and creation time of a stored dashboard or folder that file provisioning does not manage."""
+    try:
+        obj = json.loads(value)
+        metadata = obj.get("metadata") or {}
+    except (TypeError, ValueError, AttributeError):
+        return None
+    if (metadata.get("annotations") or {}).get("grafana.app/managedBy") == "classic-file-provisioning":
+        return None
+    title = (obj.get("spec") or {}).get("title") or metadata.get("name", "?")
+    return title, metadata.get("creationTimestamp", "")
+
+
+UNIFIED = "\"group\" IN ('dashboard.grafana.app', 'folder.grafana.app')"
+for kind, value in rows(f"SELECT resource, value FROM resource WHERE {UNIFIED}"):
+    found = unprovisioned(value)
+    if found:
+        print(f"{kind[:-1]} not provisioned by this stack: {found[0]} (created {found[1]})")
+for kind, value in rows(f"SELECT resource, value FROM resource_history WHERE action = 3 AND {UNIFIED}"):
+    found = unprovisioned(value)
+    if found:
+        print(f"{kind[:-1]} created and later deleted: {found[0]} (created {found[1]})")
+for title, updated in rows("SELECT title, updated FROM alert_rule"):
+    print(f"alert rule: {title} (updated {updated})")
+for name, kind, created in rows("SELECT name, type, created FROM alert_notification"):
+    print(f"notification channel: {name} type={kind} (created {created})")
+contact_points = set()
+for (config,) in rows("SELECT alertmanager_configuration FROM alert_configuration"):
+    try:
+        receivers = json.loads(config).get("alertmanager_config", {}).get("receivers") or []
+    except (ValueError, AttributeError):
+        continue
+    for receiver in receivers:
+        for integration in receiver.get("grafana_managed_receiver_configs") or []:
+            # Grafana's default contact point emails a placeholder address.
+            if "example@email.com" not in json.dumps(integration.get("settings")):
+                contact_points.add((receiver.get("name"), integration.get("type")))
+for name, kind in sorted(contact_points, key=str):
+    print(f"contact point: {name} type={kind}")
+# IDs keep counting up after rows are deleted, which reveals records that were created and later removed.
+# Provisioning deletes and recreates datasources on every start, so their IDs are not checked; the
+# datasource names are. Dashboards are only in this table before Grafana 12.
+ALLOWED_DELETIONS = {"user": 0, "api_key": 0, "org": 0, "alert_rule": 0, "dashboard": 10}
+sequences = dict(rows("SELECT name, seq FROM sqlite_sequence"))
+for table, allowed in ALLOWED_DELETIONS.items():
+    count = rows(f"SELECT count(*) FROM {table}")
+    if table in sequences and count and sequences[table] - count[0][0] > allowed:
+        print(f"{sequences[table] - count[0][0]} {table} rows were created and later deleted")
 EOF
   )
   if [[ -n "$db_findings" ]]; then
     while IFS= read -r line; do warn "$line"; done <<<"$db_findings"
   else
-    echo "  OK: no service accounts, tokens, extra users or unexpected datasources"
+    echo "  OK: no service accounts, tokens, users, datasources, organizations, dashboards or alerting changes"
   fi
 fi
 
@@ -103,17 +188,56 @@ fi
 [[ "$unexpected_plugins" -eq 0 ]] && echo "  OK: no unexpected plugins installed"
 
 echo
-if [[ "$findings" -eq 0 ]]; then
-  echo "No issues found."
+echo "== Repository files that Grafana mounted (grafana/)"
+# Releases before the Grafana hardening mounted these writable, so Grafana could change its own provisioning.
+added=0
+if changed=$(git -c safe.directory="$PWD" status --porcelain --untracked-files=all -- grafana 2>/dev/null); then
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    if [[ "$line" == "??"* ]]; then
+      # Operators may add their own dashboards here, so added files are listed for review rather than counted.
+      echo "  [?] added file, check that you added it yourself: ${line#?? }"
+      added=$((added + 1))
+    else
+      warn "changed file: $line"
+    fi
+  done <<<"$changed"
+  if [[ "$added" -gt 0 ]]; then
+    echo "  Delete any added file you did not add yourself, and report it."
+  fi
+  if [[ -z "$changed" ]]; then
+    echo "  OK: grafana/ matches this release"
+  elif [[ "$(grep -vc '^??' <<<"$changed")" -gt 0 ]]; then
+    echo "  Unless you made these changes, restore the changed files with: git checkout -- grafana"
+    echo "  Also check 'git stash list', as 'git stash apply' during an upgrade would bring changes back."
+  fi
 else
-  echo "Found $findings issue(s). This stack provisions everything Grafana needs from files, so service accounts,"
-  echo "tokens, extra users, extra datasources or plugins were most likely created by someone else."
-  echo "Please report it to security@obol.tech."
+  echo "  not a git checkout, cannot check"
+fi
+
+echo
+if [[ "$exposed" -gt 0 ]]; then
+  echo "Found $exposed exposed port(s). Fix the bindings listed above first."
+fi
+if [[ "$added" -gt 0 ]]; then
+  echo "Found $added added file(s) under grafana/. Treat any you did not add yourself as a sign of unauthorized changes."
+fi
+if [[ "$findings" -eq 0 ]]; then
+  echo "No signs of unauthorized changes found."
+else
+  echo "Found $findings issue(s). This stack provisions everything Grafana needs from files, so anything listed"
+  echo "above that you did not create yourself was most likely created by someone else. Please report it to"
+  echo "security@obol.tech. Grafana encrypts stored secrets with a default key, so treat any credentials you"
+  echo "stored in it, such as webhook URLs or tokens of contact points, as exposed and rotate them."
 fi
 
 if [[ -d "$(dirname "$DB")" ]]; then
   echo
+  if [[ "$findings" -gt 0 ]]; then
+    echo "Before deleting $(dirname "$DB"), keep a copy outside this repository for the investigation:"
+    echo "  sudo tar czf ~/grafana-evidence-\$(date +%F).tar.gz $(dirname "$DB") && sha256sum ~/grafana-evidence-*.tar.gz"
+  fi
   echo "Grafana no longer uses $(dirname "$DB"). Delete it with: sudo rm -rf $(dirname "$DB")"
 fi
 
-[[ "$findings" -eq 0 ]]
+[[ "$findings" -eq 0 && "$exposed" -eq 0 ]]
