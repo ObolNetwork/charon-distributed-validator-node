@@ -3,6 +3,32 @@
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
+  #    _          _
+  #   (_)_      _| |_
+  #   | \ \ /\ / / __|
+  #   | |\ V  V /| |_
+  #  _/ | \_/\_/  \__|
+  # |__/
+
+  # Creates the Engine API secret shared by the execution and consensus clients, once per deployment.
+  # Runs before them and never replaces an existing jwt/jwt.hex.
+  jwt-init:
+    image: busybox:${BUSYBOX_VERSION:-1.37.0}
+    network_mode: none
+    volumes:
+      - ./jwt:/jwt
+    command:
+      - sh
+      - -ec
+      - |
+        if [ -s /jwt/jwt.hex ]; then echo "Using existing jwt/jwt.hex"; exit 0; fi
+        od -An -tx1 -v -N32 /dev/urandom | tr -d ' \n' > /jwt/jwt.hex.tmp
+        grep -qE '^[0-9a-f]{64}$$' /jwt/jwt.hex.tmp
+        # Teku and Nimbus run as non-root users, so the secret must be readable by all.
+        chmod 644 /jwt/jwt.hex.tmp
+        mv /jwt/jwt.hex.tmp /jwt/jwt.hex
+        echo "Created a new random jwt/jwt.hex"
+
   #             _   _                         _           _
   #  _ __   ___| |_| |__   ___ _ __ _ __ ___ (_)_ __   __| |
   # | '_ \ / _ \ __| '_ \ / _ \ '__| '_ ` _ \| | '_ \ / _` |
@@ -11,6 +37,9 @@ services:
 
   nethermind:
     image: nethermind/nethermind:${NETHERMIND_VERSION:-2.2.2}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -20,6 +49,8 @@ services:
       - ${NETHERMIND_IP_ENGINE:-127.0.0.1}:${NETHERMIND_PORT_ENGINE:-8551}:8551 # ENGINE-API
     labels:
       - "alloy-monitored=${NETHERMIND_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       --config=${NETWORK}
       --datadir=data
@@ -50,6 +81,9 @@ services:
 
   lighthouse:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.3}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -58,6 +92,8 @@ services:
       - ${LIGHTHOUSE_IP_HTTP:-127.0.0.1}:${LIGHTHOUSE_PORT_HTTP:-5052}:5052 # BN TCP
     labels:
       - "alloy-monitored=${LIGHTHOUSE_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       lighthouse bn
       --network=${NETWORK}

@@ -13,9 +13,14 @@ services:
   cl-grandine:
     profiles: [ cl-grandine ]
     image: sifrai/grandine:${CL_GRANDINE_VERSION:-${GRANDINE_VERSION:-3.0.0-rc.2}}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_GRANDINE_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command:
       - --data-dir=/root/.grandine
       - --eth1-rpc-urls=http://${EL}:8551
@@ -48,9 +53,14 @@ services:
   cl-lighthouse:
     profiles: [ cl-lighthouse ]
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.3}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LIGHTHOUSE_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       lighthouse bn
       --network=${NETWORK}
@@ -85,9 +95,14 @@ services:
   cl-teku:
     profiles: [ cl-teku ]
     image: consensys/teku:${CL_TEKU_VERSION:-26.10.3}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       --network=${NETWORK}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
@@ -121,9 +136,14 @@ services:
   cl-lodestar:
     profiles: [ cl-lodestar ]
     image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.1}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       beacon
       --network=${NETWORK}
@@ -157,9 +177,14 @@ services:
   cl-prysm:
     profiles: [ cl-prysm ]
     image: gcr.io/prysmaticlabs/prysm/beacon-chain:${CL_PRYSM_VERSION:-v7.3.1}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_PRYSM_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command:
       - --accept-terms-of-use
       - --${NETWORK}
@@ -192,9 +217,14 @@ services:
   cl-nimbus:
     profiles: [ cl-nimbus ]
     image: statusim/nimbus-eth2:${CL_NIMBUS_VERSION:-multiarch-v26.10.2}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_NIMBUS_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     # Nimbus has no runtime checkpoint-sync flag — to checkpoint-sync from an
     # empty data dir, run the `trustedNodeSync` subcommand once before `up`:
     #   docker compose run --rm --no-deps cl-nimbus trustedNodeSync \

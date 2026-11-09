@@ -178,7 +178,7 @@ When modifying this repository:
 ## Important Notes
 
 - **Never commit `.env` files** - they contain operator-specific configuration
-- **JWT secret** in `jwt/jwt.hex` must be shared between EL and CL clients
+- **JWT secret** in `jwt/jwt.hex` must be shared between EL and CL clients. It is not tracked: the `jwt-init` service generates it per deployment before the EL and CL start
 - **Cluster lock** in `.charon/cluster-lock.json` is critical - back it up before any edit operations
 - **Validator keys** in `.charon/validator_keys/` must be kept secure and never committed
 - **Data directory compatibility**: When switching VCs, verify the new client can handle existing key state

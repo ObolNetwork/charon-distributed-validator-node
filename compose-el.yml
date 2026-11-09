@@ -12,6 +12,9 @@ services:
   el-nethermind:
     profiles: [el-nethermind]
     image: nethermind/nethermind:${NETHERMIND_VERSION:-${EL_NETHERMIND_VERSION:-2.2.2}}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -20,6 +23,8 @@ services:
       - ${EL_IP_ENGINE:-127.0.0.1}:${EL_PORT_ENGINE:-8551}:8551 # ENGINE-API
     labels:
       - "alloy-monitored=${EL_NETHERMIND_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       --config=${NETWORK}
       --data-dir=/nethermind/data
@@ -50,6 +55,9 @@ services:
   el-reth:
     profiles: [el-reth]
     image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.8.1}}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -58,6 +66,8 @@ services:
       - ${EL_IP_ENGINE:-127.0.0.1}:${EL_PORT_ENGINE:-8551}:8551 # ENGINE-API
     labels:
       - "alloy-monitored=${EL_RETH_ALLOY_MONITORED:-true}"
+      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
+      - "jwt-secret=per-deployment"
     command: |
       node
       --full
