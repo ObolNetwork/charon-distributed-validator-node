@@ -19,8 +19,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_GRANDINE_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     command:
       - --data-dir=/root/.grandine
       - --eth1-rpc-urls=http://${EL}:8551
@@ -40,7 +38,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-grandine:/root/.grandine
-      - ./jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _ _       _     _   _
@@ -59,8 +57,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LIGHTHOUSE_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     command: |
       lighthouse bn
       --network=${NETWORK}
@@ -83,7 +79,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
-      - ./jwt:/opt/jwt
+      - jwt:/opt/jwt:ro
     networks: [ dvnode ]
 
   #  _       _
@@ -101,8 +97,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_TEKU_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     command: |
       --network=${NETWORK}
       --checkpoint-sync-url=${LIGHTHOUSE_CHECKPOINT_SYNC_URL}
@@ -124,7 +118,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-teku:/opt/teku/data
-      - ./jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _           _           _
@@ -142,8 +136,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_LODESTAR_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     command: |
       beacon
       --network=${NETWORK}
@@ -165,7 +157,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-lodestar:/opt/lodestar/data
-      - ./jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _ __  _ __ _   _ ___ _ __ ___
@@ -183,8 +175,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_PRYSM_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     command:
       - --accept-terms-of-use
       - --${NETWORK}
@@ -205,7 +195,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-prysm:/data
-      - ./jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #        _           _
@@ -223,8 +213,6 @@ services:
     restart: unless-stopped
     labels:
       - "alloy-monitored=${CL_NIMBUS_ALLOY_MONITORED:-true}"
-      # Changing this label recreates the client, so the EL and CL load jwt/jwt.hex together.
-      - "jwt-secret=per-deployment"
     # Nimbus has no runtime checkpoint-sync flag — to checkpoint-sync from an
     # empty data dir, run the `trustedNodeSync` subcommand once before `up`:
     #   docker compose run --rm --no-deps cl-nimbus trustedNodeSync \
@@ -249,5 +237,5 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-nimbus:/data
-      - ./jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]

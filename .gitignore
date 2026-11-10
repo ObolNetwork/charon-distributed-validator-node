@@ -27,5 +27,5 @@ commit-boost/config.toml
 !scripts/edit/**/test/fixtures/.charon/
 !scripts/edit/**/test/fixtures/.charon/**
 
-# Engine API secret, generated per deployment by the jwt-init service in docker-compose.yml
+# Your own Engine API secret, if you provide one. The jwt-init service in docker-compose.yml generates one otherwise.
 jwt/jwt.hex*

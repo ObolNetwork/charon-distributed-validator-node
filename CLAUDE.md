@@ -133,7 +133,7 @@ docker compose exec charon charon alpha test <suite> --publish   # infra | peers
 
 - `.charon/`: Cluster configuration and validator keys (created by DKG or add-validators)
 - `data/`: Persistent data for all clients (execution, consensus, validator databases)
-- `jwt/`: JWT secret for execution<->consensus authentication
+- `jwt/`: optional operator-provided JWT secret for execution<->consensus authentication (generated in the `jwt` volume otherwise)
 - `grafana/`: Monitoring dashboards and configuration
 - `prometheus/`: Metrics collection configuration
 - `scripts/`: Automation scripts for cluster operations
@@ -178,7 +178,7 @@ When modifying this repository:
 ## Important Notes
 
 - **Never commit `.env` files** - they contain operator-specific configuration
-- **JWT secret** in `jwt/jwt.hex` must be shared between EL and CL clients. It is not tracked: the `jwt-init` service generates it per deployment before the EL and CL start
+- **JWT secret** must be shared between EL and CL clients. It is not tracked: the `jwt-init` service generates it per deployment in the `jwt` volume before the EL and CL start, or loads an operator-provided `jwt/jwt.hex`. Every EL and CL service needs `depends_on: jwt-init` (`service_completed_successfully`) and a read-only mount of the `jwt` volume
 - **Cluster lock** in `.charon/cluster-lock.json` is critical - back it up before any edit operations
 - **Validator keys** in `.charon/validator_keys/` must be kept secure and never committed
 - **Data directory compatibility**: When switching VCs, verify the new client can handle existing key state
