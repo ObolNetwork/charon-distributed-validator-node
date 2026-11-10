@@ -3,6 +3,55 @@
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 services:
+  #    _          _
+  #   (_)_      _| |_
+  #   | \ \ /\ / / __|
+  #   | |\ V  V /| |_
+  #  _/ | \_/\_/  \__|
+  # |__/
+
+  # Creates the Engine API secret shared by the execution and consensus clients, once per deployment.
+  # It lives in the jwt volume, which only those clients mount, so it is not a file in this directory.
+  # To use your own secret, for example with an external execution client, put it in jwt/jwt.hex.
+  jwt-init:
+    image: busybox:${BUSYBOX_VERSION:-1.37.0}
+    network_mode: none
+    volumes:
+      - jwt:/jwt
+      - ./jwt:/custom:ro
+    command:
+      - sh
+      - -euc
+      - |
+        # One line of 64 hex characters, which every client accepts with or without 0x and a newline.
+        is_secret() { grep -qxE '(0x)?[0-9a-fA-F]{64}' "$$1" && [ "$$(grep -c '' "$$1")" = 1 ]; }
+        # Read-only for everyone: Teku and Nimbus do not run as root, the other clients do.
+        store() { chmod 444 /jwt/jwt.hex.tmp && mv -f /jwt/jwt.hex.tmp /jwt/jwt.hex; }
+        rm -f /jwt/jwt.hex.tmp
+        if [ -s /custom/jwt.hex ]; then
+          if ! is_secret /custom/jwt.hex; then
+            echo "jwt/jwt.hex must contain 32 bytes as 64 hex characters" >&2
+            exit 1
+          elif grep -qi 7074a5bf6bd6dae368fa598249d57edfcbccc67a1205b2c8d5d2fe7b800663aa /custom/jwt.hex; then
+            echo "Ignoring jwt/jwt.hex: older releases shipped this secret to everyone, so it is public. Delete the file."
+          else
+            if ! cmp -s /custom/jwt.hex /jwt/jwt.hex; then
+              cp /custom/jwt.hex /jwt/jwt.hex.tmp
+              store
+              echo "Loaded the Engine API secret from jwt/jwt.hex. If the execution or consensus client is running, recreate both."
+            fi
+            exit 0
+          fi
+        fi
+        if [ -s /jwt/jwt.hex ]; then exit 0; fi
+        od -An -tx1 -v -N32 /dev/urandom | tr -d ' \n' > /jwt/jwt.hex.tmp
+        if ! is_secret /jwt/jwt.hex.tmp; then
+          echo "Could not generate the Engine API secret" >&2
+          exit 1
+        fi
+        store
+        echo "Generated a new Engine API secret"
+
   #             _   _                         _           _
   #  _ __   ___| |_| |__   ___ _ __ _ __ ___ (_)_ __   __| |
   # | '_ \ / _ \ __| '_ \ / _ \ '__| '_ ` _ \| | '_ \ / _` |
@@ -11,6 +60,9 @@ services:
 
   nethermind:
     image: nethermind/nethermind:${NETHERMIND_VERSION:-2.2.2}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     profiles: [""]
     restart: unless-stopped
     ports:
@@ -39,7 +91,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
-      - ./jwt:/root/jwt
+      - jwt:/root/jwt:ro
 
   #  _ _       _     _   _
   # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
@@ -50,6 +102,9 @@ services:
 
   lighthouse:
     image: sigp/lighthouse:${LIGHTHOUSE_VERSION:-v8.3.3}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     profiles: [""]
     ports:
       - ${LIGHTHOUSE_PORT_P2P:-9000}:9000/tcp # P2P TCP
@@ -77,7 +132,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
-      - ./jwt:/opt/jwt
+      - jwt:/opt/jwt:ro
     restart: unless-stopped
 
   #       _
@@ -209,4 +264,5 @@ networks:
   monitoring:
 
 volumes:
+  jwt:
   grafana-data:

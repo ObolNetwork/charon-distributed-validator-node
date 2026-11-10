@@ -12,6 +12,9 @@ services:
   el-nethermind:
     profiles: [el-nethermind]
     image: nethermind/nethermind:${NETHERMIND_VERSION:-${EL_NETHERMIND_VERSION:-2.2.2}}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -39,7 +42,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
-      - ./jwt:/root/jwt
+      - jwt:/root/jwt:ro
 
   #           _   _
   #  _ __ ___| |_| |__
@@ -50,6 +53,9 @@ services:
   el-reth:
     profiles: [el-reth]
     image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.8.1}}
+    depends_on:
+      jwt-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -73,4 +79,4 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/reth:/reth/data
-      - ./jwt:/root/jwt
+      - jwt:/root/jwt:ro
