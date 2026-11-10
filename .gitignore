@@ -26,3 +26,6 @@ commit-boost/config.toml
 # Allow test fixtures
 !scripts/edit/**/test/fixtures/.charon/
 !scripts/edit/**/test/fixtures/.charon/**
+
+# Your own Engine API secret, if you provide one. The jwt-init service in docker-compose.yml generates one otherwise.
+jwt/jwt.hex*
