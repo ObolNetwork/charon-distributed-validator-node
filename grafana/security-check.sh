@@ -108,6 +108,32 @@ for name, created in rows("SELECT name, created FROM org WHERE id != 1"):
     print(f"organization: {name} (created {created})")
 for title, created in rows("SELECT title, created FROM dashboard WHERE id NOT IN (SELECT dashboard_id FROM dashboard_provisioning)"):
     print(f"dashboard or folder not provisioned by this stack: {title} (created {created})")
+
+
+# Grafana 12 and later store dashboards and folders in the resource table, and every change in resource_history
+# (action 3 is a delete). Dashboards provisioned from files are annotated as managed by file provisioning.
+def unprovisioned(value):
+    """Returns the title and creation time of a stored dashboard or folder that file provisioning does not manage."""
+    try:
+        obj = json.loads(value)
+        metadata = obj.get("metadata") or {}
+    except (TypeError, ValueError, AttributeError):
+        return None
+    if (metadata.get("annotations") or {}).get("grafana.app/managedBy") == "classic-file-provisioning":
+        return None
+    title = (obj.get("spec") or {}).get("title") or metadata.get("name", "?")
+    return title, metadata.get("creationTimestamp", "")
+
+
+UNIFIED = "\"group\" IN ('dashboard.grafana.app', 'folder.grafana.app')"
+for kind, value in rows(f"SELECT resource, value FROM resource WHERE {UNIFIED}"):
+    found = unprovisioned(value)
+    if found:
+        print(f"{kind[:-1]} not provisioned by this stack: {found[0]} (created {found[1]})")
+for kind, value in rows(f"SELECT resource, value FROM resource_history WHERE action = 3 AND {UNIFIED}"):
+    found = unprovisioned(value)
+    if found:
+        print(f"{kind[:-1]} created and later deleted: {found[0]} (created {found[1]})")
 for title, updated in rows("SELECT title, updated FROM alert_rule"):
     print(f"alert rule: {title} (updated {updated})")
 for name, kind, created in rows("SELECT name, type, created FROM alert_notification"):
@@ -126,8 +152,9 @@ for (config,) in rows("SELECT alertmanager_configuration FROM alert_configuratio
 for name, kind in sorted(contact_points, key=str):
     print(f"contact point: {name} type={kind}")
 # IDs keep counting up after rows are deleted, which reveals records that were created and later removed.
-# Provisioning recreates a few datasources and dashboards on its own, so allow some of those.
-ALLOWED_DELETIONS = {"user": 0, "api_key": 0, "org": 0, "alert_rule": 0, "data_source": 3, "dashboard": 10}
+# Provisioning deletes and recreates datasources on every start, so their IDs are not checked; the
+# datasource names are. Dashboards are only in this table before Grafana 12.
+ALLOWED_DELETIONS = {"user": 0, "api_key": 0, "org": 0, "alert_rule": 0, "dashboard": 10}
 sequences = dict(rows("SELECT name, seq FROM sqlite_sequence"))
 for table, allowed in ALLOWED_DELETIONS.items():
     count = rows(f"SELECT count(*) FROM {table}")
@@ -163,13 +190,26 @@ fi
 echo
 echo "== Repository files that Grafana mounted (grafana/)"
 # Releases before the Grafana hardening mounted these writable, so Grafana could change its own provisioning.
+added=0
 if changed=$(git -c safe.directory="$PWD" status --porcelain --untracked-files=all -- grafana 2>/dev/null); then
-  if [[ -n "$changed" ]]; then
-    while IFS= read -r line; do warn "changed or added file: $line"; done <<<"$changed"
-    echo "  Unless you made these changes, restore the files with: git checkout -- grafana && git clean -fd grafana"
-    echo "  Also check 'git stash list', as 'git stash apply' during an upgrade would bring changes back."
-  else
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    if [[ "$line" == "??"* ]]; then
+      # Operators may add their own dashboards here, so added files are listed for review rather than counted.
+      echo "  [?] added file, check that you added it yourself: ${line#?? }"
+      added=$((added + 1))
+    else
+      warn "changed file: $line"
+    fi
+  done <<<"$changed"
+  if [[ "$added" -gt 0 ]]; then
+    echo "  Delete any added file you did not add yourself, and report it."
+  fi
+  if [[ -z "$changed" ]]; then
     echo "  OK: grafana/ matches this release"
+  elif [[ "$(grep -vc '^??' <<<"$changed")" -gt 0 ]]; then
+    echo "  Unless you made these changes, restore the changed files with: git checkout -- grafana"
+    echo "  Also check 'git stash list', as 'git stash apply' during an upgrade would bring changes back."
   fi
 else
   echo "  not a git checkout, cannot check"
@@ -178,6 +218,9 @@ fi
 echo
 if [[ "$exposed" -gt 0 ]]; then
   echo "Found $exposed exposed port(s). Fix the bindings listed above first."
+fi
+if [[ "$added" -gt 0 ]]; then
+  echo "Found $added added file(s) under grafana/. Treat any you did not add yourself as a sign of unauthorized changes."
 fi
 if [[ "$findings" -eq 0 ]]; then
   echo "No signs of unauthorized changes found."
