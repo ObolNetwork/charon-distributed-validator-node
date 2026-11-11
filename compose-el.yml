@@ -12,9 +12,6 @@ services:
   el-nethermind:
     profiles: [el-nethermind]
     image: nethermind/nethermind:${NETHERMIND_VERSION:-${EL_NETHERMIND_VERSION:-2.2.2}}
-    depends_on:
-      jwt-init:
-        condition: service_completed_successfully
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -42,7 +39,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
-      - jwt:/root/jwt:ro
+      - jwt:/root/jwt
 
   #           _   _
   #  _ __ ___| |_| |__
@@ -53,9 +50,12 @@ services:
   el-reth:
     profiles: [el-reth]
     image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.8.1}}
-    depends_on:
-      jwt-init:
-        condition: service_completed_successfully
+    # Reth only creates the Engine API secret at its default path, so create it here when it is missing.
+    entrypoint:
+      - sh
+      - -c
+      - '[ -s /root/jwt/jwt.hex ] || (umask 077 && openssl rand -hex 32 | tr -d "\n" > /root/jwt/jwt.hex) && exec /usr/local/bin/reth-binary "$$@"'
+      - --
     restart: unless-stopped
     ports:
       - ${EL_PORT_P2P:-30303}:30303/tcp # P2P TCP
@@ -79,4 +79,4 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/reth:/reth/data
-      - jwt:/root/jwt:ro
+      - jwt:/root/jwt

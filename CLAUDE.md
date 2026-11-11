@@ -178,7 +178,7 @@ When modifying this repository:
 ## Important Notes
 
 - **Never commit `.env` files** - they contain operator-specific configuration
-- **JWT secret** must be shared between EL and CL clients. It is not tracked: the `jwt-init` service generates it per deployment in the `jwt` volume before the EL and CL start, or loads an operator-provided `jwt/jwt.hex`. Every EL and CL service needs `depends_on: jwt-init` (`service_completed_successfully`) and a read-only mount of the `jwt` volume
+- **JWT secret** must be shared between EL and CL clients. It is not tracked: the EL generates it on start in the in-memory `jwt` volume, and it is replaced once both the EL and CL were stopped. Every EL service mounts the volume writable and every CL service read-only, and all of them run as root so they can read it. An operator-provided `jwt/jwt.hex` is mounted over it in a `docker-compose.override.yml`
 - **Cluster lock** in `.charon/cluster-lock.json` is critical - back it up before any edit operations
 - **Validator keys** in `.charon/validator_keys/` must be kept secure and never committed
 - **Data directory compatibility**: When switching VCs, verify the new client can handle existing key state

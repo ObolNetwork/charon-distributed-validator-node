@@ -32,6 +32,12 @@
       #- 127.0.0.1:5052:5052 # HTTP
       #- 127.0.0.1:5054:5054 # Metrics
 
+  #cl-lighthouse:
+    # Use your own Engine API secret, for example with an execution client outside this stack.
+    # Put it in jwt/jwt.hex and mount it over the generated one. The other consensus clients read it from /jwt.
+    #volumes:
+      #- ./jwt:/opt/jwt:ro
+
   #charon:
     # Configure any additional env var flags in .env.charon.more
     #env_file: [.env.charon.more]
