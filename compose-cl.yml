@@ -35,7 +35,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-grandine:/root/.grandine
-      - engine-jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _ _       _     _   _
@@ -73,7 +73,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/lighthouse:/opt/app/beacon # Keep data in lighthouse and not cl-lighthouse for backwards compatibility
-      - engine-jwt:/opt/jwt:ro
+      - jwt:/opt/jwt:ro
     networks: [ dvnode ]
 
   #  _       _
@@ -111,7 +111,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-teku:/opt/teku/data
-      - engine-jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _           _           _
@@ -147,7 +147,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-lodestar:/opt/lodestar/data
-      - engine-jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #  _ __  _ __ _   _ ___ _ __ ___
@@ -182,7 +182,7 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-prysm:/data
-      - engine-jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]
 
   #        _           _
@@ -223,5 +223,5 @@ services:
       - ${CL_IP_HTTP:-127.0.0.1}:${CL_PORT_HTTP:-5052}:5052
     volumes:
       - ./data/cl-nimbus:/data
-      - engine-jwt:/jwt:ro
+      - jwt:/jwt:ro
     networks: [ dvnode ]

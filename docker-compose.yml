@@ -39,7 +39,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/nethermind:/nethermind/data
-      - engine-jwt:/root/jwt
+      - jwt:/root/jwt
 
   #  _ _       _     _   _
   # | (_) __ _| |__ | |_| |__   ___  _   _ ___  ___
@@ -77,7 +77,7 @@ services:
     networks: [dvnode]
     volumes:
       - ./data/lighthouse:/opt/app/beacon
-      - engine-jwt:/opt/jwt:ro
+      - jwt:/opt/jwt:ro
     restart: unless-stopped
 
   #       _
@@ -212,7 +212,7 @@ networks:
 volumes:
   # Holds the Engine API secret. The execution client generates it on start and the consensus client reads it.
   # It is kept in memory and only exists while one of them runs, so it is replaced after both were stopped.
-  engine-jwt:
+  jwt:
     driver_opts:
       type: tmpfs
       device: tmpfs
