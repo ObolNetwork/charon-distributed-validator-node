@@ -6,6 +6,8 @@ services:
       CLUSTER_NAME: ${CLUSTER_NAME}
       CLUSTER_PEER: ${CLUSTER_PEER}
     # Alloy only reads logs and sends them on, so it needs no capabilities and writes only its rendered config and its data.
+    # The image's own alloy user, which owns the data directory; root without capabilities can't write to it.
+    user: "473:473"
     read_only: true
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
