@@ -11,6 +11,8 @@
 - Grafana must mount files from this repository read-only, so it cannot change its own provisioning.
 - Only the Docker socket proxy may mount the Docker socket. It must accept connections from Alloy only,
   allow nothing but GET and HEAD, and refuse the endpoints that read files or secrets out of containers.
+- Every execution client must list its JSON-RPC modules explicitly, without admin, debug, personal,
+  trace, parity or miner, instead of inheriting the client's defaults.
 - Outside compose-debug.yml, no service may run privileged or share the host's network or PID namespace.
 """
 
@@ -157,6 +159,35 @@ FORBIDDEN_PROXY_REQUESTS = [
 ]
 
 
+# How each execution client image takes its JSON-RPC module list.
+EL_MODULE_FLAGS = {
+    "nethermind/nethermind": r"--JsonRpc\.EnabledModules=\[?([\w,]+)\]?",
+    "paradigmxyz/reth": r"--http\.api=([\w,]+)",
+}
+FORBIDDEN_EL_MODULES = {"admin", "debug", "personal", "trace", "parity", "miner"}
+
+
+def check_el_modules():
+    """Returns errors for execution clients that inherit default JSON-RPC modules or enable dangerous ones."""
+    errors = []
+    for path, services in compose_files():
+        for name, service in services.items():
+            image = str(service.get("image", ""))
+            for image_name, pattern in EL_MODULE_FLAGS.items():
+                if image_name not in image:
+                    continue
+                command = service.get("command") or ""
+                command = " ".join(command) if isinstance(command, list) else str(command)
+                m = re.search(pattern, command)
+                if not m:
+                    errors.append(f"{path}: {name} does not list its JSON-RPC modules; set them explicitly")
+                    continue
+                enabled = {module.lower() for module in m.group(1).split(",")}
+                for module in sorted(enabled & FORBIDDEN_EL_MODULES):
+                    errors.append(f"{path}: {name} enables the {module} JSON-RPC module")
+    return errors
+
+
 def check_socket_proxy():
     """Returns errors if the socket proxy accepts other clients, other methods or any forbidden request."""
     errors = []
@@ -190,6 +221,7 @@ def main():
         + check_grafana_service()
         + check_privileges()
         + check_socket_proxy()
+        + check_el_modules()
     )
     for error in errors:
         print(f"::error::{error}")

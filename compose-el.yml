@@ -75,6 +75,7 @@ services:
       --http
       --http.addr=0.0.0.0
       --http.port=8545
+      --http.api=eth,net,web3
       --metrics=0.0.0.0:8008
     networks: [dvnode]
     volumes:
