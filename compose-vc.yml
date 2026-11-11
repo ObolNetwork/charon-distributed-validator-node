@@ -27,7 +27,7 @@ services:
     labels:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
-      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - ./lodestar/run.sh:/opt/lodestar/run.sh:ro
       - .charon/validator_keys:/home/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
@@ -57,7 +57,7 @@ services:
     labels:
       - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
     volumes:
-      - ./lighthouse/run.sh:/opt/lighthouse/run.sh
+      - ./lighthouse/run.sh:/opt/lighthouse/run.sh:ro
       - .charon/validator_keys:/opt/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-lighthouse:/opt/data
@@ -89,7 +89,7 @@ services:
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
-      - ./nimbus/run.sh:/home/user/run.sh
+      - ./nimbus/run.sh:/home/user/run.sh:ro
       - .charon/validator_keys:/home/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-nimbus:/home/user/data
@@ -119,7 +119,7 @@ services:
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
-      - ./prysm/run.sh:/home/prysm/run.sh
+      - ./prysm/run.sh:/home/prysm/run.sh:ro
       - ./data/vc-prysm:/data/vc
       - .charon/validator_keys:/home/charon/validator_keys
       - .charon:/opt/charon/node:ro
@@ -150,7 +150,7 @@ services:
     labels:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
-      - ./teku/run.sh:/opt/teku/run.sh
+      - ./teku/run.sh:/opt/teku/run.sh:ro
       - .charon/validator_keys:/opt/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-teku:/home/data

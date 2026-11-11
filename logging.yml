@@ -6,11 +6,11 @@ services:
       CLUSTER_NAME: ${CLUSTER_NAME}
       CLUSTER_PEER: ${CLUSTER_PEER}
     volumes:
-      - ./alloy:/etc/alloy
+      - ./alloy:/etc/alloy:ro
     networks: [dvnode, docker-api]
     depends_on: [docker-socket-proxy]
     entrypoint: /etc/alloy/run.sh
-    command: ["/bin/alloy", "run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data"]
+    command: ["/bin/alloy", "run", "/tmp/config.alloy", "--storage.path=/var/lib/alloy/data"]
     restart: unless-stopped
 
   # Gives Alloy only the Docker API calls it needs instead of the full Docker API.

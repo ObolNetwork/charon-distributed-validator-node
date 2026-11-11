@@ -196,7 +196,7 @@ services:
     labels:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
-      - ./lodestar/run.sh:/opt/lodestar/run.sh
+      - ./lodestar/run.sh:/opt/lodestar/run.sh:ro
       - .charon/validator_keys:/home/charon/validator_keys
       - ./data/lodestar:/opt/data
     restart: unless-stopped
@@ -238,7 +238,7 @@ services:
       CLUSTER_NAME: ${CLUSTER_NAME:-}
       CLUSTER_PEER: ${CLUSTER_PEER:-}
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./prometheus:/etc/prometheus:ro
       - ./data/prometheus:/prometheus
     entrypoint: /etc/prometheus/run.sh
     restart: unless-stopped

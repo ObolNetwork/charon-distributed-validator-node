@@ -16,7 +16,8 @@ if [ -z "${CLUSTER_PEER:-}" ]; then
 fi
 
 SRC="/etc/alloy/config.alloy.example"
-DST="/etc/alloy/config.alloy"
+# Rendered inside the container, so the mounted ./alloy stays read-only and the rendered config never lands on the host.
+DST="/tmp/config.alloy"
 
 echo "Rendering template: $SRC -> $DST"
 
