@@ -13,13 +13,24 @@ services:
     command: ["/bin/alloy", "run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data"]
     restart: unless-stopped
 
-  # Gives Alloy read-only access to container metadata and logs instead of the full Docker API.
+  # Gives Alloy only the Docker API calls it needs instead of the full Docker API.
   docker-socket-proxy:
-    image: tecnativa/docker-socket-proxy:${DOCKER_SOCKET_PROXY_VERSION:-v0.5.0}
-    environment:
-      CONTAINERS: 1
-      # Alloy's container discovery also lists networks.
-      NETWORKS: 1
+    image: wollomatic/socket-proxy:${SOCKET_PROXY_VERSION:-1.13.2}
+    # Root inside the container only so it can open the root-owned Docker socket; it has no capabilities and a read-only filesystem.
+    user: "0:0"
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    command:
+      - -listenip=0.0.0.0
+      - -allowfrom=alloy
+      # Alloy lists containers and networks, and reads a container's metadata and logs. Everything else is refused,
+      # including reading files out of containers (archive, export) and every write.
+      - -allowHEAD=(/v1\.[0-9]+)?/_ping
+      - -allowGET=(/v1\.[0-9]+)?/(_ping|version|containers/json|containers/[a-zA-Z0-9_.-]+/(json|logs)|networks)
+      # Restart if the Docker socket goes away, for example after a Docker engine update.
+      - -watchdoginterval=60
+      - -stoponwatchdog
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks: [docker-api]

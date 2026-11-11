@@ -9,7 +9,8 @@
   env_file, since those override grafana.ini.
 - Grafana must only join the monitoring network, so it cannot reach charon, the clients or the ejector.
 - Grafana must mount files from this repository read-only, so it cannot change its own provisioning.
-- Only the Docker socket proxy may mount the Docker socket.
+- Only the Docker socket proxy may mount the Docker socket. It must accept connections from Alloy only,
+  allow nothing but GET and HEAD, and refuse the endpoints that read files or secrets out of containers.
 - Outside compose-debug.yml, no service may run privileged or share the host's network or PID namespace.
 """
 
@@ -139,8 +140,57 @@ def check_privileges():
     return errors
 
 
+# Requests a compromised Alloy must not be able to make through the socket proxy.
+FORBIDDEN_PROXY_REQUESTS = [
+    ("GET", "/v1.47/containers/abc/archive"),
+    ("GET", "/v1.47/containers/abc/export"),
+    ("GET", "/v1.47/containers/abc/attach/ws"),
+    ("GET", "/v1.47/containers/abc/changes"),
+    ("GET", "/v1.47/images/json"),
+    ("GET", "/v1.47/info"),
+    ("GET", "/v1.47/secrets"),
+    ("POST", "/v1.47/containers/create"),
+    ("POST", "/v1.47/containers/abc/exec"),
+    ("POST", "/v1.47/exec/abc/start"),
+    ("POST", "/v1.47/containers/abc/kill"),
+    ("DELETE", "/v1.47/containers/abc"),
+]
+
+
+def check_socket_proxy():
+    """Returns errors if the socket proxy accepts other clients, other methods or any forbidden request."""
+    errors = []
+    for path, services in compose_files():
+        service = services.get(SOCKET_PROXY)
+        if service is None:
+            continue
+        args = [str(arg) for arg in service.get("command") or []]
+        if service.get("environment") or "-allowfrom=alloy" not in args:
+            errors.append(f"{path}: {SOCKET_PROXY} must be configured with command flags only, including -allowfrom=alloy")
+        rules = []
+        for arg in args:
+            m = re.fullmatch(r"-allow([A-Z]+)=(.*)", arg)
+            if not m:
+                continue
+            if m.group(1) not in ("GET", "HEAD"):
+                errors.append(f"{path}: {SOCKET_PROXY} allows {m.group(1)} requests")
+            # socket-proxy anchors every pattern with ^ and $.
+            rules.append((m.group(1), re.compile("^" + m.group(2) + "$")))
+        for method, url in FORBIDDEN_PROXY_REQUESTS:
+            if any(method == rule_method and regex.match(url) for rule_method, regex in rules):
+                errors.append(f"{path}: {SOCKET_PROXY} allows {method} {url}")
+    return errors
+
+
 def main():
-    errors = check_ports() + check_sample_ports() + check_grafana() + check_grafana_service() + check_privileges()
+    errors = (
+        check_ports()
+        + check_sample_ports()
+        + check_grafana()
+        + check_grafana_service()
+        + check_privileges()
+        + check_socket_proxy()
+    )
     for error in errors:
         print(f"::error::{error}")
     if not errors:
