@@ -18,6 +18,7 @@
 
 import configparser
 import glob
+import os
 import re
 import sys
 
@@ -151,6 +152,8 @@ FORBIDDEN_PROXY_REQUESTS = [
     ("GET", "/v1.47/images/json"),
     ("GET", "/v1.47/info"),
     ("GET", "/v1.47/secrets"),
+    ("GET", "/v1.47/containers/abc/../../info"),
+    ("GET", "/v1.47/events"),
     ("POST", "/v1.47/containers/create"),
     ("POST", "/v1.47/containers/abc/exec"),
     ("POST", "/v1.47/exec/abc/start"),
@@ -189,27 +192,32 @@ def check_el_modules():
 
 
 def check_socket_proxy():
-    """Returns errors if the socket proxy accepts other clients, other methods or any forbidden request."""
+    """Returns errors if anything besides Alloy can reach the socket proxy, or its haproxy allowlist admits other methods or a forbidden request."""
     errors = []
     for path, services in compose_files():
         service = services.get(SOCKET_PROXY)
         if service is None:
             continue
-        args = [str(arg) for arg in service.get("command") or []]
-        if service.get("environment") or "-allowfrom=alloy" not in args:
-            errors.append(f"{path}: {SOCKET_PROXY} must be configured with command flags only, including -allowfrom=alloy")
-        rules = []
-        for arg in args:
-            m = re.fullmatch(r"-allow([A-Z]+)=(.*)", arg)
-            if not m:
-                continue
-            if m.group(1) not in ("GET", "HEAD"):
-                errors.append(f"{path}: {SOCKET_PROXY} allows {m.group(1)} requests")
-            # socket-proxy anchors every pattern with ^ and $.
-            rules.append((m.group(1), re.compile("^" + m.group(2) + "$")))
+        for name, other in services.items():
+            if name not in (SOCKET_PROXY, "alloy") and "docker-api" in (other.get("networks") or []):
+                errors.append(f"{path}: only alloy and {SOCKET_PROXY} may join the docker-api network, not {name}")
+        mounts = [str(v) for v in service.get("volumes") or []]
+        cfg = next((m.split(":")[0] for m in mounts if m.endswith(":/usr/local/etc/haproxy/haproxy.cfg:ro")), None)
+        if service.get("command") or cfg is None:
+            errors.append(f"{path}: {SOCKET_PROXY} must run haproxy with a read-only haproxy.cfg from this repo")
+            continue
+        text = open(os.path.join(os.path.dirname(path), cfg)).read()
+        rules = [line.strip() for line in text.splitlines() if line.strip().startswith("http-request")]
+        if rules[:1] != ["http-request deny unless { method GET HEAD }"]:
+            errors.append(f"{path}: {cfg} must first deny every method except GET and HEAD")
+        paths = [re.fullmatch(r"http-request deny unless \{ path,url_dec -m reg (\S+) \}", rule) for rule in rules[1:]]
+        if len(paths) != 1 or not paths[0]:
+            errors.append(f"{path}: {cfg} must only add one rule that denies paths outside an allowlist")
+            continue
+        allowed = re.compile(paths[0].group(1))
         for method, url in FORBIDDEN_PROXY_REQUESTS:
-            if any(method == rule_method and regex.match(url) for rule_method, regex in rules):
-                errors.append(f"{path}: {SOCKET_PROXY} allows {method} {url}")
+            if method in ("GET", "HEAD") and allowed.search(url):
+                errors.append(f"{path}: {cfg} allows {method} {url}")
     return errors
 
 

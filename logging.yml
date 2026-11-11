@@ -5,34 +5,31 @@ services:
       CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
       CLUSTER_NAME: ${CLUSTER_NAME}
       CLUSTER_PEER: ${CLUSTER_PEER}
+    # Alloy only reads logs and sends them on, so it needs no capabilities and writes only its rendered config and its data.
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    tmpfs: [/tmp]
     volumes:
       - ./alloy:/etc/alloy:ro
+      - alloy-data:/var/lib/alloy/data
     networks: [dvnode, docker-api]
     depends_on: [docker-socket-proxy]
     entrypoint: /etc/alloy/run.sh
-    command: ["/bin/alloy", "run", "/tmp/config.alloy", "--storage.path=/var/lib/alloy/data"]
+    command: ["/bin/alloy", "run", "/tmp/config.alloy", "--storage.path=/var/lib/alloy/data", "--disable-reporting"]
     restart: unless-stopped
 
-  # Gives Alloy only the Docker API calls it needs instead of the full Docker API.
+  # Gives Alloy only the Docker API calls it needs instead of the full Docker API (allowlist in docker-socket-proxy/haproxy.cfg).
   docker-socket-proxy:
-    image: wollomatic/socket-proxy:${SOCKET_PROXY_VERSION:-1.13.2}
+    image: haproxy:${HAPROXY_VERSION:-3.2.26-alpine}
     # Root inside the container only so it can open the root-owned Docker socket; it has no capabilities and a read-only filesystem.
     user: "0:0"
     read_only: true
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
-    command:
-      - -listenip=0.0.0.0
-      - -allowfrom=alloy
-      # Alloy lists containers and networks, and reads a container's metadata and logs. Everything else is refused,
-      # including reading files out of containers (archive, export) and every write.
-      - -allowHEAD=(/v1\.[0-9]+)?/_ping
-      - -allowGET=(/v1\.[0-9]+)?/(_ping|version|containers/json|containers/[a-zA-Z0-9_.-]+/(json|logs)|networks)
-      # Restart if the Docker socket goes away, for example after a Docker engine update.
-      - -watchdoginterval=60
-      - -stoponwatchdog
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker-socket-proxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     networks: [docker-api]
     restart: unless-stopped
 
@@ -41,3 +38,6 @@ networks:
   # Only Alloy and the Docker socket proxy join this network, and it has no external access.
   docker-api:
     internal: true
+
+volumes:
+  alloy-data:
