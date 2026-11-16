@@ -1,90 +1,17 @@
 #!/usr/bin/env bash
 
-WALLET_DIR="/prysm-wallet"
+# The vc-bundle service renders Prysm's wallet, proposer settings and flags from .charon before this starts. The
+# wallet holds this node's key shares and its password file, so Prysm reads it in place without an import.
+BUNDLE_DIR="/opt/charon/node/vc-bundle"
 
-# Cleanup wallet directories if already exists.
-rm -rf $WALLET_DIR
-mkdir $WALLET_DIR
+mapfile -t VC_FLAGS <"${BUNDLE_DIR}/vc-flags.txt"
 
-# Refer: https://prysm.offchainlabs.com/docs/install-prysm/install-with-script/#step-5-run-a-validator-using-prysm
-# Running a prysm VC involves two steps which need to run in order:
-# 1. Import validator keys in a prysm wallet account.
-# 2. Run the validator client.
-WALLET_PASSWORD="prysm-validator-secret"
-echo $WALLET_PASSWORD > /wallet-password.txt
-/app/cmd/validator/validator wallet create --accept-terms-of-use --wallet-password-file=wallet-password.txt --keymanager-kind=direct --wallet-dir="$WALLET_DIR"
-
-tmpkeys="/home/validator_keys/tmpkeys"
-mkdir -p ${tmpkeys}
-
-for f in /home/charon/validator_keys/keystore-*.json; do
-    echo "Importing key ${f}"
-
-    # Copy keystore file to tmpkeys/ directory.
-    cp "${f}" "${tmpkeys}"
-
-    # Import keystore with password.
-    /app/cmd/validator/validator accounts import \
-        --accept-terms-of-use=true \
-        --wallet-dir="$WALLET_DIR" \
-        --keys-dir="${tmpkeys}" \
-        --account-password-file="${f//json/txt}" \
-        --wallet-password-file=wallet-password.txt
-
-    # Delete tmpkeys/keystore-*.json file that was copied before.
-    filename="$(basename ${f})"
-    rm "${tmpkeys}/${filename}"
-done
-
-# Delete the tmpkeys/ directory since it's no longer needed.
-rm -r ${tmpkeys}
-
-echo "Imported all keys"
-
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
-PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-for _ in $(seq 60); do
-    [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
-    sleep 2
-done
-
-# Render Prysm's proposer settings from the charon-generated canonical config when available:
-# entries only carry fields diverging from default_config, absent fields fall back to it.
-# Rendered as v2 settings with a top-level gas_limit, since at the gloas fork Prysm drops the
-# legacy builder.gas_limit. The legacy builder block is kept for pre-gloas registrations, and
-# carries charon's gloas builder configuration when set.
-PROPOSER_SETTINGS=()
-if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
-    echo "proposer-config.json found, rendering prysm proposer settings"
-    jq --argjson enabled "${BUILDER_API_ENABLED}" '
-        .default_config as $d |
-        {
-            version: 2,
-            proposer_config: (.proposer_config | map_values({
-                fee_recipient: (.fee_recipient // $d.fee_recipient),
-                gas_limit: (.gas_limit // $d.gas_limit),
-                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
-            })),
-            default_config: {
-                fee_recipient: $d.fee_recipient,
-                gas_limit: $d.gas_limit,
-                builder: ({enabled: $enabled, gas_limit: $d.gas_limit} + ($d.builder // {}))
-            }
-        }' "${PROPOSER_CONFIG_FILE}" >/tmp/prysm-proposer-settings.json
-    PROPOSER_SETTINGS+=(--proposer-settings-file="/tmp/prysm-proposer-settings.json")
-else
-    echo "proposer-config.json not found, running without proposer settings"
-fi
-
-# Now run prysm VC
-exec /app/cmd/validator/validator --wallet-dir="$WALLET_DIR" \
+exec /app/cmd/validator/validator --wallet-dir="${BUNDLE_DIR}/prysm-wallet" \
     --accept-terms-of-use=true \
     --datadir="/data/vc" \
-    --wallet-password-file="/wallet-password.txt" \
-    --enable-beacon-rest-api \
     --monitoring-host=0.0.0.0 \
     --beacon-rest-api-provider="${BEACON_NODE_ADDRESS}" \
     --beacon-rpc-provider="${BEACON_NODE_ADDRESS}" \
     --"${NETWORK}" \
-    --distributed \
-    "${PROPOSER_SETTINGS[@]}"
+    --proposer-settings-file="${BUNDLE_DIR}/prysm-proposer-settings.json" \
+    "${VC_FLAGS[@]}"

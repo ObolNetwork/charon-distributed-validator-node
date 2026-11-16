@@ -1,107 +1,33 @@
 #!/bin/sh
 
-# Remove the existing keystores to avoid keystore locking issues.
-rm -rf /opt/data/cache /opt/data/secrets /opt/data/keystores
-
+# The vc-bundle service renders Lodestar's keystores, proposer settings and flags from .charon before this starts.
+BUNDLE_DIR="/opt/charon/node/vc-bundle"
 DATA_DIR="/opt/data"
 KEYSTORES_DIR="${DATA_DIR}/keystores"
 SECRETS_DIR="${DATA_DIR}/secrets"
 
-mkdir -p "${KEYSTORES_DIR}" "${SECRETS_DIR}"
+# Replace the keystores on every start, which also avoids keystore locking issues.
+rm -rf "${DATA_DIR}/cache" "${KEYSTORES_DIR}" "${SECRETS_DIR}"
+cp -r "${BUNDLE_DIR}/keystores" "${KEYSTORES_DIR}"
+cp -r "${BUNDLE_DIR}/secrets" "${SECRETS_DIR}"
 
-IMPORTED_COUNT=0
-EXISTING_COUNT=0
+echo "Imported $(ls "${KEYSTORES_DIR}" | wc -l) keystores"
 
-for f in /home/charon/validator_keys/keystore-*.json; do
-    echo "Importing key ${f}"
+# Append the flags of vc-flags.txt, one per line.
+set --
+while IFS= read -r flag; do
+    set -- "$@" "${flag}"
+done <"${BUNDLE_DIR}/vc-flags.txt"
 
-    # Extract pubkey from keystore file
-    PUBKEY="0x$(grep '"pubkey"' "$f" | awk -F'"' '{print $4}')"
-
-    PUBKEY_DIR="${KEYSTORES_DIR}/${PUBKEY}"
-
-    # Skip import if keystore already exists
-    if [ -d "${PUBKEY_DIR}" ]; then
-        EXISTING_COUNT=$((EXISTING_COUNT + 1))
-        continue
-    fi
-
-    mkdir -p "${PUBKEY_DIR}"
-
-    # Copy the keystore file to persisted keys backend
-    install -m 600 "$f" "${PUBKEY_DIR}/voting-keystore.json"
-
-    # Copy the corresponding password file
-    PASSWORD_FILE="${f%.json}.txt"
-    install -m 600 "${PASSWORD_FILE}" "${SECRETS_DIR}/${PUBKEY}"
-
-    IMPORTED_COUNT=$((IMPORTED_COUNT + 1))
-done
-
-echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
-
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
-PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-for _ in $(seq 60); do
-    [ -f "${PROPOSER_CONFIG_FILE}" ] && break
-    sleep 2
-done
-
-# Render Lodestar's proposer settings from the charon-generated canonical config when
-# available: entries only carry fields diverging from default_config, absent fields
-# fall back to it. Lodestar only accepts yml/yaml file extensions; JSON is valid YAML.
-PROPOSER_SETTINGS=""
-if [ -f "${PROPOSER_CONFIG_FILE}" ]; then
-    echo "proposer-config.json found, rendering lodestar proposer settings"
-    node -e '
-        const fs = require("fs");
-        const src = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-        const d = src.default_config;
-        const out = {
-            proposer_config: {},
-            default_config: {fee_recipient: d.fee_recipient, builder: {gas_limit: d.gas_limit}},
-        };
-        if (d.builder) {
-            // Per-entry override keys match the keymanager JSON format, pass through verbatim.
-            Object.assign(out.default_config.builder, {
-                min_bid: d.builder.min_bid,
-                boost_factor: d.builder.builder_boost_factor,
-                max_execution_payment: d.builder.max_execution_payment,
-                builders: d.builder.builders,
-            });
-        }
-        for (const [pubkey, entry] of Object.entries(src.proposer_config || {})) {
-            out.proposer_config[pubkey] = {
-                fee_recipient: entry.fee_recipient ?? d.fee_recipient,
-                builder: {gas_limit: entry.gas_limit ?? d.gas_limit},
-            };
-        }
-        fs.writeFileSync(process.argv[2], JSON.stringify(out));
-    ' "${PROPOSER_CONFIG_FILE}" /tmp/proposer-config.yml
-    PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
-    # Lodestar refuses a max execution payment above 0 (trusted payments) without an explicit opt-in.
-    if [ "$(node -p 'require(process.argv[1]).default_config.builder?.max_execution_payment ?? "0"' "${PROPOSER_CONFIG_FILE}")" != "0" ]; then
-        PROPOSER_SETTINGS="${PROPOSER_SETTINGS} --allowDangerousTrustedPayments"
-    fi
-else
-    echo "proposer-config.json not found, running without proposer settings"
-fi
-
-# Request the stateful gloas block form (payload kept on the beacon node), which charon expects from
-# distributed validators.
-# Word splitting of $PROPOSER_SETTINGS is intentional, it holds zero or more flags.
-# shellcheck disable=SC2086
 exec node /usr/app/packages/cli/bin/lodestar validator \
-    --dataDir="$DATA_DIR" \
-    --keystoresDir="$KEYSTORES_DIR" \
-    --secretsDir="$SECRETS_DIR" \
-    --network="$NETWORK" \
+    --dataDir="${DATA_DIR}" \
+    --keystoresDir="${KEYSTORES_DIR}" \
+    --secretsDir="${SECRETS_DIR}" \
+    --network="${NETWORK}" \
     --metrics=true \
     --metrics.address="0.0.0.0" \
     --metrics.port=5064 \
-    --beaconNodes="$BEACON_NODE_ADDRESS" \
-    --builder="$BUILDER_API_ENABLED" \
-    --builder.selection="$BUILDER_SELECTION" \
-    --distributed \
-    --payloadLocal=true \
-    $PROPOSER_SETTINGS
+    --beaconNodes="${BEACON_NODE_ADDRESS}" \
+    --builder.selection="${BUILDER_SELECTION}" \
+    --proposerSettingsFile="${BUNDLE_DIR}/lodestar-proposer-settings.yml" \
+    "$@"

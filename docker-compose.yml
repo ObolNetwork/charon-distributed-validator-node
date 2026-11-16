@@ -185,7 +185,11 @@ services:
   lodestar:
     image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.1}
     profiles: [""]
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_started
+      vc-bundle:
+        condition: service_completed_successfully
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
@@ -197,7 +201,7 @@ services:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
-      - .charon/validator_keys:/home/charon/validator_keys
+      - .charon:/opt/charon/node:ro
       - ./data/lodestar:/opt/data
     restart: unless-stopped
 

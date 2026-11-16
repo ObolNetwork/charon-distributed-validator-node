@@ -2,11 +2,40 @@
 # ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
-# Each VC mounts .charon read-only and renders its proposer settings from vc-config/proposer-config.json,
-# which charon writes there. .charon is mounted rather than vc-config itself, since Docker would create
-# a missing vc-config as root before charon writes it.
+# Before the selected VC starts, the vc-bundle service renders what it consumes into .charon/vc-bundle with
+# `charon alpha vc-bundle`: its keystores, its proposer settings from vc-config/proposer-config.json and the flags a
+# distributed validator needs (vc-flags.txt). Each VC mounts .charon read-only and copies the bundle into its own
+# data directory. .charon is mounted rather than a subdirectory, since Docker would create a missing one as root
+# before charon writes it. After the proposer config changes, run `docker compose up -d` rather than
+# `docker compose restart <vc>`: only `up` renders the bundle again.
+
+x-vc-depends-on: &vc-depends-on
+  charon:
+    condition: service_started
+  vc-bundle:
+    condition: service_completed_successfully
 
 services:
+  #                  _                     _ _
+  # __   _____      | |__  _   _ _ __   __| | | ___
+  # \ \ / / __|_____| '_ \| | | | '_ \ / _` | |/ _ \
+  #  \ V / (_|_____| |_) | |_| | | | | (_| | |  __/
+  #   \_/ \___|    |_.__/ \__,_|_| |_|\__,_|_|\___|
+
+  vc-bundle:
+    profiles: ["", vc-lodestar, vc-lighthouse, vc-nimbus, vc-prysm, vc-teku]
+    image: obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}
+    depends_on: [charon]
+    entrypoint: /opt/vc-bundle/run.sh
+    environment:
+      VC: ${VC:-vc-lodestar}
+    volumes:
+      - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
+      - .charon:/opt/charon/.charon
+      # Lighthouse mounts the keystores at the same path, which its validator definitions point at.
+      - .charon/validator_keys:/opt/charon/validator_keys:ro
+    restart: "no"
+
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
@@ -16,7 +45,7 @@ services:
   vc-lodestar:
     profiles: [vc-lodestar]
     image: chainsafe/lodestar:${VC_LODESTAR_VERSION:-v1.50.1}
-    depends_on: [charon]
+    depends_on: *vc-depends-on
     networks: [dvnode]
     entrypoint: /opt/lodestar/run.sh
     environment:
@@ -28,7 +57,6 @@ services:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
-      - .charon/validator_keys:/home/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
     restart: unless-stopped
@@ -42,12 +70,8 @@ services:
 
   vc-lighthouse:
     profiles: [vc-lighthouse]
-    image: "lighthouse-vc:${VC_LIGHTHOUSE_VERSION:-v8.3.3}"
-    build:
-      context: lighthouse
-      args:
-        VERSION: ${VC_LIGHTHOUSE_VERSION:-v8.3.3}
-    depends_on: [charon]
+    image: sigp/lighthouse:${VC_LIGHTHOUSE_VERSION:-v8.3.3}
+    depends_on: *vc-depends-on
     networks: [dvnode]
     entrypoint: /opt/lighthouse/run.sh
     environment:
@@ -71,17 +95,11 @@ services:
 
   vc-nimbus:
     profiles: [vc-nimbus]
-    # The -jq suffix makes compose build the image again, as the previous one lacks jq: compose
-    # only builds an image it doesn't have yet.
-    image: "nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.2}-jq"
-    build:
-      context: nimbus
-      args:
-        VERSION: ${VC_NIMBUS_VERSION:-multiarch-v26.10.2}
+    image: statusim/nimbus-validator-client:${VC_NIMBUS_VERSION:-multiarch-v26.10.2}
     # Starts as root so run.sh can hand ./data/vc-nimbus to uid 1000; Nimbus itself runs as uid 1000.
     user: root
     entrypoint: /home/user/run.sh
-    depends_on: [charon]
+    depends_on: *vc-depends-on
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
@@ -90,7 +108,6 @@ services:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
       - ./nimbus/run.sh:/home/user/run.sh
-      - .charon/validator_keys:/home/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
@@ -103,13 +120,9 @@ services:
 
   vc-prysm:
     profiles: [vc-prysm]
-    image: "prysm-validator-client:${VC_PRYSM_VERSION:-v7.3.1}"
-    build:
-      context: prysm
-      args:
-        VERSION: ${VC_PRYSM_VERSION:-v7.3.1}
+    image: offchainlabs/prysm-validator:${VC_PRYSM_VERSION:-v7.3.1}
     platform: "linux/amd64"
-    depends_on: [charon]
+    depends_on: *vc-depends-on
     networks: [dvnode]
     entrypoint: /home/prysm/run.sh
     environment:
@@ -121,7 +134,6 @@ services:
     volumes:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
-      - .charon/validator_keys:/home/charon/validator_keys
       - .charon:/opt/charon/node:ro
     restart: unless-stopped
 
@@ -133,14 +145,11 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    image: "teku-validator-client:${VC_TEKU_VERSION:-26.10.3}"
-    build:
-      context: teku
-      args:
-        VERSION: ${VC_TEKU_VERSION:-26.10.3}
+    # Teku reads builders from the proposer config only after 26.10.3: develop until the next release.
+    image: consensys/teku:${VC_TEKU_VERSION:-develop}
     # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
     user: root
-    depends_on: [charon]
+    depends_on: *vc-depends-on
     networks: [dvnode]
     entrypoint: /opt/teku/run.sh
     environment:
@@ -151,7 +160,6 @@ services:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
       - ./teku/run.sh:/opt/teku/run.sh
-      - .charon/validator_keys:/opt/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-teku:/home/data
     restart: unless-stopped
