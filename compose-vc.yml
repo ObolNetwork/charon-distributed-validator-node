@@ -6,8 +6,9 @@
 # `charon alpha vc-bundle`: its keystores, its proposer settings from vc-config/proposer-config.json and the flags a
 # distributed validator needs (vc-flags.txt). Each VC mounts .charon read-only and copies the bundle into its own
 # data directory. .charon is mounted rather than a subdirectory, since Docker would create a missing one as root
-# before charon writes it. After the proposer config changes, run `docker compose up -d` rather than
-# `docker compose restart <vc>`: only `up` renders the bundle again.
+# before charon writes it. The vc-bundle service is in docker-compose.yml, beside the default lodestar that uses it too.
+# After the proposer config changes, run `docker compose up -d` rather than `docker compose restart <vc>`: only `up`
+# renders the bundle again.
 
 x-vc-depends-on: &vc-depends-on
   charon:
@@ -16,26 +17,6 @@ x-vc-depends-on: &vc-depends-on
     condition: service_completed_successfully
 
 services:
-  #                  _                     _ _
-  # __   _____      | |__  _   _ _ __   __| | | ___
-  # \ \ / / __|_____| '_ \| | | | '_ \ / _` | |/ _ \
-  #  \ V / (_|_____| |_) | |_| | | | | (_| | |  __/
-  #   \_/ \___|    |_.__/ \__,_|_| |_|\__,_|_|\___|
-
-  vc-bundle:
-    profiles: ["", vc-lodestar, vc-lighthouse, vc-nimbus, vc-prysm, vc-teku]
-    image: obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}
-    depends_on: [charon]
-    entrypoint: /opt/vc-bundle/run.sh
-    environment:
-      VC: ${VC:-vc-lodestar}
-    volumes:
-      - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
-      - .charon:/opt/charon/.charon
-      # Lighthouse mounts the keystores at the same path, which its validator definitions point at.
-      - .charon/validator_keys:/opt/charon/validator_keys:ro
-    restart: "no"
-
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|

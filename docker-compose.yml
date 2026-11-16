@@ -176,6 +176,26 @@ services:
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
 
+  #                  _                     _ _
+  # __   _____      | |__  _   _ _ __   __| | | ___
+  # \ \ / / __|_____| '_ \| | | | '_ \ / _` | |/ _ \
+  #  \ V / (_|_____| |_) | |_| | | | | (_| | |  __/
+  #   \_/ \___|    |_.__/ \__,_|_| |_|\__,_|_|\___|
+
+  vc-bundle:
+    profiles: ["", vc-lodestar, vc-lighthouse, vc-nimbus, vc-prysm, vc-teku]
+    image: obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}
+    depends_on: [charon]
+    entrypoint: /opt/vc-bundle/run.sh
+    environment:
+      VC: ${VC:-vc-lodestar}
+    volumes:
+      - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
+      - .charon:/opt/charon/.charon
+      # Lighthouse mounts the keystores at the same path, which its validator definitions point at.
+      - .charon/validator_keys:/opt/charon/validator_keys:ro
+    restart: "no"
+
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
