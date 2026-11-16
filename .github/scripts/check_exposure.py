@@ -9,8 +9,9 @@
   env_file, since those override grafana.ini.
 - Grafana must only join the monitoring network, so it cannot reach charon, the clients or the ejector.
 - Grafana must mount files from this repository read-only, so it cannot change its own provisioning.
-- Only the Docker socket proxy may mount the Docker socket. It must accept connections from Alloy only,
-  allow nothing but GET and HEAD, and refuse the endpoints that read files or secrets out of containers.
+- Only the Docker socket proxy may mount the Docker socket. Only Alloy may share its network, and it must
+  allow nothing but GET and HEAD, refuse the endpoints that read files out of containers, and still allow
+  the calls Alloy makes. Inspect and logs stay allowed for every container, so container env is readable.
 - Every execution client must list its JSON-RPC modules explicitly, without admin, debug, personal,
   trace, parity or miner, instead of inheriting the client's defaults.
 - Outside compose-debug.yml, no service may run privileged or share the host's network or PID namespace.
@@ -161,6 +162,16 @@ FORBIDDEN_PROXY_REQUESTS = [
     ("DELETE", "/v1.47/containers/abc"),
 ]
 
+# Requests Alloy makes, which the socket proxy must keep allowing.
+REQUIRED_PROXY_REQUESTS = [
+    "/_ping",
+    "/v1.47/version",
+    "/v1.47/containers/json",
+    "/v1.47/containers/abc/json",
+    "/v1.47/containers/abc/logs",
+    "/v1.47/networks",
+]
+
 
 # How each execution client image takes its JSON-RPC module list.
 EL_MODULE_FLAGS = {
@@ -192,7 +203,7 @@ def check_el_modules():
 
 
 def check_socket_proxy():
-    """Returns errors if anything besides Alloy can reach the socket proxy, or its haproxy allowlist admits other methods or a forbidden request."""
+    """Returns errors if anything besides Alloy can reach the socket proxy, or its haproxy allowlist admits other methods or a forbidden request, or refuses a call Alloy needs."""
     errors = []
     for path, services in compose_files():
         service = services.get(SOCKET_PROXY)
@@ -218,6 +229,9 @@ def check_socket_proxy():
         for method, url in FORBIDDEN_PROXY_REQUESTS:
             if method in ("GET", "HEAD") and allowed.search(url):
                 errors.append(f"{path}: {cfg} allows {method} {url}")
+        for url in REQUIRED_PROXY_REQUESTS:
+            if not allowed.search(url):
+                errors.append(f"{path}: {cfg} refuses GET {url}, which Alloy needs")
     return errors
 
 

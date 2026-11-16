@@ -232,8 +232,9 @@ services:
     image: prom/prometheus:${PROMETHEUS_VERSION:-v3.15.1}
     user: ":"
     networks: [dvnode, monitoring]
+    # The token is a secret file, not an environment variable, so inspecting the container does not reveal it.
+    secrets: [prom_remote_write_token]
     environment:
-      PROM_REMOTE_WRITE_TOKEN: ${PROM_REMOTE_WRITE_TOKEN}
       SERVICE_OWNER: ${SERVICE_OWNER:-obol-cdvn}
       CLUSTER_NAME: ${CLUSTER_NAME:-}
       CLUSTER_PEER: ${CLUSTER_PEER:-}
@@ -263,6 +264,10 @@ networks:
   dvnode:
   # Grafana only joins this network, so it can reach the monitoring backends but not charon or the clients.
   monitoring:
+
+secrets:
+  prom_remote_write_token:
+    environment: PROM_REMOTE_WRITE_TOKEN
 
 volumes:
   jwt:
