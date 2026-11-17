@@ -1,5 +1,11 @@
 discovery.docker "docker" {
 	host = "tcp://docker-socket-proxy:2375"
+
+	// Only list and tail the containers this stack labels for collection, not every container on the host.
+	filter {
+		name   = "label"
+		values = ["alloy-monitored=true"]
+	}
 }
 
 loki.process "docker" {

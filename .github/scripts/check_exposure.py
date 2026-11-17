@@ -9,12 +9,17 @@
   env_file, since those override grafana.ini.
 - Grafana must only join the monitoring network, so it cannot reach charon, the clients or the ejector.
 - Grafana must mount files from this repository read-only, so it cannot change its own provisioning.
-- Only the Docker socket proxy may mount the Docker socket.
+- Only the Docker socket proxy may mount the Docker socket. Only Alloy may share its network, and it must
+  allow nothing but GET and HEAD, refuse the endpoints that read files out of containers, and still allow
+  the calls Alloy makes. Inspect and logs stay allowed for every container, so container env is readable.
+- Every execution client must list its JSON-RPC modules explicitly, without admin, debug, personal,
+  trace, parity or miner, instead of inheriting the client's defaults.
 - Outside compose-debug.yml, no service may run privileged or share the host's network or PID namespace.
 """
 
 import configparser
 import glob
+import os
 import re
 import sys
 
@@ -139,8 +144,107 @@ def check_privileges():
     return errors
 
 
+# Requests a compromised Alloy must not be able to make through the socket proxy.
+FORBIDDEN_PROXY_REQUESTS = [
+    ("GET", "/v1.47/containers/abc/archive"),
+    ("GET", "/v1.47/containers/abc/export"),
+    ("GET", "/v1.47/containers/abc/attach/ws"),
+    ("GET", "/v1.47/containers/abc/changes"),
+    ("GET", "/v1.47/images/json"),
+    ("GET", "/v1.47/info"),
+    ("GET", "/v1.47/secrets"),
+    ("GET", "/v1.47/containers/abc/../../info"),
+    ("GET", "/v1.47/events"),
+    ("POST", "/v1.47/containers/create"),
+    ("POST", "/v1.47/containers/abc/exec"),
+    ("POST", "/v1.47/exec/abc/start"),
+    ("POST", "/v1.47/containers/abc/kill"),
+    ("DELETE", "/v1.47/containers/abc"),
+]
+
+# Requests Alloy makes, which the socket proxy must keep allowing.
+REQUIRED_PROXY_REQUESTS = [
+    "/_ping",
+    "/v1.47/version",
+    "/v1.47/containers/json",
+    "/v1.47/containers/abc/json",
+    "/v1.47/containers/abc/logs",
+    "/v1.47/networks",
+]
+
+
+# How each execution client image takes its JSON-RPC module list.
+EL_MODULE_FLAGS = {
+    "nethermind/nethermind": r"--JsonRpc\.EnabledModules=\[?([\w,]+)\]?",
+    "paradigmxyz/reth": r"--http\.api=([\w,]+)",
+}
+FORBIDDEN_EL_MODULES = {"admin", "debug", "personal", "trace", "parity", "miner"}
+
+
+def check_el_modules():
+    """Returns errors for execution clients that inherit default JSON-RPC modules or enable dangerous ones."""
+    errors = []
+    for path, services in compose_files():
+        for name, service in services.items():
+            image = str(service.get("image", ""))
+            for image_name, pattern in EL_MODULE_FLAGS.items():
+                if image_name not in image:
+                    continue
+                command = service.get("command") or ""
+                command = " ".join(command) if isinstance(command, list) else str(command)
+                m = re.search(pattern, command)
+                if not m:
+                    errors.append(f"{path}: {name} does not list its JSON-RPC modules; set them explicitly")
+                    continue
+                enabled = {module.lower() for module in m.group(1).split(",")}
+                for module in sorted(enabled & FORBIDDEN_EL_MODULES):
+                    errors.append(f"{path}: {name} enables the {module} JSON-RPC module")
+    return errors
+
+
+def check_socket_proxy():
+    """Returns errors if anything besides Alloy can reach the socket proxy, or its haproxy allowlist admits other methods or a forbidden request, or refuses a call Alloy needs."""
+    errors = []
+    for path, services in compose_files():
+        service = services.get(SOCKET_PROXY)
+        if service is None:
+            continue
+        for name, other in services.items():
+            if name not in (SOCKET_PROXY, "alloy") and "docker-api" in (other.get("networks") or []):
+                errors.append(f"{path}: only alloy and {SOCKET_PROXY} may join the docker-api network, not {name}")
+        mounts = [str(v) for v in service.get("volumes") or []]
+        cfg = next((m.split(":")[0] for m in mounts if m.endswith(":/usr/local/etc/haproxy/haproxy.cfg:ro")), None)
+        if service.get("command") or cfg is None:
+            errors.append(f"{path}: {SOCKET_PROXY} must run haproxy with a read-only haproxy.cfg from this repo")
+            continue
+        text = open(os.path.join(os.path.dirname(path), cfg)).read()
+        rules = [line.strip() for line in text.splitlines() if line.strip().startswith("http-request")]
+        if rules[:1] != ["http-request deny unless { method GET HEAD }"]:
+            errors.append(f"{path}: {cfg} must first deny every method except GET and HEAD")
+        paths = [re.fullmatch(r"http-request deny unless \{ path,url_dec -m reg (\S+) \}", rule) for rule in rules[1:]]
+        if len(paths) != 1 or not paths[0]:
+            errors.append(f"{path}: {cfg} must only add one rule that denies paths outside an allowlist")
+            continue
+        allowed = re.compile(paths[0].group(1))
+        for method, url in FORBIDDEN_PROXY_REQUESTS:
+            if method in ("GET", "HEAD") and allowed.search(url):
+                errors.append(f"{path}: {cfg} allows {method} {url}")
+        for url in REQUIRED_PROXY_REQUESTS:
+            if not allowed.search(url):
+                errors.append(f"{path}: {cfg} refuses GET {url}, which Alloy needs")
+    return errors
+
+
 def main():
-    errors = check_ports() + check_sample_ports() + check_grafana() + check_grafana_service() + check_privileges()
+    errors = (
+        check_ports()
+        + check_sample_ports()
+        + check_grafana()
+        + check_grafana_service()
+        + check_privileges()
+        + check_socket_proxy()
+        + check_el_modules()
+    )
     for error in errors:
         print(f"::error::{error}")
     if not errors:

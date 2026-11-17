@@ -26,7 +26,7 @@ services:
     user: ":"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
-      - ./tempo:/etc/tempo
+      - ./tempo:/etc/tempo:ro
       - ./data/tempo:/opt/tempo
     # Grafana reaches Tempo and Loki over the monitoring network defined in docker-compose.yml.
     networks: [default, monitoring]
@@ -37,7 +37,7 @@ services:
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:
-      - ./loki/loki.yml:/etc/loki/loki.yml
+      - ./loki/loki.yml:/etc/loki/loki.yml:ro
       - ./data/loki:/loki
     networks: [default, monitoring]
     restart: unless-stopped

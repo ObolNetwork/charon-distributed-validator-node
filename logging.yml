@@ -5,23 +5,39 @@ services:
       CHARON_LOKI_ADDRESSES: ${CHARON_LOKI_ADDRESSES}
       CLUSTER_NAME: ${CLUSTER_NAME}
       CLUSTER_PEER: ${CLUSTER_PEER}
+    # Alloy only reads logs and sends them on, so it needs no capabilities and writes only its rendered config and its data.
+    # The image's own alloy user, which owns the data directory; root without capabilities can't write to it.
+    user: "473:473"
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    tmpfs: [/tmp]
     volumes:
-      - ./alloy:/etc/alloy
+      - ./alloy:/etc/alloy:ro
+      - alloy-data:/var/lib/alloy/data
     networks: [dvnode, docker-api]
     depends_on: [docker-socket-proxy]
     entrypoint: /etc/alloy/run.sh
-    command: ["/bin/alloy", "run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data"]
+    command: ["/bin/alloy", "run", "/tmp/config.alloy", "--storage.path=/var/lib/alloy/data", "--disable-reporting"]
     restart: unless-stopped
 
-  # Gives Alloy read-only access to container metadata and logs instead of the full Docker API.
+  # Gives Alloy only the Docker API calls it needs instead of the full Docker API (allowlist in docker-socket-proxy/haproxy.cfg).
   docker-socket-proxy:
-    image: tecnativa/docker-socket-proxy:${DOCKER_SOCKET_PROXY_VERSION:-v0.5.0}
-    environment:
-      CONTAINERS: 1
-      # Alloy's container discovery also lists networks.
-      NETWORKS: 1
+    image: haproxy:${HAPROXY_VERSION:-3.2.26-alpine}
+    # Root inside the container only so it can open the root-owned Docker socket; it has no capabilities and a read-only filesystem.
+    user: "0:0"
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker-socket-proxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    # Restart if the Docker socket goes away, for example after a Docker engine update: the restart mounts the new socket.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:2375/_ping || kill 1"]
+      interval: 60s
+      timeout: 10s
+      start_period: 10s
     networks: [docker-api]
     restart: unless-stopped
 
@@ -30,3 +46,6 @@ networks:
   # Only Alloy and the Docker socket proxy join this network, and it has no external access.
   docker-api:
     internal: true
+
+volumes:
+  alloy-data:

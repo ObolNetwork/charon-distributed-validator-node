@@ -11,7 +11,9 @@ cluster-lock.json
 data/
 .idea
 .charon
+# Configs that older releases rendered here; they are now rendered inside the containers.
 prometheus/prometheus.yml
+alloy/config.alloy
 commit-boost/config.toml
 
 # Cluster data and keys

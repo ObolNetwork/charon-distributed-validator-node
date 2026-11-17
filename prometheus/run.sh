@@ -6,6 +6,12 @@ then
   exit 1
 fi
 
+# Compose mounts the token as a secret file; the variable still works if an override file sets it.
+TOKEN_FILE="/run/secrets/prom_remote_write_token"
+if [ -z "$PROM_REMOTE_WRITE_TOKEN" ] && [ -r "$TOKEN_FILE" ]; then
+  PROM_REMOTE_WRITE_TOKEN="$(cat "$TOKEN_FILE")"
+fi
+
 if [ -z "$PROM_REMOTE_WRITE_TOKEN" ]
 then
   echo "\$PROM_REMOTE_WRITE_TOKEN variable is empty" >&2
@@ -17,7 +23,7 @@ sed -e "s|\$PROM_REMOTE_WRITE_TOKEN|${PROM_REMOTE_WRITE_TOKEN}|g" \
     -e "s|\$CLUSTER_NAME|${CLUSTER_NAME}|g" \
     -e "s|\$CLUSTER_PEER|${CLUSTER_PEER}|g" \
     -e "s|\$ALERT_DISCORD_IDS|${ALERT_DISCORD_IDS}|g" \
-    /etc/prometheus/prometheus.yml.example > /etc/prometheus/prometheus.yml
+    /etc/prometheus/prometheus.yml.example > /tmp/prometheus.yml
 
 /bin/prometheus \
-  --config.file=/etc/prometheus/prometheus.yml
+  --config.file=/tmp/prometheus.yml
