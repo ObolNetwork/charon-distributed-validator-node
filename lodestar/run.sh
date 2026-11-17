@@ -1,107 +1,42 @@
 #!/bin/sh
 
-# Remove the existing keystores to avoid keystore locking issues.
-rm -rf /opt/data/cache /opt/data/secrets /opt/data/keystores
+# The vc-bundle service renders Lodestar's keystores and proposer settings from .charon before this starts.
+CHARON_BUNDLE_DIR="/opt/charon/node/vc-bundle"
+CHARON_KEYS_DIR="${CHARON_BUNDLE_DIR}/keystores"
+CHARON_SECRETS_DIR="${CHARON_BUNDLE_DIR}/secrets"
+VC_DATA_DIR="/opt/data"
+VC_KEYS_DIR="${VC_DATA_DIR}/keystores"
+VC_SECRETS_DIR="${VC_DATA_DIR}/secrets"
 
-DATA_DIR="/opt/data"
-KEYSTORES_DIR="${DATA_DIR}/keystores"
-SECRETS_DIR="${DATA_DIR}/secrets"
+# Copy validator keys to VC directory
+echo "Importing validator keys..."
+rm -rf "${VC_DATA_DIR}/cache" "${VC_KEYS_DIR}" "${VC_SECRETS_DIR}"
+cp -r "${CHARON_KEYS_DIR}" "${VC_KEYS_DIR}"
+cp -r "${CHARON_SECRETS_DIR}" "${VC_SECRETS_DIR}"
 
-mkdir -p "${KEYSTORES_DIR}" "${SECRETS_DIR}"
+echo "Imported $(ls "${VC_KEYS_DIR}" | wc -l) keystores"
 
-IMPORTED_COUNT=0
-EXISTING_COUNT=0
+# Copy proposer preferences config to VC directory
+# Copy builder preferences config to VC directory: Lodestar takes both from its proposer settings file
+echo "Importing proposer and builder preferences config..."
+cp "${CHARON_BUNDLE_DIR}/lodestar-proposer-settings.yml" "${VC_DATA_DIR}/"
+echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/lodestar-proposer-settings.yml"
 
-for f in /home/charon/validator_keys/keystore-*.json; do
-    echo "Importing key ${f}"
-
-    # Extract pubkey from keystore file
-    PUBKEY="0x$(grep '"pubkey"' "$f" | awk -F'"' '{print $4}')"
-
-    PUBKEY_DIR="${KEYSTORES_DIR}/${PUBKEY}"
-
-    # Skip import if keystore already exists
-    if [ -d "${PUBKEY_DIR}" ]; then
-        EXISTING_COUNT=$((EXISTING_COUNT + 1))
-        continue
-    fi
-
-    mkdir -p "${PUBKEY_DIR}"
-
-    # Copy the keystore file to persisted keys backend
-    install -m 600 "$f" "${PUBKEY_DIR}/voting-keystore.json"
-
-    # Copy the corresponding password file
-    PASSWORD_FILE="${f%.json}.txt"
-    install -m 600 "${PASSWORD_FILE}" "${SECRETS_DIR}/${PUBKEY}"
-
-    IMPORTED_COUNT=$((IMPORTED_COUNT + 1))
-done
-
-echo "Processed all keys imported=${IMPORTED_COUNT}, existing=${EXISTING_COUNT}, total=$(ls /home/charon/validator_keys/keystore-*.json | wc -l)"
-
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
-PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-for _ in $(seq 60); do
-    [ -f "${PROPOSER_CONFIG_FILE}" ] && break
-    sleep 2
-done
-
-# Render Lodestar's proposer settings from the charon-generated canonical config when
-# available: entries only carry fields diverging from default_config, absent fields
-# fall back to it. Lodestar only accepts yml/yaml file extensions; JSON is valid YAML.
-PROPOSER_SETTINGS=""
-if [ -f "${PROPOSER_CONFIG_FILE}" ]; then
-    echo "proposer-config.json found, rendering lodestar proposer settings"
-    node -e '
-        const fs = require("fs");
-        const src = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-        const d = src.default_config;
-        const out = {
-            proposer_config: {},
-            default_config: {fee_recipient: d.fee_recipient, builder: {gas_limit: d.gas_limit}},
-        };
-        if (d.builder) {
-            // Per-entry override keys match the keymanager JSON format, pass through verbatim.
-            Object.assign(out.default_config.builder, {
-                min_bid: d.builder.min_bid,
-                boost_factor: d.builder.builder_boost_factor,
-                max_execution_payment: d.builder.max_execution_payment,
-                builders: d.builder.builders,
-            });
-        }
-        for (const [pubkey, entry] of Object.entries(src.proposer_config || {})) {
-            out.proposer_config[pubkey] = {
-                fee_recipient: entry.fee_recipient ?? d.fee_recipient,
-                builder: {gas_limit: entry.gas_limit ?? d.gas_limit},
-            };
-        }
-        fs.writeFileSync(process.argv[2], JSON.stringify(out));
-    ' "${PROPOSER_CONFIG_FILE}" /tmp/proposer-config.yml
-    PROPOSER_SETTINGS="--proposerSettingsFile=/tmp/proposer-config.yml"
-    # Lodestar refuses a max execution payment above 0 (trusted payments) without an explicit opt-in.
-    if [ "$(node -p 'require(process.argv[1]).default_config.builder?.max_execution_payment ?? "0"' "${PROPOSER_CONFIG_FILE}")" != "0" ]; then
-        PROPOSER_SETTINGS="${PROPOSER_SETTINGS} --allowDangerousTrustedPayments"
-    fi
-else
-    echo "proposer-config.json not found, running without proposer settings"
-fi
-
-# Request the stateful gloas block form (payload kept on the beacon node), which charon expects from
-# distributed validators.
-# Word splitting of $PROPOSER_SETTINGS is intentional, it holds zero or more flags.
-# shellcheck disable=SC2086
+# --payloadLocal: charon expects the stateful gloas block form, the payload kept on the beacon node.
+# --builder.selection=maxprofit: Lodestar applies the boost factor of the proposer settings file only with it.
+# --allowDangerousTrustedPayments: Lodestar refuses to start on a builder max execution payment above 0 in the
+# proposer settings without it. The cluster's proposer config sets that value, so it is allowed here.
 exec node /usr/app/packages/cli/bin/lodestar validator \
-    --dataDir="$DATA_DIR" \
-    --keystoresDir="$KEYSTORES_DIR" \
-    --secretsDir="$SECRETS_DIR" \
-    --network="$NETWORK" \
+    --dataDir="${VC_DATA_DIR}" \
+    --keystoresDir="${VC_KEYS_DIR}" \
+    --secretsDir="${VC_SECRETS_DIR}" \
+    --network="${NETWORK}" \
     --metrics=true \
     --metrics.address="0.0.0.0" \
     --metrics.port=5064 \
-    --beaconNodes="$BEACON_NODE_ADDRESS" \
-    --builder="$BUILDER_API_ENABLED" \
-    --builder.selection="$BUILDER_SELECTION" \
+    --beaconNodes="${BEACON_NODE_ADDRESS}" \
+    --builder.selection=maxprofit \
+    --proposerSettingsFile="${VC_DATA_DIR}/lodestar-proposer-settings.yml" \
     --distributed \
     --payloadLocal=true \
-    $PROPOSER_SETTINGS
+    --allowDangerousTrustedPayments
