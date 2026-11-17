@@ -3,12 +3,13 @@
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
 # Before the selected VC starts, the vc-bundle service renders what it consumes into .charon/vc-bundle with
-# `charon alpha vc-bundle`: its keystores, its proposer settings from vc-config/proposer-config.json and the flags a
-# distributed validator needs (vc-flags.txt). Each VC mounts .charon read-only and copies the bundle into its own
-# data directory. .charon is mounted rather than a subdirectory, since Docker would create a missing one as root
-# before charon writes it. The vc-bundle service is in docker-compose.yml, beside the default lodestar that uses it too.
-# After the proposer config changes, run `docker compose up -d` rather than `docker compose restart <vc>`: only `up`
-# renders the bundle again.
+# `charon alpha vc-bundle`: its keystores and its proposer settings from vc-config/proposer-config.json, plus
+# vc-flags.txt with the builder flags Nimbus takes. Each VC mounts .charon read-only, copies its validator keys and
+# settings into its own data directory and runs only from there.
+# .charon is mounted rather than a subdirectory, since Docker would create a missing one as root before charon writes
+# it. The vc-bundle service is in docker-compose.yml, beside the default lodestar that uses it too. After the proposer
+# config changes, run `docker compose up -d` rather than `docker compose restart <vc>`: only `up` renders the bundle
+# again.
 
 x-vc-depends-on: &vc-depends-on
   charon:
@@ -33,7 +34,6 @@ services:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
-      BUILDER_SELECTION: ${VC_LODESTAR_BUILDER_SELECTION:-builderalways}
     labels:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
@@ -63,7 +63,6 @@ services:
       - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
     volumes:
       - ./lighthouse/run.sh:/opt/lighthouse/run.sh
-      - .charon/validator_keys:/opt/charon/validator_keys
       - .charon:/opt/charon/node:ro
       - ./data/vc-lighthouse:/opt/data
     restart: unless-stopped

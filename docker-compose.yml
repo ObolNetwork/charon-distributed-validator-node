@@ -192,8 +192,8 @@ services:
     volumes:
       - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
       - .charon:/opt/charon/.charon
-      # Lighthouse mounts the keystores at the same path, which its validator definitions point at.
-      - .charon/validator_keys:/opt/charon/validator_keys:ro
+      # Lighthouse's validator definitions name the keystores by this path, where its run.sh copies them.
+      - .charon/validator_keys:/opt/data/validator_keys:ro
     restart: "no"
 
   #  _           _           _
@@ -216,7 +216,6 @@ services:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
       BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
-      BUILDER_SELECTION: ${BUILDER_SELECTION:-builderalways}
     labels:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
