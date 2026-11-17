@@ -192,8 +192,6 @@ services:
     volumes:
       - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
       - .charon:/opt/charon/.charon
-      # Lighthouse's validator definitions name the keystores by this path, where its run.sh copies them.
-      - .charon/validator_keys:/opt/data/validator_keys:ro
     restart: "no"
 
   #  _           _           _

@@ -1,31 +1,35 @@
 #!/bin/bash
 
-# The vc-bundle service renders Lighthouse's validator and builder definitions from .charon before this starts.
+# The vc-bundle service renders Lighthouse's keystores, validator and builder definitions from .charon before this
+# starts, in Lighthouse's own layout: a directory per validator with its keystore, the passwords apart.
 CHARON_BUNDLE_DIR="/opt/charon/node/vc-bundle"
-CHARON_KEYS_DIR="/opt/charon/node/validator_keys"
+CHARON_KEYS_DIR="${CHARON_BUNDLE_DIR}/validators"
+CHARON_SECRETS_DIR="${CHARON_BUNDLE_DIR}/secrets"
+# The validator definitions name the keystores by their path here: --lighthouse-dir in vc-bundle/run.sh.
 VC_DATA_DIR="/opt/data"
-# The validator definitions point at the keystores by their path here: --validator-keys-dir in vc-bundle/run.sh.
-VC_KEYS_DIR="${VC_DATA_DIR}/validator_keys"
-# Lighthouse reads its validator (proposer preferences) and builder definitions from here.
-VC_DEFINITIONS_DIR="${VC_DATA_DIR}/validators"
+VC_KEYS_DIR="${VC_DATA_DIR}/validators"
+VC_SECRETS_DIR="${VC_DATA_DIR}/secrets"
+
+# Replace the keystores and definitions on every start, but keep the slashing protection DB
+# (validators/slashing_protection.sqlite). validator_keys is where earlier versions copied the keystores.
+rm -rf "${VC_DATA_DIR}/validator_keys" "${VC_SECRETS_DIR}" "${VC_KEYS_DIR}"/0x*
+mkdir -p "${VC_KEYS_DIR}"
 
 # Copy validator keys to VC directory
 echo "Importing validator keys..."
-rm -rf "${VC_KEYS_DIR}"
-cp -r "${CHARON_KEYS_DIR}" "${VC_KEYS_DIR}"
-echo "Imported $(ls "${VC_KEYS_DIR}"/keystore-*.json | wc -l) keystores"
-
-mkdir -p "${VC_DEFINITIONS_DIR}"
+cp -r "${CHARON_SECRETS_DIR}" "${VC_SECRETS_DIR}"
+cp -r "${CHARON_KEYS_DIR}"/0x* "${VC_KEYS_DIR}/"
+echo "Imported $(ls -d "${VC_KEYS_DIR}"/0x* | wc -l) keystores"
 
 # Copy proposer preferences config to VC directory
 echo "Importing proposer preferences config..."
-cp "${CHARON_BUNDLE_DIR}/validators/validator_definitions.yml" "${VC_DEFINITIONS_DIR}/"
-echo "Imported proposer preferences config to ${VC_DEFINITIONS_DIR}/validator_definitions.yml"
+cp "${CHARON_KEYS_DIR}/validator_definitions.yml" "${VC_KEYS_DIR}/"
+echo "Imported proposer preferences config to ${VC_KEYS_DIR}/validator_definitions.yml"
 
 # Copy builder preferences config to VC directory
 echo "Importing builder preferences config..."
-cp "${CHARON_BUNDLE_DIR}/validators/builder_definitions.yml" "${VC_DEFINITIONS_DIR}/"
-echo "Imported builder preferences config to ${VC_DEFINITIONS_DIR}/builder_definitions.yml"
+cp "${CHARON_KEYS_DIR}/builder_definitions.yml" "${VC_KEYS_DIR}/"
+echo "Imported builder preferences config to ${VC_KEYS_DIR}/builder_definitions.yml"
 
 exec lighthouse validator_client \
     --network "${NETWORK}" \

@@ -23,9 +23,10 @@ done
 # Start from an empty bundle, so files of removed validators are not picked up.
 rm -rf "${BUNDLE_DIR}"
 
-# Lighthouse's definitions point at the keystores by absolute path: /opt/data/validator_keys is where Lighthouse's
-# run.sh copies them in its own container.
+# Lighthouse's definitions name the keystores by absolute path under its data directory: /opt/data in its
+# container, where its run.sh copies them. The other clients ignore --lighthouse-dir.
 exec charon alpha vc-bundle "${CLIENT}" \
     --output-dir="${BUNDLE_DIR}" \
     --proposer-config-file="${PROPOSER_CONFIG_FILE}" \
-    --validator-keys-dir=/opt/data/validator_keys
+    --validator-keys-dir="${NODE_DIR}/validator_keys" \
+    --lighthouse-dir=/opt/data
