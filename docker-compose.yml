@@ -14,7 +14,7 @@ services:
   # It lives in the jwt volume, which only those clients mount, so it is not a file in this directory.
   # To use your own secret, for example with an external execution client, put it in jwt/jwt.hex.
   jwt-init:
-    image: busybox:${BUSYBOX_VERSION:-1.37.0}
+    image: busybox:${BUSYBOX_VERSION:-1.38.0}
     network_mode: none
     volumes:
       - jwt:/jwt
@@ -183,7 +183,7 @@ services:
   # |_|\___/ \__,_|\___||___/\__\__,_|_|
 
   lodestar:
-    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.1}
+    image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.51.0}
     profiles: [""]
     depends_on: [charon]
     entrypoint: /opt/lodestar/run.sh
@@ -229,7 +229,7 @@ services:
   #                                                |___/
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.15.1}
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.16.0}
     user: ":"
     networks: [dvnode, monitoring]
     environment:
@@ -244,7 +244,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-13.2.5}
+    image: grafana/grafana:${GRAFANA_VERSION:-13.3.1}
     ports:
       - ${MONITORING_IP_GRAFANA:-127.0.0.1}:${MONITORING_PORT_GRAFANA:-3000}:3000
     networks: [monitoring]

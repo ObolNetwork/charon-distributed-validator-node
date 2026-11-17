@@ -12,7 +12,7 @@ services:
 
   cl-grandine:
     profiles: [ cl-grandine ]
-    image: sifrai/grandine:${CL_GRANDINE_VERSION:-${GRANDINE_VERSION:-3.0.0-rc.2}}
+    image: sifrai/grandine:${CL_GRANDINE_VERSION:-${GRANDINE_VERSION:-3.0.0-rc.4}}
     depends_on:
       jwt-init:
         condition: service_completed_successfully
@@ -129,7 +129,7 @@ services:
 
   cl-lodestar:
     profiles: [ cl-lodestar ]
-    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.50.1}
+    image: chainsafe/lodestar:${CL_LODESTAR_VERSION:-v1.51.0}
     depends_on:
       jwt-init:
         condition: service_completed_successfully
