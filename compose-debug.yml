@@ -5,7 +5,7 @@
 
 services:
   cadvisor:
-    image: ghcr.io/google/cadvisor:${CADVISOR_VERSION:-v0.60.6}
+    image: ghcr.io/google/cadvisor:${CADVISOR_VERSION:-v0.61.0}
     command: --raw_cgroup_prefix_whitelist=/docker/ --disable_metrics=hugetlb
     privileged: true
     volumes:
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:${LOKI_VERSION:-3.7.9}
+    image: grafana/loki:${LOKI_VERSION:-3.7.10}
     user: ":"
     command: -config.file=/etc/loki/loki.yml
     volumes:

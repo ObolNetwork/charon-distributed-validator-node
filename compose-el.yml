@@ -52,7 +52,7 @@ services:
 
   el-reth:
     profiles: [el-reth]
-    image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.8.1}}
+    image: ghcr.io/paradigmxyz/reth:${RETH_VERSION:-${EL_RETH_VERSION:-v2.11.0}}
     depends_on:
       jwt-init:
         condition: service_completed_successfully
