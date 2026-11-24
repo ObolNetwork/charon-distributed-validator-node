@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# The vc-bundle service renders Teku's keystores and proposer config from .charon before this starts.
-CHARON_BUNDLE_DIR="/opt/charon/node/vc-bundle"
-CHARON_KEYS_DIR="${CHARON_BUNDLE_DIR}/keystores"
+# The vc-files service leaves Teku's keystores and proposer config in .charon/vc-files before this starts.
+CHARON_KEYS_DIR="/opt/charon/vc-files/keys"
+CHARON_CONFIG_DIR="/opt/charon/vc-files/config"
 VC_DATA_DIR="/home/data"
 VC_KEYS_DIR="${VC_DATA_DIR}/keystores"
 
@@ -14,17 +14,24 @@ if [ "$(id -u)" = "0" ]; then
   HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
 fi
 
-# Copy validator keys to VC directory
-echo "Importing validator keys..."
-rm -rf "${VC_KEYS_DIR}"
-cp -r "${CHARON_KEYS_DIR}" "${VC_KEYS_DIR}"
-echo "Imported $(ls "${VC_KEYS_DIR}"/*.json | wc -l) keystores"
+if [ -d "${CHARON_KEYS_DIR}" ]; then
+    # Copy validator keys to VC directory
+    echo "Importing validator keys..."
+    rm -rf "${VC_KEYS_DIR}"
+    cp -r "${CHARON_KEYS_DIR}/keystores" "${VC_KEYS_DIR}"
+    echo "Imported $(ls "${VC_KEYS_DIR}"/*.json | wc -l) keystores"
 
-# Copy proposer preferences config to VC directory
-# Copy builder preferences config to VC directory: Teku takes both from its proposer config file
-echo "Importing proposer and builder preferences config..."
-cp "${CHARON_BUNDLE_DIR}/teku-proposer-config.json" "${VC_DATA_DIR}/"
-echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/teku-proposer-config.json"
+    # Copy proposer preferences config to VC directory
+    # Copy builder preferences config to VC directory: Teku takes both from its proposer config file
+    echo "Importing proposer and builder preferences config..."
+    cp "${CHARON_CONFIG_DIR}/teku-proposer-config.json" "${VC_DATA_DIR}/"
+    echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/teku-proposer-config.json"
+
+    # Teku runs from its own copy, .charon keeps none.
+    rm -rf "${CHARON_KEYS_DIR}" "${CHARON_CONFIG_DIR}"
+else
+    echo "Nothing to import in .charon/vc-files, starting with the validator keys and settings imported before"
+fi
 
 exec /opt/teku/bin/teku validator-client \
     --beacon-node-api-endpoint "${BEACON_NODE_ADDRESS}" \

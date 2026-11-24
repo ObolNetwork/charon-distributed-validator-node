@@ -1,26 +1,34 @@
 #!/bin/sh
 
-# The vc-bundle service renders Lodestar's keystores and proposer settings from .charon before this starts.
-CHARON_BUNDLE_DIR="/opt/charon/node/vc-bundle"
-CHARON_KEYS_DIR="${CHARON_BUNDLE_DIR}/keystores"
-CHARON_SECRETS_DIR="${CHARON_BUNDLE_DIR}/secrets"
+# The vc-files service leaves Lodestar's keystores and proposer settings in .charon/vc-files before this starts.
+CHARON_KEYS_DIR="/opt/charon/vc-files/keys"
+CHARON_CONFIG_DIR="/opt/charon/vc-files/config"
 VC_DATA_DIR="/opt/data"
 VC_KEYS_DIR="${VC_DATA_DIR}/keystores"
 VC_SECRETS_DIR="${VC_DATA_DIR}/secrets"
 
-# Copy validator keys to VC directory
-echo "Importing validator keys..."
-rm -rf "${VC_DATA_DIR}/cache" "${VC_KEYS_DIR}" "${VC_SECRETS_DIR}"
-cp -r "${CHARON_KEYS_DIR}" "${VC_KEYS_DIR}"
-cp -r "${CHARON_SECRETS_DIR}" "${VC_SECRETS_DIR}"
+# Remove the cache and the locks a killed Lodestar leaves behind, to avoid keystore locking issues.
+rm -rf "${VC_DATA_DIR}/cache" "${VC_KEYS_DIR}"/*/voting-keystore.json.lock
 
-echo "Imported $(ls "${VC_KEYS_DIR}" | wc -l) keystores"
+if [ -d "${CHARON_KEYS_DIR}" ]; then
+    # Copy validator keys to VC directory
+    echo "Importing validator keys..."
+    rm -rf "${VC_KEYS_DIR}" "${VC_SECRETS_DIR}"
+    cp -r "${CHARON_KEYS_DIR}/keystores" "${VC_KEYS_DIR}"
+    cp -r "${CHARON_KEYS_DIR}/secrets" "${VC_SECRETS_DIR}"
+    echo "Imported $(ls "${VC_KEYS_DIR}" | wc -l) keystores"
 
-# Copy proposer preferences config to VC directory
-# Copy builder preferences config to VC directory: Lodestar takes both from its proposer settings file
-echo "Importing proposer and builder preferences config..."
-cp "${CHARON_BUNDLE_DIR}/lodestar-proposer-settings.yml" "${VC_DATA_DIR}/"
-echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/lodestar-proposer-settings.yml"
+    # Copy proposer preferences config to VC directory
+    # Copy builder preferences config to VC directory: Lodestar takes both from its proposer settings file
+    echo "Importing proposer and builder preferences config..."
+    cp "${CHARON_CONFIG_DIR}/lodestar-proposer-settings.yml" "${VC_DATA_DIR}/"
+    echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/lodestar-proposer-settings.yml"
+
+    # Lodestar runs from its own copy, .charon keeps none.
+    rm -rf "${CHARON_KEYS_DIR}" "${CHARON_CONFIG_DIR}"
+else
+    echo "Nothing to import in .charon/vc-files, starting with the validator keys and settings imported before"
+fi
 
 # --payloadLocal: charon expects the stateful gloas block form, the payload kept on the beacon node.
 # --builder.selection=maxprofit: Lodestar applies the boost factor of the proposer settings file only with it.

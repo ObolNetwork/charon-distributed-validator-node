@@ -2,19 +2,20 @@
 # ${VARIABLE:-default} evaluates to default if VARIABLE is unset or empty in the environment.
 # ${VARIABLE-default} evaluates to default only if VARIABLE is unset in the environment.
 
-# Before the selected VC starts, the vc-bundle service renders what it consumes into .charon/vc-bundle with
-# `charon alpha vc-bundle`: its keystores and its proposer settings from vc-config/proposer-config.json, plus
-# vc-flags.txt with the builder flags Nimbus takes. Each VC mounts .charon read-only, copies its validator keys and
-# settings into its own data directory and runs only from there.
-# .charon is mounted rather than a subdirectory, since Docker would create a missing one as root before charon writes
-# it. The vc-bundle service is in docker-compose.yml, beside the default lodestar that uses it too. After the proposer
-# config changes, run `docker compose up -d` rather than `docker compose restart <vc>`: only `up` renders the bundle
+# Before the selected VC starts, the vc-files service leaves what it consumes in .charon/vc-files: its key shares
+# in its layout in keys with `charon alpha validator keys`, and its proposer settings from
+# vc-config/proposer-config.json in config with `charon alpha validator config`, plus vc-flags.txt with the builder
+# flags Nimbus takes. Each VC mounts only that folder, moves its validator keys and settings into its own data
+# directory and runs only from there, so .charon keeps no copy of them. A VC restarted on its own finds the folder
+# empty and starts with what it moved before.
+# The vc-files service is in docker-compose.yml, beside the default lodestar that uses it too. After the proposer
+# config changes, run `docker compose up -d` rather than `docker compose restart <vc>`: only `up` writes the files
 # again.
 
 x-vc-depends-on: &vc-depends-on
   charon:
     condition: service_started
-  vc-bundle:
+  vc-files:
     condition: service_completed_successfully
 
 services:
@@ -38,7 +39,7 @@ services:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/lodestar:/opt/data # Keep data in lodestar and not vc-lodestar for backwards compatibility
     restart: unless-stopped
 
@@ -63,7 +64,7 @@ services:
       - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
     volumes:
       - ./lighthouse/run.sh:/opt/lighthouse/run.sh
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/vc-lighthouse:/opt/data
     restart: unless-stopped
 
@@ -88,7 +89,7 @@ services:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
       - ./nimbus/run.sh:/home/user/run.sh
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/vc-nimbus:/home/user/data
     restart: unless-stopped
 
@@ -114,7 +115,7 @@ services:
     volumes:
       - ./prysm/run.sh:/home/prysm/run.sh
       - ./data/vc-prysm:/data/vc
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
     restart: unless-stopped
 
   #  _       _
@@ -140,6 +141,6 @@ services:
       - "alloy-monitored=${VC_TEKU_ALLOY_MONITORED:-true}"
     volumes:
       - ./teku/run.sh:/opt/teku/run.sh
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/vc-teku:/home/data
     restart: unless-stopped

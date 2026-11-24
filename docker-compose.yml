@@ -176,21 +176,21 @@ services:
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
 
-  #                  _                     _ _
-  # __   _____      | |__  _   _ _ __   __| | | ___
-  # \ \ / / __|_____| '_ \| | | | '_ \ / _` | |/ _ \
-  #  \ V / (_|_____| |_) | |_| | | | | (_| | |  __/
-  #   \_/ \___|    |_.__/ \__,_|_| |_|\__,_|_|\___|
+  #                   __ _ _
+  # __   _____       / _(_) | ___  ___
+  # \ \ / / __|_____| |_| | |/ _ \/ __|
+  #  \ V / (_|_____||  _| | |  __/\__ \
+  #   \_/ \___|     |_| |_|_|\___||___/
 
-  vc-bundle:
+  vc-files:
     profiles: ["", vc-lodestar, vc-lighthouse, vc-nimbus, vc-prysm, vc-teku]
     image: obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}
     depends_on: [charon]
-    entrypoint: /opt/vc-bundle/run.sh
+    entrypoint: /opt/vc-files/run.sh
     environment:
       VC: ${VC:-vc-lodestar}
     volumes:
-      - ./vc-bundle/run.sh:/opt/vc-bundle/run.sh
+      - ./vc-files/run.sh:/opt/vc-files/run.sh
       - .charon:/opt/charon/.charon
     restart: "no"
 
@@ -206,7 +206,7 @@ services:
     depends_on:
       charon:
         condition: service_started
-      vc-bundle:
+      vc-files:
         condition: service_completed_successfully
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
@@ -218,7 +218,7 @@ services:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
-      - .charon:/opt/charon/node:ro
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/lodestar:/opt/data
     restart: unless-stopped
 
