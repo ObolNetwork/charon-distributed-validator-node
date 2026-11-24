@@ -122,8 +122,8 @@ services:
 
   vc-teku:
     profiles: [vc-teku]
-    # Teku reads builders from the proposer config only after 26.10.3: develop until the next release.
-    image: consensys/teku:${VC_TEKU_VERSION:-develop}
+    # Teku reads builders from the proposer config only from 26.11.0.
+    image: consensys/teku:${VC_TEKU_VERSION:-26.11.0}
     # Starts as root so run.sh can hand ./data/vc-teku to uid 1000; Teku itself runs as uid 1000.
     user: root
     depends_on: *vc-depends-on
