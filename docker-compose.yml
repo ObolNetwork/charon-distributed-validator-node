@@ -176,6 +176,26 @@ services:
     healthcheck:
       test: wget -qO- http://localhost:3620/readyz
 
+  #                   __ _ _
+  # __   _____       / _(_) | ___  ___
+  # \ \ / / __|_____| |_| | |/ _ \/ __|
+  #  \ V / (_|_____||  _| | |  __/\__ \
+  #   \_/ \___|     |_| |_|_|\___||___/
+
+  vc-files:
+    profiles: ["", vc-lodestar, vc-lighthouse, vc-nimbus, vc-prysm, vc-teku]
+    image: obolnetwork/charon:${CHARON_VERSION:-v2.0.0-rc2}
+    depends_on: [charon]
+    entrypoint: /opt/vc-files/run.sh
+    environment:
+      VC: ${VC:-vc-lodestar}
+      # Before the gloas fork the proposer config holds no builders: builder proposals are enabled on the VC as on charon.
+      CHARON_BUILDER_API: ${BUILDER_API_ENABLED:-true}
+    volumes:
+      - ./vc-files/run.sh:/opt/vc-files/run.sh
+      - .charon:/opt/charon/.charon
+    restart: "no"
+
   #  _           _           _
   # | | ___   __| | ___  ___| |_ __ _ _ __
   # | |/ _ \ / _` |/ _ \/ __| __/ _` | '__|
@@ -185,19 +205,21 @@ services:
   lodestar:
     image: chainsafe/lodestar:${LODESTAR_VERSION:-v1.50.1}
     profiles: [""]
-    depends_on: [charon]
+    depends_on:
+      charon:
+        condition: service_started
+      vc-files:
+        condition: service_completed_successfully
     entrypoint: /opt/lodestar/run.sh
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
-      BUILDER_SELECTION: ${BUILDER_SELECTION:-builderalways}
     labels:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
       - ./lodestar/run.sh:/opt/lodestar/run.sh
-      - .charon/validator_keys:/home/charon/validator_keys
+      - .charon/vc-files:/opt/charon/vc-files
       - ./data/lodestar:/opt/data
     restart: unless-stopped
 

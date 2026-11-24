@@ -60,7 +60,7 @@ mv output .charon
 docker compose up -d charon lodestar
 ```
 
-Lodestar's boot script (`lodestar/run.sh`) will automatically import all keys, removing any existing keys and cache. Charon will load the new `cluster-lock.json` and recognize all validators in the cluster.
+Before the validator client starts, the `vc-files` service writes its keystores, proposer settings and flags from `.charon` with `charon alpha validator keys` and `charon alpha validator config`, and the validator client's boot script (e.g. `lodestar/run.sh`) replaces any existing keys and cache with them. Charon will load the new `cluster-lock.json` and recognize all validators in the cluster.
 
 Steps 4–6 must be performed independently by all node operators, likely at different times. During this process, some nodes will use the old configuration and others the new one. Once the number of upgraded nodes reaches the BFT threshold, the newly added validators will begin participating in the cluster.
 

@@ -1,71 +1,52 @@
 #!/bin/bash
 
+set -e
+
+# The vc-files service leaves Teku's keystores and proposer config in .charon/vc-files before this starts.
+CHARON_KEYS_DIR="/opt/charon/vc-files/keys"
+CHARON_CONFIG_DIR="/opt/charon/vc-files/config"
+VC_DATA_DIR="/home/data"
+VC_KEYS_DIR="${VC_DATA_DIR}/keystores"
+
 # Docker creates missing bind mount directories as root. Start as root only to
-# hand /home/data to uid 1000, then re-run this script as uid 1000.
+# hand the data directory to uid 1000, then re-run this script as uid 1000.
 if [ "$(id -u)" = "0" ]; then
-  chown -R 1000:1000 /home/data
-  chmod 700 /home/data
+  chown -R 1000:1000 "${VC_DATA_DIR}"
+  chmod 700 "${VC_DATA_DIR}"
   HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
 fi
 
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
-PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-for _ in $(seq 60); do
-    [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
-    sleep 2
-done
+if [ -d "${CHARON_KEYS_DIR}" ]; then
+    # Copy validator keys to VC directory
+    echo "Importing validator keys..."
+    rm -rf "${VC_KEYS_DIR}"
+    cp -r "${CHARON_KEYS_DIR}/keystores" "${VC_KEYS_DIR}"
+    echo "Imported $(ls "${VC_KEYS_DIR}"/*.json | wc -l) keystores"
 
-# Render Teku's proposer config from the charon-generated canonical config when available:
-# entries only carry fields diverging from default_config, absent fields fall back to it.
-# Otherwise fall back to a zero default fee recipient, which charon overrides pre-gloas.
-PROPOSER_CONFIG=()
-if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
-    echo "proposer-config.json found, rendering teku proposer config"
-    jq --argjson enabled "${BUILDER_API_ENABLED}" '
-        .default_config as $d |
-        {
-            proposer_config: (.proposer_config | map_values({
-                fee_recipient: (.fee_recipient // $d.fee_recipient),
-                builder: {enabled: $enabled, gas_limit: (.gas_limit // $d.gas_limit)}
-            })),
-            default_config: {
-                fee_recipient: $d.fee_recipient,
-                builder: {enabled: $enabled, gas_limit: $d.gas_limit}
-            }
-        }' "${PROPOSER_CONFIG_FILE}" >/tmp/teku-proposer-config.json
-    PROPOSER_CONFIG+=(--validators-proposer-config="/tmp/teku-proposer-config.json")
+    # Copy proposer preferences config to VC directory
+    # Copy builder preferences config to VC directory: Teku takes both from its proposer config file
+    echo "Importing proposer and builder preferences config..."
+    cp "${CHARON_CONFIG_DIR}/teku-proposer-config.json" "${VC_DATA_DIR}/"
+    echo "Imported proposer and builder preferences config to ${VC_DATA_DIR}/teku-proposer-config.json"
+
+    # Teku runs from its own copy, .charon keeps none.
+    rm -rf "${CHARON_KEYS_DIR}" "${CHARON_CONFIG_DIR}"
 else
-    echo "proposer-config.json not found, running with zero default fee recipient"
-    PROPOSER_CONFIG+=(--validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000")
-fi
-
-# From the gloas fork, Teku signs builder request auths for the builders in --Xbuilder-urls one
-# epoch ahead for charon to aggregate. Its builder settings are global, so per-builder overrides
-# don't apply.
-BUILDER_ARGS=()
-if [[ -f "${PROPOSER_CONFIG_FILE}" ]] && jq -e '.default_config.builder.builders[0]' "${PROPOSER_CONFIG_FILE}" >/dev/null; then
-    builder() { jq -r ".default_config.builder.$1" "${PROPOSER_CONFIG_FILE}"; }
-    BUILDER_ARGS=(
-        --Xbuilder-urls="$(jq -r '[.default_config.builder.builders[].url] | join(",")' "${PROPOSER_CONFIG_FILE}")"
-        --Xbuilder-min-bid="$(builder min_bid)"
-        --Xbuilder-boost-factor="$(builder builder_boost_factor)"
-        --Xbuilder-max-execution-payment="$(builder max_execution_payment)"
-    )
+    echo "Nothing to import in .charon/vc-files, starting with the validator keys and settings imported before"
 fi
 
 exec /opt/teku/bin/teku validator-client \
     --beacon-node-api-endpoint "${BEACON_NODE_ADDRESS}" \
     --network="${NETWORK}" \
-    --data-base-path=/home/data \
-    --validator-keys="/opt/charon/validator_keys:/opt/charon/validator_keys" \
+    --data-base-path="${VC_DATA_DIR}" \
+    --validator-keys="${VC_KEYS_DIR}:${VC_KEYS_DIR}" \
     --validators-keystore-locking-enabled false \
     --validators-external-signer-slashing-protection-enabled true \
     --validators-builder-registration-default-enabled "${BUILDER_API_ENABLED}" \
-    --Xobol-dvt-integration-enabled true \
+    --validators-proposer-config="${VC_DATA_DIR}/teku-proposer-config.json" \
     --Xvalidator-client-beacon-api-executor-threads=50 \
     --metrics-enabled=true \
     --metrics-interface=0.0.0.0 \
     --metrics-port=8008 \
     --metrics-host-allowlist="*" \
-    "${PROPOSER_CONFIG[@]}" \
-    "${BUILDER_ARGS[@]}"
+    --Xobol-dvt-integration-enabled=true

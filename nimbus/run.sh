@@ -1,98 +1,58 @@
 #!/usr/bin/env bash
 
+set -e
+
+# The vc-files service leaves Nimbus's keystores, per-validator proposer settings and flags in .charon/vc-files
+# before this starts, in Nimbus's own layout: a directory per validator with its keystore and settings, the
+# passwords apart.
+CHARON_KEYS_DIR="/opt/charon/vc-files/keys"
+CHARON_CONFIG_DIR="/opt/charon/vc-files/config"
+VC_DATA_DIR="/home/user/data"
+VC_KEYS_DIR="${VC_DATA_DIR}/validators"
+VC_SECRETS_DIR="${VC_DATA_DIR}/secrets"
+
 # Docker creates missing bind mount directories as root. Start as root only to
-# hand /home/user/data to uid 1000, then re-run this script as uid 1000.
+# hand the data directory to uid 1000, then re-run this script as uid 1000.
 if [ "$(id -u)" = "0" ]; then
-  chown -R 1000:1000 /home/user/data
-  chmod 700 /home/user/data
+  chown -R 1000:1000 "${VC_DATA_DIR}"
+  chmod 700 "${VC_DATA_DIR}"
   HOME="$(getent passwd 1000 | cut -d: -f6)" exec setpriv --reuid=1000 --regid=1000 --init-groups "$0" "$@"
 fi
 
-# Remove previously imported keys, but keep the slashing protection DB
-# (validators/slashing_protection.sqlite3*) across restarts.
-rm -rf /home/user/data/secrets /home/user/data/validators/0x*
+if [ -d "${CHARON_KEYS_DIR}" ]; then
+    # Replace the keystores and settings, but keep the slashing protection DB
+    # (validators/slashing_protection.sqlite3*).
+    rm -rf "${VC_SECRETS_DIR}" "${VC_KEYS_DIR}"/0x*
+    mkdir -p "${VC_KEYS_DIR}"
 
-# Refer: https://nimbus.guide/keys.html
-# Running a nimbus VC involves two steps which need to run in order:
-# 1. Importing the validator keys
-# 2. And then actually running the VC
-tmpkeys="/home/validator_keys/tmpkeys"
-mkdir -p ${tmpkeys}
+    # Copy validator keys to VC directory
+    echo "Importing validator keys..."
+    cp -r "${CHARON_KEYS_DIR}/secrets" "${VC_SECRETS_DIR}"
+    cp -r "${CHARON_KEYS_DIR}/validators"/0x* "${VC_KEYS_DIR}/"
+    echo "Imported $(ls -d "${VC_KEYS_DIR}"/0x* | wc -l) keystores"
 
-for f in /home/validator_keys/keystore-*.json; do
-  echo "Importing key ${f}"
+    # Copy proposer preferences config to VC directory: each validator's directory holds its settings beside its keystore
+    echo "Importing proposer preferences config..."
+    cp -r "${CHARON_CONFIG_DIR}/validators"/0x* "${VC_KEYS_DIR}/"
+    echo "Imported proposer preferences config to ${VC_KEYS_DIR}"
 
-  # Read password from keystore-*.txt into $password variable.
-  password=$(<"${f//json/txt}")
+    # Copy builder preferences config to VC directory: Nimbus takes it as flags only, so vc-flags.txt holds them with
+    # the flags a distributed validator needs.
+    echo "Importing builder preferences config as flags..."
+    cp "${CHARON_CONFIG_DIR}/vc-flags.txt" "${VC_DATA_DIR}/"
+    echo "Imported builder preferences config as flags from vc-flags.txt: Nimbus doesn't read a builder config file"
 
-  # Copy keystore file to tmpkeys/ directory.
-  cp "${f}" "${tmpkeys}"
-
-  # Import keystore with the password.
-  echo "$password" |
-    /home/user/nimbus_beacon_node deposits import \
-      --data-dir=/home/user/data \
-      /home/validator_keys/tmpkeys
-
-  # Delete tmpkeys/keystore-*.json file that was copied before.
-  filename="$(basename ${f})"
-  rm "${tmpkeys}/${filename}"
-done
-
-# Delete the tmpkeys/ directory since it's no longer needed.
-rm -r ${tmpkeys}
-
-echo "Imported all keys"
-
-# On a fresh setup charon writes proposer-config.json shortly after it starts, wait for it.
-PROPOSER_CONFIG_FILE="/opt/charon/node/vc-config/proposer-config.json"
-for _ in $(seq 60); do
-  [[ -f "${PROPOSER_CONFIG_FILE}" ]] && break
-    sleep 2
-done
-
-if [[ -f "${PROPOSER_CONFIG_FILE}" ]]; then
-  echo "proposer-config.json found, rendering per-validator proposer settings"
-
-  # Resolve each imported validator's settings: proposer_config entries only carry
-  # fields diverging from default_config, absent fields fall back to it.
-  config="${PROPOSER_CONFIG_FILE}"
-  for f in /home/validator_keys/keystore-*.json; do
-    pubkey="0x$(jq -r .pubkey "${f}")"
-    fee_recipient=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].fee_recipient // .default_config.fee_recipient' "${config}")
-    gas_limit=$(jq -r --arg pk "${pubkey}" '.proposer_config[$pk].gas_limit // .default_config.gas_limit' "${config}")
-
-    for dir in "/home/user/data/validators/${pubkey}" "/home/user/data/validators/${pubkey#0x}"; do
-      if [[ -d "${dir}" ]]; then
-        echo "${fee_recipient}" >"${dir}/suggested_fee_recipient.hex"
-        echo "${gas_limit}" >"${dir}/suggested_gas_limit.json"
-      fi
-    done
-  done
+    # Nimbus runs from its own copy, .charon keeps none.
+    rm -rf "${CHARON_KEYS_DIR}" "${CHARON_CONFIG_DIR}"
 else
-  echo "proposer-config.json not found, running without proposer settings"
+    echo "Nothing to import in .charon/vc-files, starting with the validator keys and settings imported before"
 fi
 
-# Nimbus takes a single builder: pass the first of charon's builders, whose request auth it
-# signs inline with each gloas block request for charon to aggregate.
-BUILDER_ARGS=()
-if [[ -f "${PROPOSER_CONFIG_FILE}" ]] && jq -e '.default_config.builder.builders[0]' "${PROPOSER_CONFIG_FILE}" >/dev/null; then
-  builder() { jq -r ".default_config.builder as \$d | \$d.builders[0].$1 // \$d.$1" "${PROPOSER_CONFIG_FILE}"; }
-  BUILDER_ARGS=(
-    --payload-builder-url="$(builder url)"
-    --builder-min-bid="$(builder min_bid)"
-    --builder-boost-factor="$(builder builder_boost_factor)"
-    --builder-max-execution-payment="$(builder max_execution_payment)"
-  )
-fi
+mapfile -t VC_FLAGS <"${VC_DATA_DIR}/vc-flags.txt"
 
-# Now run nimbus VC
 exec /home/user/nimbus_validator_client \
-  --data-dir=/home/user/data \
+  --data-dir="${VC_DATA_DIR}" \
   --beacon-node="${BEACON_NODE_ADDRESS}" \
-  --doppelganger-detection=false \
   --metrics \
   --metrics-address=0.0.0.0 \
-  --payload-builder="${BUILDER_API_ENABLED}" \
-  "${BUILDER_ARGS[@]}" \
-  --distributed
+  "${VC_FLAGS[@]}"
