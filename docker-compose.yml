@@ -189,6 +189,8 @@ services:
     entrypoint: /opt/vc-files/run.sh
     environment:
       VC: ${VC:-vc-lodestar}
+      # Before the gloas fork the proposer config holds no builders: builder proposals are enabled on the VC as on charon.
+      CHARON_BUILDER_API: ${BUILDER_API_ENABLED:-true}
     volumes:
       - ./vc-files/run.sh:/opt/vc-files/run.sh
       - .charon:/opt/charon/.charon
@@ -213,7 +215,6 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${LODESTAR_ALLOY_MONITORED:-true}"
     volumes:

@@ -34,7 +34,6 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_LODESTAR_ALLOY_MONITORED:-true}"
     volumes:
@@ -59,7 +58,6 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_LIGHTHOUSE_ALLOY_MONITORED:-true}"
     volumes:
@@ -84,7 +82,6 @@ services:
     networks: [dvnode]
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_NIMBUS_ALLOY_MONITORED:-true}"
     volumes:
@@ -109,7 +106,6 @@ services:
     environment:
       BEACON_NODE_ADDRESS: http://charon:3600
       NETWORK: ${NETWORK}
-      BUILDER_API_ENABLED: ${BUILDER_API_ENABLED:-true}
     labels:
       - "alloy-monitored=${VC_PRYSM_ALLOY_MONITORED:-true}"
     volumes:
