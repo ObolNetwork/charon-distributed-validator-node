@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # The vc-files service leaves Lighthouse's keystores, validator and builder definitions in .charon/vc-files before
 # this starts, in Lighthouse's own layout: a directory per validator with its keystore, the passwords apart.
 CHARON_KEYS_DIR="/opt/charon/vc-files/keys"

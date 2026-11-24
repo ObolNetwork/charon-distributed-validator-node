@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # The vc-files service leaves Prysm's wallet and proposer settings in .charon/vc-files before this starts. The
 # wallet holds this node's key shares and its password file, so Prysm needs no import.
 CHARON_KEYS_DIR="/opt/charon/vc-files/keys"

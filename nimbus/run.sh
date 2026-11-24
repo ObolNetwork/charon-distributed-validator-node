@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # The vc-files service leaves Nimbus's keystores, per-validator proposer settings and flags in .charon/vc-files
 # before this starts, in Nimbus's own layout: a directory per validator with its keystore and settings, the
 # passwords apart.

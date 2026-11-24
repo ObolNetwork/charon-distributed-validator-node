@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # The vc-files service leaves Lodestar's keystores and proposer settings in .charon/vc-files before this starts.
 CHARON_KEYS_DIR="/opt/charon/vc-files/keys"
 CHARON_CONFIG_DIR="/opt/charon/vc-files/config"
