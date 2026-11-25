@@ -2031,7 +2031,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "label_replace(\n  histogram_quantile(0.90, sum(rate(block_arrival_latency_milliseconds_bucket[5m])) by (le, instance)) / 1000\n  or on() histogram_quantile(0.90, sum(rate(beacon_block_delay_bucket[5m])) by (le, instance))\n  or on() histogram_quantile(0.90, sum(rate(lodestar_gossip_block_elapsed_time_till_received_bucket[5m])) by (le, instance))\n  or on() histogram_quantile(0.90, sum(rate(beacon_block_gossip_slot_start_delay_time_bucket[5m])) by (le, instance)),\n  \"cl\", \"$2\", \"instance\", \"(cl-)?([a-z]+):[0-9]+\"\n)",
+          "expr": "label_replace(\n  histogram_quantile(0.90, sum(rate(block_arrival_latency_milliseconds_bucket[5m])) by (le, instance)) / 1000\n  or on() histogram_quantile(0.90, sum(rate(beacon_block_delay_bucket[5m])) by (le, instance))\n  or on() histogram_quantile(0.90, sum(rate(lodestar_gossip_block_elapsed_time_till_received_seconds_bucket[5m])) by (le, instance))\n  or on() histogram_quantile(0.90, sum(rate(lodestar_gossip_block_elapsed_time_till_received_bucket[5m])) by (le, instance))\n  or on() histogram_quantile(0.90, sum(rate(beacon_block_gossip_slot_start_delay_time_bucket[5m])) by (le, instance)),\n  \"cl\", \"$2\", \"instance\", \"(cl-)?([a-z]+):[0-9]+\"\n)",
           "legendFormat": "{{cl}}",
           "range": true,
           "refId": "A"
